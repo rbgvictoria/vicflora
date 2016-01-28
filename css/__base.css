@@ -1,0 +1,235 @@
+/* 
+    Document   : base
+    Created on : 28/01/2014, 12:14:47 PM
+    Author     : NKlaze
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+html, body {
+	height: 100%;
+}
+
+#container {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin: 0 auto -70px; /* the bottom margin is the negative value of the footer's height */
+}
+#footer, .push {
+	height: 70px; /* .push must be the same height as .footer */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Lucida Grande', Verdana, Geneva, Sans-serif;
+    font-size: 75%;
+    color: #000;
+}
+
+#container {
+    margin-top: 0px;
+    background-color: #ffffff;
+}
+
+#banner {
+    height: 130px;
+    border-bottom: solid 0.1em #2f8a26;
+}
+
+#banner-content {
+    height: 130px;
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo {
+    float: left;
+    width: 120px;
+    background-color: white;
+    text-align: center;
+    margin-left: -1.5em;
+}
+
+.header {
+    float: left;
+    padding: 15px 10px 0px 10px;
+    margin-bottom: -25px;
+}
+
+.title {
+    padding-left: 0.5em;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 3em;
+}
+
+.subtitle {
+    margin-top: 0;
+    margin-bottom: 0.2em;
+    padding-left: 0.85em;
+    font-size: 1.65em;
+}
+
+#userinfo {
+    text-align: right;
+    margin-top: 48px;
+    padding-right: 10px;
+}
+
+.main-menu {
+    padding-top: 18px;
+}
+
+#main {
+    clear: both;
+}
+
+#footer {
+    clear: both;
+    border-top: solid 0.3em #2f8a26;
+}
+
+#footer footer {
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#footer div {
+    float: right;
+    padding: 0.7em 1em;
+}
+
+.copyright {
+    margin-top: 0.7em;
+}
+
+.main-menu ul {
+    margin: 0;
+    padding-left: 0;
+}
+
+.main-menu li {
+    display: inline-block;
+    list-style-type: none;
+    padding: 0 1em;
+}
+
+.main-menu li:first-of-type {
+    padding-left: 0.5em;
+}
+
+.main-menu li:last-of-type {
+    padding-right: 0.5em;
+}
+
+.main-menu a {
+    color: #2f8a26;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+#main-content {
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px 10px 25px 10px;
+}
+
+#main_panel {
+    width: 740px;
+    float: left;
+    padding-right: 10px;
+}
+
+#side_panel {
+    width: 240px;
+    float: right;
+    background-color: #eeeeee;
+    padding-left: 10px;
+    padding-bottom: 20px;
+}
+
+#full-width-panel {
+    width: 1024px;
+    margin: 0;
+    clear: both;
+}
+
+@media screen and (min-width: 1024px) {
+    #left-side-panel {
+        width: 240px;
+        float: left;
+        padding-bottom: 20px;
+    }
+
+    #right-side-panel {
+        width: 240px;
+        float: right;
+        background-color: #eeeeee;
+        padding-left: 10px;
+        padding-bottom: 20px;
+    }
+
+    #left-main-panel {
+        width: 740px;
+        float: left;
+        padding-right: 10px;
+    }
+
+    #right-main-panel {
+        width: 740px;
+        float: right;
+        padding-left: 10px;
+    }
+}
+
+h2 {
+    color: #aaa;
+    letter-spacing: -1px;
+}
+
+h3 {
+    color: #aaaaaa;
+}
+
+label {
+    display: inline-block;
+    width: 75px;
+    margin-right: 10px;
+}
+
+table {
+    border-collapse: collapse;
+    border-right-style: solid;
+    border-left-style: solid;
+    border-bottom-style: solid;
+    border-top-style: solid;
+    border-right-width: 1px;
+    border-left-width: 1px;
+    border-bottom-width: 1px;
+    border-top-width: 1px;
+    border-right-color: #cccccc;
+    border-left-color: #cccccc;
+    border-bottom-color: #cccccc;
+    border-top-color: #cccccc;
+}
+
+td, th {
+    border-right-style: solid;
+    border-left-style: solid;
+    border-bottom-style: solid;
+    border-top-style: solid;
+    border-right-width: 1px;
+    border-left-width: 1px;
+    border-bottom-width: 1px;
+    border-top-width: 1px;
+    border-right-color: #cccccc;
+    border-left-color: #cccccc;
+    border-bottom-color: #cccccc;
+    border-top-color: #cccccc;
+    padding: 3px 10px;
+}

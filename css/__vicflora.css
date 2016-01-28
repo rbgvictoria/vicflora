@@ -1,0 +1,687 @@
+/* 
+    Document   : vicflora
+    Created on : 28/01/2014, 12:14:56 PM
+    Author     : NKlaze
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.title {
+    color: #2f8a26;
+}
+
+label.namelinks {
+    width: 150px;
+    font-weight: bold;
+}
+
+.search {
+    margin-bottom: 1em;
+}
+
+
+.clear-all a,
+.download-submit a, .download a, .back-to-search a {
+    text-decoration: none;
+    padding: 2px 4px;
+    border: solid 1px #999;
+    border-radius: 4px;
+    background-color: #ddd;
+    color: #2f8a26;
+}
+
+.more, .fewer  {
+    text-decoration: none;
+    color: #2f8a26;
+    margin-left: 17px;
+}
+
+.apply-filter {
+    text-decoration: none;
+    color: #2f8a26;
+    padding: 0.125rem 0.5rem;
+    border: solid 1px #aaa;
+    background-color: #eee;
+    border-radius: 1rem;
+}
+.more:after, .fewer:after {
+    content: " ...";
+}
+
+.facet-footer {
+    /*text-align: right;*/
+    padding-left: 3px;
+    /*margin-top: 0.3em;*/
+}
+
+.name {
+    margin-bottom: 6px;
+    vertical-align: top;
+}
+
+.name a {
+    text-decoration: none;
+    color: #000;
+}
+
+span.indent {
+    display: inline-block;
+    width: 1.5em;
+}
+
+span.taxon-rank {
+    display: inline-block;
+    width: 10em;
+    color: #999;
+}
+
+.classification .currentname {
+    padding: 0.3em 0;
+}
+
+.cl-separator-higher,
+.cl-separator-subordinate {
+    width: 100%;
+    text-align: right;
+}
+
+.cl-separator-higher {
+    padding: 0.3em 0;
+    border-bottom: solid 1px #2f8a26;
+}
+
+.cl-separator-subordinate {
+    padding: 0.3em 0;
+    border-top: solid 1px #2f8a26;
+}
+
+.cl-separator-higher .ui-icon, .cl-separator-subordinate .ui-icon {
+    display: inline-block;
+}
+
+.classification.currenttaxon {
+    padding: 0.8em 0;
+}
+
+.section {
+    padding-top: 0.4em;
+    margin-bottom: 0.5em;
+}
+
+.status {
+    margin-bottom: 2em;
+}
+
+.status p {
+    margin: 0.5em 0;
+}
+
+.area {
+    margin: 0.3em 0;
+}
+
+.area-source {
+    color: #999;
+    margin-bottom: 0.8em;
+}
+
+/*.status, .protologue, .taxon-name {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}*/
+
+#tabs {
+    border: none;
+    padding: 0;
+    font-size:  0.875rem;
+}
+
+#tabs .ui-widget-header {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    border-bottom: solid 0.1em #2f8a26;
+    border-radius: 0;
+    padding-left: 10px;
+}
+
+#tabs .ui-state-default {
+    border: solid 1px #fff;
+    background-color: transparent;
+    background-image: none;
+}
+
+#tabs .ui-state-default a {
+    font-weight: bold;
+    color: #aaa;
+}
+
+#tabs .ui-tabs-active a {
+    color: #2f8a26;
+}
+
+#tabs .ui-state-default a:focus {
+    outline: 0;
+}
+
+#tabs .ui-tabs-panel {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+.ibra {
+    width: 50%;
+    float: left;
+}
+
+
+#status {
+
+}
+
+#status span.status_label {
+    display: inline-block;
+    width: 140px;
+}
+
+.links {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.links a {
+    border: 1px solid #339933;
+    border-radius: 5px;
+    padding: 5px 5px 5px 5px;
+    background-color: #f4f4f4;
+    text-decoration: none;
+    color: #339933;
+    font-weight: bold;
+}
+
+.links a:hover {
+    background-color: #ddeedd;
+}
+
+#classification h3,
+#status h3,
+#lowertaxa h3 {
+    margin-bottom: 0px;
+}
+
+#classification .rank {
+    display: inline-block;
+    width: 70px;
+    margin-right: 5px;
+}
+
+#classification a {
+    text-decoration: none;
+    color: #339933;
+}
+
+#lowertaxa a {
+    text-decoration: none;
+    color: #000000;
+}
+
+#lowertaxa a .family,
+#lowertaxa a .genus,
+#lowertaxa a .species,
+#lowertaxa a .spepithet,
+#lowertaxa a .infraepithet {
+    color: #339933;
+}
+
+/* links */
+div.links {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.links span a{
+    display: inline-block;
+    min-width: 15px;
+    margin: 1px;
+    padding: 3px 5px 3px 5px;
+    border: 2px solid #339933;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #339933;
+    font-weight: bold;
+    text-align: center;
+}
+
+div.links span.current {
+    display: inline-block;
+    min-width: 15px;
+    margin: 1px;
+    padding: 3px 5px 3px 5px;
+    border: 2px solid #000000;
+    border-radius: 3px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* browse */
+#list a {
+    text-decoration: none;
+}
+
+#list>div {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#alphabet span.nolink {
+    margin: 1px;
+    padding: 5px 9px 5px 9px;
+    border: 2px solid #000000;
+    border-radius: 3px;
+    color: #000000;
+    font-weight: bold;
+    width: 100%;
+    height: 100%;
+}
+
+#alphabet .letter a {
+    margin: 1px;
+    padding: 5px 9px 5px 9px;
+    border: 2px solid #339933;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #339933;
+    font-weight: bold;
+    width: 100%;
+    height: 100%;
+}
+
+
+#alphabet a {
+}
+
+/* classification browser */
+#higher_classification {
+    padding-left: 30px;
+    background-image: url('../images/arrow_up.gif');
+    background-repeat: no-repeat;
+}
+
+#this_taxon {
+    padding-left: 30px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#this_taxon a {
+    text-decoration: none;
+}
+
+#subordinate_taxa {
+    padding-left: 30px;
+    background-image: url('../images/arrow_down.gif');
+    background-repeat: no-repeat;
+    padding-bottom: 10px;
+}
+
+hr {
+    color: #339933;
+    height: 0px;
+}
+
+#higher_classification a,
+#this_taxon a,
+#subordinate_taxa a {
+    color: #000000;
+}
+#otherfloras div a {
+    text-decoration: none;
+}
+
+#otherfloras div img, #specimendata img, #specimendata .image_button input {
+    margin: 3px;
+    border: 1px solid #999999;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+#specimendata div.ala_options {
+    clear: both;
+}
+
+#specimendata div.ala_options div.col1, 
+#specimendata div.ala_options div.col2, 
+#specimendata div.ala_options div.col3 
+{
+    float: left;
+}
+
+.scientific_name {
+    font-style: italic;
+}
+
+
+/* solr search */
+.facet li>label>a {
+    text-align: left;
+    color: #2f8a26;
+    text-decoration: none;
+}
+
+.fqs {
+    margin-bottom: 5px;
+}
+
+.download-fields {
+    clear: both;
+}
+
+.column-left {
+    width: 50%;
+    float: left;
+}
+
+.column-left label {
+    width: auto;
+}
+
+.column-left p:first-child,
+.column-left h4:first-child {
+    margin-top: -5px;
+}
+
+div.spacer {
+    height: 0px;
+    clear: both;
+}
+
+.download-submit {
+    text-align: center;
+}
+
+span.spacer {
+    display: inline-block;
+    width: 2rem;
+}
+
+#change-parent a, #assign_to_taxon a {
+    color: #2f8a26;
+    text-decoration: underline;
+}
+
+#new_parent, #new_taxon {
+    display: none;
+}
+
+#new_accepted_name {
+    display: inline-block;
+    margin-left: 1rem;
+    color: #2f8a26;
+    font-weight: bold;
+}
+
+/* Common names table in Edit form */
+.common-names, .apni-name-match {
+    margin-left: 0.625rem;
+}
+
+.common-names td, .common-names th,
+.apni-name-match td, .apni-name-match th {
+    text-align: left;
+    border: solid 0.0625rem #a9a9a9;
+}
+
+.common-names th, .apni-name-match th {
+    background-color: #ccc;
+}
+
+.common-names td [type=text] {
+    border: none;
+}
+
+.common-names .undo {
+    float: none;
+}
+
+.common-names tbody td:nth-child(2) .undo {
+    display: none;
+}
+
+.new-common-name-row {
+    padding-left: 0.625rem;
+}
+
+.apni-name-match th:nth-child(1), .apni-name-match th:nth-child(3) {
+    width: 174px;
+}
+
+.apni-name-match th:nth-child(2) {
+    width: 404px;
+}
+
+.apni-name-match th:nth-child(4), .apni-name-match th:nth-child(5) {
+    width: 52px;
+}
+
+.new-apni-row {
+    padding-left: 0.625rem;
+}
+
+.apni-manual {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.find-in-apni {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.find-in-apni-dialog {
+    display: none;
+}
+
+div#tab-images .thumb {
+    display: inline-block;
+    width: 138px;
+    height: 138px;
+    margin: 5px;
+    border: solid 1px #ccc;
+    text-align: center;
+    padding: 3px;
+    vertical-align: middle;
+}
+
+.image-frame {
+    
+}
+
+.image-innerframe {
+    width: 100%;
+    text-align: center;
+}
+
+.bioregions {
+    
+}
+
+.bioregions td, .bioregions th,
+.occurrences-at-point td, .occurrences-at-point {
+    padding: 0 0.375rem;
+    border: solid 0.0625rem #aaaaaa;
+}
+
+.bioregions th,
+.occurrences-at-point th {
+    background-color: #cccccc;
+}
+
+span.legend-item {
+    line-height: 0.75;
+}
+
+span.legend-symbol {
+    display: inline-block;
+    height: 15px;
+    width: 30px;
+    border: solid 1px #aaaaaa;
+}
+
+.legend-item .legend-symbol {
+    position: relative;
+    top: 4px;
+}
+
+td .legend-symbol {
+    height: 14px;
+    position: relative;
+    top: 2px;
+}
+
+span.legend-label {
+    display: inline-block;
+    margin-left: 10px;
+    margin-left: 0.625rem;
+}
+
+
+
+.bioregions-link {
+    margin-top: 0.5rem;
+}
+
+#term-list {
+    width: 100%;
+    height: 400px;
+}
+
+.checklist h4, .checklist h3 {
+    margin-bottom: 3px;
+    margin-bottom: 0.1875rem;
+}
+
+.checklist h4 {
+    margin-top: 12px;
+    margin-top: 0.75rem;
+}
+
+.checklist h3+h4 {
+    margin-top: 3px;
+    margin-top: 0.1875rem;
+}
+
+.checklist h3 {
+    color: #aaaaaa;
+}
+
+#capad_map {
+    width: 600px;
+    height: 363px;
+}
+
+#edit_distribution_map {
+    width: 840px;
+    height: 490px;
+}
+
+#mouse-position {
+    height: 1rem;
+    width: 840px;
+    margin-bottom: 1rem;
+    text-align: right;
+}
+
+.capad-areas td, .capad-areas th {
+    border-collapse: collapse;
+    border: solid 1px #ccc;
+    padding: 0.3125rem;
+}
+
+.capad-areas th {
+    background-color: #eee;
+}
+
+.flora-links ul {
+    padding-left: 0;
+}
+
+li.flora-link {
+    list-style-type: none;
+}
+
+li.flora-link a {
+    display: inline-block;
+    margin-bottom: 5px;
+    min-width: 145px;
+    border: solid 1px #aaa;
+    border-radius: 5px;
+    padding: 4px;
+    padding-right: 14px;
+    text-align: center;
+}
+
+#svg-avhdistribution {
+    width: 25rem;
+    height: 15.125rem;
+}
+
+.back-link {
+    width: 100%;
+    text-align: right;
+}
+
+.back-link a {
+    display: inline-block;
+    margin: 3px 10px;
+    padding: 3px 5px;
+    background-color: #2f8a26;
+    color: #ffffff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.taxon-name h2, .protologue, .apni, .status {
+    margin: 7px;
+}
+
+.checklist-source {
+}
+
+.checklist-source .label {
+    display: inline-block;
+    width: 4rem;
+    font-weight: bold;
+}
+
+.checklist-source .value {
+    vertical-align: top;
+    display: inline-block;
+}
+
+#nodelist {
+    margin-bottom: 1rem;
+}
+
+.facets li.indent {
+    margin-left: 1rem;
+}
+
+/* Static page edit link
+-------------------------------------------*/
+.edit-static {
+  float: right;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.edit-static a {
+  text-decoration: none;
+  padding: 5px 10px;
+  display: inline-block;
+  background-color: #33bb33;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 4px;
+}

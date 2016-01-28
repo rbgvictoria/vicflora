@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/errors/error_general.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/map/update.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/header.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/map/index.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/js/jquery.vicflora.openlayers.js</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/models/mapmodel.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/js/colorbox/jquery.vicflora.colorbox.js</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/css/vicflora.admin.css</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/controllers/admin.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/models/edittaxonmodel.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/helpers/ala_ws_helper.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/models/taxonmodel.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/models/keybasemodel.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/js/vicflora.js</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/taxon_view.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/js/jquery.vicflora.edit-taxon.js</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/models/checklistmodel.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/key_view.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/helpers/map_helper.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/controllers/flora.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/bioregions_view.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/controllers/ajax.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/models/solrmodel.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/css/vicflora.css</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/map_updates_view.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/ala_matched_names_view.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/helpers/curl_helper.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/controllers/tools.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/views/keybase_update_view.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/libraries/VicFloraMap.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/errors/error_php.php</file>
+            <file>file:/C:/Users/nklaze/Documents/NetBeansProjects/vicflora/libraries/VicFloraTaxonTree.php</file>
+        </group>
+    </open-files>
+</project-private>

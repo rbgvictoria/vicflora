@@ -1,0 +1,54 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 21/08/2015, 7:06:44 PM
+    Author     : nklazenga
+*/
+
+.keybase-player-window h3 {
+    background-color: rgb(127,148,87);
+    font-size: 16px;
+}
+
+.key-title {
+    color: rgb(127,148,87);
+    margin-bottom: 20px;
+}
+
+/*.keybase-player-tokey {
+    display: none;
+}*/
+
+#keybase-lightbox-shadow {
+    z-index: 10000;
+}
+
+#keybase-lightbox {
+    z-index: 10001;
+}
+
+.keybase-local-filter label {
+    background-color: rgb(127,148,87);
+}
+
+.keybase-local-filter-footer button {
+    color: rgb(127,148,87);
+}
+
+.breadcrumbs {
+    min-height: 20px;
+    margin-bottom: -10px;
+}
+
+.breadcrumbs a {
+    display: inline-block;
+    padding-right: 5px; 
+}
+
+.breadcrumbs a::before {
+    content: '> ';
+}
+

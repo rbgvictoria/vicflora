@@ -1,0 +1,96 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 18/06/2015, 5:44:29 PM
+    Author     : NKlaze
+*/
+
+/* Taxon edit menu
+--------------------------------*/
+.taxon-edit-menu {
+    display: none;
+}
+
+@media only screen and (min-width: 768px) {
+    .taxon-edit-menu {
+        display:block;
+    }
+}
+
+.taxon-edit-menu a {
+    text-decoration: none;
+    color: #222;
+    border: solid 1px #aaa;
+    padding: 0.1875rem 1rem;
+    border-radius: 0.3125rem;
+    background-color: #eee;
+}
+
+/* Taxon edit page
+---------------------------------*/
+
+.form-horizontal .control-label.text-left {
+    text-align: left;
+}
+
+.ui-autocomplete {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: left;
+  font: inherit;
+}
+
+#status .ui-autocomplete {
+  z-index: 100000;
+}
+
+.has-changed {
+  background-color: #ff9;
+}
+
+#new_parent, #new_taxon {
+    display: none;
+}
+
+#new_accepted_name {
+  display: inline-block;
+  margin-left: 1rem;
+  color: #2f8a26;
+  font-weight: bold;
+}
+
+.editor-menu, .new-profile {
+    margin: 16px 0;
+}
+
+.record-update {
+    margin-top: 20px;
+    border-top: solid 1px #999;
+}
+
+.record-update .form-group {
+    margin-bottom: 0;
+}
+
+/* Edit distribution page
+------------------------------------*/
+#edit_distribution_map {
+    width: 840px;
+    height: 490px;
+}
+
+/* Edit glossary page
+------------------------------------*/
+h1 .glossary-term-name {
+  color: #2f8a26;
+}
+
+.rel-delete, .rel-add {
+    display: block;
+    width: 100%;
+    text-align: center;
+}

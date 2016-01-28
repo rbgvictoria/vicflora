@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="jquery.jsonview.css" />
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript" src="jquery.jsonview.js"></script>
+        <script>
+        
+        var base = 'http://keybase.rbg.vic.gov.au/dev';
+            
+        $(function() {
+            
+            ajax_jsonp('coupletJSON');
+            
+            $('button').on('click', function() {
+                $('h2').html($(this).html());
+            });
+
+            $('#all').on('click', function() {
+                ajax_jsonp('coupletJSON');
+            });
+            
+            $('#current').on('click', function() {
+                ajax_jsonp('nextCoupletJSON');
+            });
+            
+            $('#path').on('click', function() {
+                ajax_jsonp('pathJSON');
+            });
+            
+            $('#remaining').on('click', function() {
+                ajax_jsonp('remainingItemsJSON');
+            });
+            
+            $('#discarded').on('click', function() {
+                ajax_jsonp('discardedItemsJSON');
+            });
+            
+        });
+        
+        function ajax_jsonp(type) {
+            $.ajax({
+                url: base + '/ajax/' + type + '/1907/245961',
+                dataType: 'jsonp',
+                success:function(data){
+                    $('#console').JSONView(data);
+                }
+            });
+        
+        }
+        </script>
+
+    </head>
+    <body>
+        <div>
+            <button id="all">Entire couplet</button>
+            <button id="current">Current node</button>
+            <button id="path">Path</button>
+            <button id="remaining">Remaining items</button>
+            <button id="discarded">Discarded items</button>
+        </div>
+        <hr />
+        <h2>Entire couplet</h2>
+        <div id="console"></div>
+    </body>
+</html>
