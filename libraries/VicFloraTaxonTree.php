@@ -34,33 +34,27 @@ class VicfloraTaxonTree {
             FROM vicflora_taxon
             WHERE TaxonTreeDefItemID=1";
         $initStmt = $this->db->query($select);
-        
         $this->nodenumber++;
         $depth = 0;
         $row = $initStmt->row();
-        
         $node = new Node();
         $node->TimestampCreated = date('Y-m-d H:i:s');
         $node->TimestampModified = date('Y-m-d H:i:s');
         $node->TaxonID = $row->TaxonID;
         $node->NodeNumber = $this->nodenumber;
         $node->Depth = 0;
-        
         $this->tree[] = (array) $node;
         $this->parentids[] = NULL;
         $this->taxonids[] = $row->TaxonID;
-        
         $this->addNode($row->TaxonID, $depth);
     }
     
     private function addNode($parentid, $depth) {
-        $this->selectStmt->execute(array($parentid));
-        $result = $this->selectStmt->fetchAll(5);
-        if ($result) {
+        $query = $this->db->query($this->selectStmt, array($parentid));
+        if ($query->num_rows()) {
             $depth++;
-            foreach ($result as $row) {
+            foreach ($query->result() as $row) {
                 $this->nodenumber++;
-                
                 $node = new Node();
                 $node->TimestampCreated = date('Y-m-d H:i:s');
                 $node->TimestampModified = date('Y-m-d H:i:s');
@@ -71,11 +65,9 @@ class VicfloraTaxonTree {
                 $node->Depth = $depth;
                 $node->CreatedByID = 1;
                 $node->ModifiedByID = 1;
-                
                 $this->tree[] = (array) $node;
                 $this->taxonids[] = $row->TaxonID;
                 $this->parentids[] = $parentid;
-        
                 $this->addNode($row->TaxonID, $depth);
             }
         }
@@ -85,10 +77,7 @@ class VicfloraTaxonTree {
     }
     
     private function getHighestDescendantNodeNumbers() {
-        //print_r($this->tree);
         foreach ($this->tree as $key=>$node) {
-            //echo $taxon . "\n";
-            
             $this->getHighestDescendant($key, $node['TaxonID']);
         }
         return TRUE;
@@ -113,21 +102,20 @@ class VicfloraTaxonTree {
     }
     
     private function saveTree() {
-        $fields = array_keys($this->tree[0]);
+        /*$fields = array_keys($this->tree[0]);
         $values = array();
-        foreach ($fields as $field)
+        foreach ($fields as $field) {
             $values[] = '?';
+        }
         $fields = implode(',', $fields);
         $values = implode(',', $values);
         $insert = "INSERT INTO vicflora_taxontree ($fields)
-                VALUES ($values)";
-        $insertStmt = $this->db->prepare($insert);
+                VALUES ($values)";*/
         
         foreach ($this->tree as $node) {
-            $insertStmt->execute(array_values($node));
+            $this->db->insert('vicflora_taxontree', $node);
         }
     }
-
 }
 
 class Node {

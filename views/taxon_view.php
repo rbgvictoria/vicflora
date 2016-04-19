@@ -7,7 +7,7 @@
 <div class="container">
 <?php if (isset($this->session->userdata['last_search']) || isset($breadcrumbs)): ?>
     <div class="row">
-        <?php if (isset($breadcrumbs) || isset($siblings)): ?>
+        <?php if (isset($breadcrumbs) || isset($siblings)  || isset($children)): ?>
         <?php if (isset($this->session->userdata['last_search'])): ?>
         <div class="col-md-8">
         <?php else: ?>
@@ -268,7 +268,9 @@
                                     }
                                 }
                                 array_multisort($intr, SORT_ASC, $distStr);
-                                $distr = implode(', ', $distStr) . '.';
+                                if ($distStr) {
+                                    $distr = implode(', ', $distStr) . '.';
+                                }
                             }    
                             if ($namedata['DistA']) {
                                 $distr .= ' ' . $namedata['DistA'];
@@ -281,11 +283,20 @@
                                 $distr .= ' ' . $namedata['DistW'] . '.';
                             }
 
-                            if ($distr && strpos($prof, '<p class="description">') !== FALSE) {
+                            if ($distr && strpos($prof, '<p class="phenology">') !== FALSE) {
+                                $desc = substr($prof, 0, strpos($prof, '</p>', strpos($prof, '<p class="phenology">'))+4);
+                                $remainder = substr($prof, strpos($prof, '</p>', strpos($prof, '<p class="phenology">'))+4);
+                                $prof = $desc . '<p>' . $distr . '</p>' . $remainder;
+                            }
+                            elseif ($distr && strpos($prof, '<p class="description">') !== FALSE) {
                                 $desc = substr($prof, 0, strpos($prof, '</p>')+4);
                                 $remainder = substr($prof, strpos($prof, '</p>')+4);
                                 $prof = $desc . '<p>' . $distr . '</p>' . $remainder;
                             }
+                            
+                            // Add 'References' label for references.
+                            $prof = str_replace('<p class="references">', '<p class="references"><b>References:</b> ', $prof);
+                            
                         ?>
                         
                         <div class="row">
@@ -312,7 +323,7 @@
                         ?>
                         <div class="profile-source">
                             <b>Source: </b><?=$profile[0]['Author'] . ' (' . $profile[0]['PublicationYear'] . '). ' .
-                                $profile[0]['Title'] . '. In: ' . $profile[0]['InAuthor'] . ', <i>' . 
+                                preg_replace('/~([^~]*)~/', '<i>$1</i>', $profile[0]['Title']) . '. In: ' . $profile[0]['InAuthor'] . ', <i>' . 
                                 preg_replace('/(Vol\. [2-4]), /', "</i><b>$1</b>, <i>", $profile[0]['InTitle']) . '</i>. ' . 
                                 $profile[0]['Publisher'] . ', ' . $profile[0]['PlaceOfPublication']; ?><?=($as) ? " ($as)." : '.'; ?>
                         </div>
@@ -331,6 +342,17 @@
                         </div>
                         <?php endif; ?>
                         <?php endif; ?>
+                                
+                        <?php if ($taxonReferences): ?>
+                        <div class="taxon-references">
+                            <div>&nbsp;</div>
+                            <div><b>References</b></div>
+                            <?php foreach ($taxonReferences as $ref): ?>
+                            <p><b><?=$ref->label?>. </b> <?=$ref->description?></p>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+                                
 
                         <?php if ($key): ?>
                         <div>&nbsp;</div>

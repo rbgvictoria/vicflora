@@ -35,7 +35,7 @@
     <script src="http://maps.google.com/maps/api/js"></script>
     <script src="<?=base_url()?>js/OpenLayers/OpenLayers.js" type="text/javascript"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <script src="<?=base_url()?>js/jquery.vicflora.openlayers.js?v=<?=filemtime('js/jquery.vicflora.openlayers.js')?>"></script>
     <script src="<?=base_url()?>js/jquery.keybase.key.js?v=<?=filemtime('js/jquery.keybase.key.js')?>"></script>
     <script src="<?=base_url()?>js/vicflora.js?v=<?=filemtime('js/vicflora.js')?>"></script>

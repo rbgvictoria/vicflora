@@ -38,7 +38,6 @@
 
             ?>
             <div class="profile">
-
                 <?php if ($profile['TaxonomicStatus'] == 'accepted' || count($profiles) == 1 || $index == 0): ?>
                 <div class="profile-editor">
                     <?php if ($as): ?>
@@ -92,7 +91,7 @@
                 <?php if ($profile['Author']): ?>
                 <div class="profile-source">
                     <b>Source: </b><?=$profile['Author'] . ' (' . $profile['PublicationYear'] . '). ' .
-                        $profile['Title'] . '. In: ' . $profile['InAuthor'] . ', <i>' . 
+                        preg_replace('/~([^~]*)~/', '<i>$1</i>', $profile['Title']) . '. In: ' . $profile['InAuthor'] . ', <i>' . 
                         preg_replace('/(Vol\. [2-4]), /', "</i><b>$1</b>, <i>", $profile['InTitle']) . '</i>. ' . 
                         $profile['Publisher'] . ', ' . $profile['PlaceOfPublication'] . '.'; ?>
                 </div>
@@ -111,6 +110,35 @@
                 </div>
                 <?php endif; ?>
                 <?php endif; ?>
+                
+                <h3>References</h3>
+                <div id="taxon-references">
+                    <?php if ($taxonReferences): ?>
+                    <?php foreach ($taxonReferences as $ref): ?>
+                    <p>
+                        <b><?=$ref->label?></b>
+                        <?=anchor(site_url() . 'reference/show/' . $ref->value, '<i class="fa fa-search"></i>'); ?>
+                        <?=anchor(site_url() . 'reference/delete_taxon_reference_ajax/', '<i class="fa fa-trash"></i>', array('class' => 'delete-taxon-reference', 'data-vicflora-reference-id' => $ref->value)); ?><br/>
+                        <?=$ref->description?>
+                    </p>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                         <div class="form-horizontal">
+                            <div class="input-group">
+                                <?=form_input(array('name' => 'reference', 'id' => 'reference-search', 'class' => 'form-control input-sm')); ?>
+                                <?=form_input(array('type' => 'hidden', 'name' => 'reference-id', 'id' => 'reference-id')); ?>
+                                <div class="input-group-addon"><i class="fa fa-search fa-lg"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <?=anchor(site_url() . 'reference/create/', 'New reference', array('class' => 'btn btn-default btn-sm')); ?>
+                    </div>
+                </div>
+                
             </div>
             <?php endforeach; ?>
             <?php endif; ?>

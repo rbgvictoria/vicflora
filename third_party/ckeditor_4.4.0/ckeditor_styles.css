@@ -103,6 +103,15 @@ p.description:before {
     font-weight: bold;
 }
 
+p.phenology {
+    font-style: normal;
+}
+
+p.phenology:before {
+    content: "Phenology: ";
+    font-weight: bold;
+}
+
 p.habitat {
     font-style: normal;
 }
@@ -112,21 +121,21 @@ p.habitat:before {
     font-weight: bold;
 }
 
-p.phenology {
-    font-style: normal;
-}
-
-.phenology:before {
-    content: "Phenology: ";
-    font-weight: bold;
-}
-
 p.note {
     font-style: normal;
 }
 
 p.note:before {
     content: 'Note: ';
+    font-weight: bold;
+}
+
+p.references {
+    font-style: normal;
+}
+
+p.references:before {
+    content: 'References: ';
     font-weight: bold;
 }
 

@@ -47,6 +47,9 @@
         elseif ($image->License == 'All rights reserved') {
             $license = 'All rights reserved';
         }
+        elseif ($image->SubjectCategory == 'Flora of the Otway Plain and Ranges plate') {
+            $license = 'not to be reproduced without prior permission from CSIRO Publishing.';
+        }
         else {
             $license = anchor('https://creativecommons.org/licenses/by/4.0', 'CC BY 4.0');
         }
@@ -69,6 +72,12 @@
             <?=$image->Creator?>, &copy; <?=($image->RightsHolder) ? $image->RightsHolder : 'Royal Botanic Gardens Victoria';?>,
             <?=date('Y')?>, <?=$license?>.
         </p>
+        <?php if ($image->SubjectCategory == 'Flora of the Otway Plain and Ranges plate'): ?>
+        <p>Reproduced with permission from <i>Flora of the Otway Plain and Ranges 1: Orchids, Irises, Lilies, Grass -trees, 
+            Mat-rushes and Other Petaloid Monocotyledons / Flora of the Otway Plain and Ranges 2: Daisies, Heaths, Peas, 
+            Saltbushes, Sundews, Wattles and Other Shrubby and Herbaceous Dicotyledons</i> by Enid Mayfield.
+            Published by CSIRO Publishing</p>
+        <?php endif; ?>
     </div>
 </div>
 <?php endif; ?>

@@ -547,6 +547,7 @@
                             FALSE => '',
                             'native' => 'native',
                             'native (naturalised in part(s) of state)' => 'native and naturalised',
+                            'introduced' => 'introduced',
                             'naturalised' => 'naturalised',
                             'sparingly established' => 'sparingly established',
                             'uncertain' => 'uncertain'

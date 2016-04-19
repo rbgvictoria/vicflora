@@ -46,8 +46,10 @@ $(function(){
         var href = that.attr('href');
         var keyID = href.substr(href.lastIndexOf('/') + 1);
         $('.keybase-link a').attr('href', 'http://keybase.rbg.vic.gov.au/keys/show/' + keyID);
+        var wsUrl = 'http://data.rbg.vic.gov.au/keybase-ws';
         
         $.fn.keybase({
+            baseUrl: wsUrl + "/ws/key_get",
             playerDiv: '#keybase-player',
             key: keyID,
             title: false,
@@ -122,7 +124,7 @@ $(function(){
     
     var discardedItemsDisplay = function(items, itemsDiv) {
         var list = keybaseItemsDisplay(items);
-        $(itemsDiv).eq(0).children('h3').eq(0).html('Remaining items (' + items.length + ')');
+        $(itemsDiv).eq(0).children('h3').eq(0).html('Discarded items (' + items.length + ')');
         $(itemsDiv).eq(0).children('div').eq(0).html('<ul>' + list.join('') + '</ul>');
     };
     

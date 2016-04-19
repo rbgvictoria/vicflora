@@ -209,8 +209,10 @@ class TaxonModel extends CI_Model {
         $this->db->select("p.ProfileID, p.GUID, p.Profile, if(p.AcceptedID!=p.TaxonID, sn.FullName, NULL) AS AsFullName, 
             if(p.AcceptedID!=p.TaxonID, sn.Author, NULL) AS AsAuthor, 
             if(p.AcceptedID!=p.TaxonID, st.GUID, NULL) AS AsGUID, p.TaxonomicStatus, p.IsUpdated=1 AS IsUpdated,
-            IF(p.SourceID IS NULL AND p.IsUpdated IS NULL, DATE(p.TimestampCreated), NULL) AS DateCreated,
-            IF(p.SourceID IS NULL AND p.isUpdated IS NULL, CONCAT(u.FirstName, ' ', u.LastName), NULL) AS CreatedBy,
+            /* IF(p.SourceID IS NULL AND p.IsUpdated IS NULL, DATE(p.TimestampCreated), NULL) AS DateCreated, */
+            IF(p.SourceID IS NULL OR p.SourceID=0, DATE(p.TimestampCreated), NULL) AS DateCreated,
+            /* IF(p.SourceID IS NULL AND p.isUpdated IS NULL, CONCAT(u.FirstName, ' ', u.LastName), NULL) AS CreatedBy, */
+            IF(p.SourceID IS NULL OR p.SourceID=0, CONCAT(u.FirstName, ' ', u.LastName), NULL) AS CreatedBy,
             DATE(p.TimestampCreated) AS DateUpdated, CONCAT(u.FirstName, ' ', u.LastName) AS UpdatedBy,
             r.Author, ir.PublicationYear, r.Title, ir.Author as InAuthor, ir.Title AS InTitle, 
             ir.Publisher, ir.PlaceOfPublication", FALSE);
@@ -318,8 +320,8 @@ class TaxonModel extends CI_Model {
     public function getThumbnails($guid) {
         $this->db->select('i.CumulusRecordID,i.GUID');
         $this->db->from('cumulus_image i');
-        $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.AcceptedID');
-        $this->db->join('vicflora_taxon p', 't.ParentID=p.TaxonID');
+        $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.TaxonID');
+        $this->db->join('vicflora_taxon p', "t.ParentID=p.TaxonID");
         $this->db->where("(t.GUID='$guid' OR (p.GUID='$guid' AND p.RankID=220))", FALSE, FALSE);
         $this->db->where('PixelXDimension >', 0);
         $this->db->where('i.ThumbnailUrlEnabled', true);
@@ -353,7 +355,9 @@ class TaxonModel extends CI_Model {
     public function getImage($guid) {
         $this->db->select("i.CumulusRecordID, 
             i.PixelXDimension, i.PixelYDimension,
-            n.FullName AS ScientificName, if(t.TaxonID!=st.TaxonID, sn.FullName, NULL) AS AsName, i.Subtype, i.Caption, i.SubjectPart, i.Creator, i.RightsHolder, i.License", FALSE);
+            n.FullName AS ScientificName, if(t.TaxonID!=st.TaxonID, sn.FullName, NULL) AS AsName, 
+            i.Subtype, i.Caption, i.SubjectPart, i.Creator, i.RightsHolder, i.License,
+            i.Source, i.SubjectCategory", FALSE);
         $this->db->from('cumulus_image i');
         $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.TaxonID');
         $this->db->join('vicflora_name n', 't.NameID=n.NameID');
@@ -438,7 +442,7 @@ class TaxonModel extends CI_Model {
         $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
         $this->db->where('tt.NodeNumber <', $nodeNumber);
         $this->db->where('tt.HighestDescendantNodeNumber >=', $nodeNumber);
-        $this->db->where_in('t.RankID', array(140, 180, 220));
+        $this->db->where_in('t.RankID', array(70, 90, 100, 140, 180, 220));
         $this->db->order_by('t.RankID');
         $query = $this->db->get();
         return $query->result();

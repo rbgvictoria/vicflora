@@ -9,6 +9,8 @@
  */
 
 require_once('third_party/class.Diff.php');
+require_once 'third_party/Encoding/Encoding.php';
+require_once 'third_party/uuid/uuid.php';
 
 class Admin extends CI_Controller {
 // a class to allow users to log in and set a session var to say they
@@ -162,6 +164,7 @@ class Admin extends CI_Controller {
     }
     
     public function editprofile($guid) {
+        $this->data['js'][] = site_url() . 'js/jquery.vicflora.reference.js';
         $this->load->model('edittaxonmodel', 'taxonmodel');
         $this->load->model('solrmodel');
         
@@ -182,14 +185,17 @@ class Admin extends CI_Controller {
             $this->data['profiles'] = $this->taxonmodel->getProfiles($guid);
         else 
             $this->data['profiles'] = $this->taxonmodel->getUnmatchedProfiles($guid);
+        $this->load->model('referencemodel');
+        $this->data['taxonReferences'] = $this->referencemodel->getTaxonReferences($guid);
         $this->load->view('editprofile_view.php', $this->data);
     }
     
     public function newprofile($guid) {
+        $this->data['js'][] = site_url() . 'js/jquery.vicflora.reference.js';
         if ($this->input->post('save')) {
             $this->load->model('solrmodel');
             $this->load->model('edittaxonmodel');
-            $this->edittaxonmodel->newProfile($this->input->post('taxon_id'), $this->input->post('profile'));
+            $this->edittaxonmodel->newProfile($this->input->post('taxon_id'), $this->input->post('profile'), $this->input->post('source-id'));
             $this->solrmodel->updateDocument($guid);
             redirect('admin/editprofile/' . $guid);
         }
@@ -586,13 +592,69 @@ class Admin extends CI_Controller {
         }
     }
     
-    public function updateSolrIndex() {
+    public function update_taxon_tree() {
+        if (!$this->input->is_cli_request() ) {
+            show_error('You don\'t have access to this page.', 403);
+        }
+        $this->load->library('VicFloraTaxonTree');
+        $this->vicflorataxontree->updateTaxonTree();
+    }
+    
+    public function update_solr_index() {
         if (!$this->input->is_cli_request() ) {
             show_error('You don\'t have access to this page.', 403);
         }
         $this->load->model('solrmodel');
         $this->solrmodel->updateAll();
     }
+    
+    public function update_cumulus_images($date=FALSE) {
+        if (!$date) {
+            $date = date('Y-m-d');
+        }
+        if (!$this->input->is_cli_request() ) {
+            show_error('You don\'t have access to this page.', 403);
+        }
+        $dir = getcwd() . '/roboflow';
+        $files = array();
+        if (is_dir($dir)) {
+            if ($dh = opendir($dir)) {
+                while (($file = readdir($dh)) !== false) {
+                    if (strlen($file) > 2 && date('Y-m-d', filemtime($dir . '/' . $file)) == $date) {
+                        $files[] = $file;
+                    }
+                }
+                closedir($dh);
+            }
+        }
+        if (!$files) {
+            echo "No files were found for this date.\n";
+        }
+        else {
+            $this->load->library('RoboFlow');
+            $this->roboflow->update($dir . '/' . $files[0]);
+        }
+    }
+    
+    public function update_maps($from=FALSE, $pageSize=1000, $start=0) {
+        if (!$this->input->is_cli_request() ) {
+            show_error('You don\'t have access to this page.', 403);
+        }
+        set_time_limit(0);
+        if (!$from) {
+            $date = new DateTime();
+            $date->sub(new DateInterval('P14D'));
+            $from = $date->format('Y-m-d');
+            echo $from . "\n";
+        }
+        $this->load->library('VicFloraMap');
+        $startTime = date('Y-m-d H:i:s');
+        $numLoaded = $this->vicfloramap->updateOccurrences($from, $pageSize, $start);
+        $endTime = date('Y-m-d H:i:s');
+        $this->vicfloramap->updateDistribution($startTime, $endTime);
+        $this->update_solr_index();
+    }
+
 }
 
 /* End of file admin.php */

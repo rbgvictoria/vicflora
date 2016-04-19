@@ -935,7 +935,7 @@ class EditTaxonModel extends TaxonModel {
         }
     }
     
-    public function newprofile($taxonid, $profile) {
+    public function newprofile($taxonid, $profile, $sourceid) {
         // Set IsCurrent=0 for all profile records for this taxon
         $this->db->where('AcceptedID', $taxonid);
         $this->db->update('vicflora_profile', array('IsCurrent' => 0));
@@ -950,10 +950,10 @@ class EditTaxonModel extends TaxonModel {
             'AcceptedID' => $taxonid,
             'Profile' => $profile,
             'TaxonomicStatus' => 'accepted',
-            'SourceID' => NULL,
+            'SourceID' => $sourceid,
             'IsCurrent' => 1,
             'IsUpdated' => NULL,
-            'CreatedByID' => $this->session->userdata['id']
+            'CreatedByID' => $this->session->userdata('id')
         );
         $this->db->insert('vicflora_profile', $ins);
     }

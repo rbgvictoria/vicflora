@@ -12,7 +12,7 @@ class Flora extends CI_Controller {
         $this->load->helper('form');
         
         $this->config->load('vicflora_config');
-        $this->output->enable_profiler();
+        $this->output->enable_profiler(true);
     }
     
     public function index() {
@@ -164,7 +164,7 @@ class Flora extends CI_Controller {
         }*/
         
         if ($this->data['namedata']['TaxonomicStatus'] == 'accepted' &&
-                $this->data['namedata']['RankID'] > 140) {
+                $this->data['namedata']['RankID'] > 0) {
             $this->data['breadcrumbs'] = $this->taxonmodel->getClassificationBreadCrumbs($guid);
             $this->data['siblings'] = $this->taxonmodel->getSiblingsDropdown($guid);
             $this->data['children'] = $this->taxonmodel->getChildrenDropdown($guid);
@@ -189,6 +189,10 @@ class Flora extends CI_Controller {
         $this->data['distribution'] = FALSE;
         $this->data['stateDistribution'] = FALSE;
         $this->data['stateDistributionMap'] = FALSE;
+        
+        $this->load->model('referencemodel');
+        $this->data['taxonReferences'] = $this->referencemodel->getTaxonReferences($guid);
+
         if ($this->data['namedata']['RankID'] >= 220) {
             $this->load->model('mapmodel');
             $this->data['distribution'] = $this->mapmodel->getDistributionDetail($guid);

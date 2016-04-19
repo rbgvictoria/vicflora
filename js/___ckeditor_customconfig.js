@@ -1,5 +1,5 @@
 //var base_url = location.href.substr(0, location.href.indexOf('vicflora_dev')+12);
-var base_url = location.href.substr(0, location.href.indexOf('vicflora')+8);;
+//var base_url = location.href.substr(0, location.href.indexOf('vicflora')+8);;
 CKEDITOR.config.customConfig = base_url + '/js/ckeditor_customconfig.js';
 
 CKEDITOR.editorConfig = function( config ) {
@@ -43,15 +43,3 @@ CKEDITOR.editorConfig = function( config ) {
     //config.pasteFromWordRemoveStyles = false;
 };
 
-/*
-CKEDITOR.stylesSet.add( 'custom_styles', [
-    // Block-level styles.
-    { name: 'Description', element: 'p', attributes: { 'class': 'description' } },
-    { name: 'Habitat',  element: 'p', attributes: { 'class': 'habitat' } },
-    { name: 'Phenology',  element: 'p', attributes: { 'class': 'phenology' } },
-    { name: 'Note',  element: 'p', attributes: { 'class': 'note' } },
-
-    // Inline styles.
-    { name: 'Scientific name', element: 'span', attributes: { 'class': 'scientific_name'} },
-]);
-*/

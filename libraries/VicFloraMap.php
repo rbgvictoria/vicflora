@@ -50,14 +50,14 @@ class VicFloraMap {
                     $this->loadVicFloraOccurrences($records);
                 }
                 $startIndex += $pageSize;
-                if ($this->ci->input->is_cli_request()) {
+                /*if ($this->ci->input->is_cli_request()) {
                     if ($startIndex < $this->recordCount) {
                         echo $startIndex . ' of ' . $this->recordCount . PHP_EOL;
                     }
                     else {
                         echo $this->recordCount . ' of ' . $this->recordCount . PHP_EOL;
                     }
-                }
+                }*/
             }
             $totalRecords += $this->recordCount;
         }
@@ -68,7 +68,6 @@ class VicFloraMap {
         $taxa = $this->ci->mapmodel->getUpdatedTaxa($startTime, $endTime);
         if ($taxa) {
             foreach ($taxa as $taxon) {
-                echo $taxon['taxon_id'] . PHP_EOL;
                 $this->ci->mapmodel->updateVicFloraDistribution($taxon['taxon_id']);
             }
         }

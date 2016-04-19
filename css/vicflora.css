@@ -304,6 +304,7 @@ li.flora-link a {
 -------------------------------------*/
 #glossary-first-letter {
     margin: -1px;
+    padding-bottom: 5px;
 }
 
 #glossary-first-letter a {
@@ -322,19 +323,12 @@ li.flora-link a {
 
 #glossary-first-letter .active {
     background-color: rgb(127,148,87);
-}
-
-#glossary-first-letter .active {
     color: #fff;
     text-decoration: none;
 }
 
 #glossary-first-letter a.active, #term-list li.active {
     font-weight: bold;
-}
-
-#glossary-first-letter {
-    padding-bottom: 5px;
 }
 
 #definition h2 {
@@ -653,4 +647,40 @@ a.glossary-link {
 span.assertion-ala-name {
     color: #959595;
     font-size: 85%;
+}
+
+/* Reference lookup autocomplete
+**************************************************/
+.vicflora-reference-lookup-autocomplete-list {
+    max-height: 300px;
+    max-width: 500px;
+    overflow-y: auto;
+}
+
+.vicflora-reference-lookup-autocomplete-list li {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 12px;
+    font-size: 90%;
+}
+
+.vicflora-reference-lookup-autocomplete-list .ui-state-focus {
+    background-color: #eee;
+    border-top: solid 1px #ccc;
+    border-bottom: solid 1px #ccc;
+}
+
+.vicflora-reference-lookup-autocomplete-list li, 
+.vicflora-reference-lookup-autocomplete-list li a {
+    cursor: pointer;
+}
+
+.alert-vicflora {
+    color: #333;
+    background-color: #eee;
+    border-color: #ccc;
+}
+
+.ref_nav {
+    padding-bottom: 6px;
 }

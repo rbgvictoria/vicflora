@@ -43,9 +43,10 @@ CKEDITOR.editorConfig = function( config ) {
 CKEDITOR.stylesSet.add( 'custom_styles', [
     // Block-level styles.
     { name: 'Description', element: 'p', attributes: { 'class': 'description' } },
-    { name: 'Habitat',  element: 'p', attributes: { 'class': 'habitat' } },
     { name: 'Phenology',  element: 'p', attributes: { 'class': 'phenology' } },
+    { name: 'Habitat',  element: 'p', attributes: { 'class': 'habitat' } },
     { name: 'Note',  element: 'p', attributes: { 'class': 'note' } },
+    { name: 'References',  element: 'p', attributes: { 'class': 'references' } },
 
     // Inline styles.
     { name: 'Scientific name', element: 'span', attributes: { 'class': 'scientific_name'} }

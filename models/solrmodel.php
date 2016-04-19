@@ -513,6 +513,7 @@ class SolrModel extends CI_Model {
         $updateQuery = $this->client->createUpdate();
         $this->doc = $updateQuery->createDocument();
         $select = "SELECT n.GUID AS scientificNameID,
+                n.NameID,
                 n.FullName AS scientificName,
                 n.Author AS scientificNameAuthorship,
                 r.GUID AS namePublishedInID,
@@ -586,7 +587,6 @@ class SolrModel extends CI_Model {
             $this->doc->media = $this->media($id);
         }
         
-        
         $this->doc->vernacular_name = $row->vernacularName;
         
         if ($row->NodeNumber) {
@@ -618,7 +618,11 @@ class SolrModel extends CI_Model {
         if ($threatStatus)
             $this->doc->threat_status = $threatStatus;
         
-        $this->doc->profile = $this->description($id);
+        $apni = $this->apniMatch($row->NameID);
+        if ($apni) {
+            $this->doc->apni_match_type = $apni['apni_match_type'];
+            $this->doc->apni_match_verification_status = $apni['apni_match_verification_status'];
+        }
         
         $updateQuery->addDocuments(array($this->doc), $overwrite=true);
         $updateQuery->addCommit();
@@ -824,9 +828,9 @@ class SolrModel extends CI_Model {
                 JOIN vicflora_name n ON t.NameID=n.NameID
                 LEFT JOIN vicflora_taxon ct ON t.TaxonID=ct.ParentID AND t.RankID=220
                 LEFT JOIN vicflora_name cn ON ct.NameID=cn.NameID
-                LEFT JOIN cumulus_image i ON coalesce(t.TaxonID, ct.TaxonID)=i.TaxonID
+                LEFT JOIN cumulus_image i ON coalesce(t.TaxonID, ct.TaxonID)=i.TaxonID AND PixelXDimension>0
                 LEFT JOIN vicflora_profile p ON t.TaxonID=p.AcceptedID AND p.IsCurrent=true
-                WHERE t.GUID='$id'
+                WHERE t.GUID='$id' OR ct.GUID='$id'
                 GROUP BY t.TaxonID";
         $query = $this->db->query($select);
         if ($query->num_rows()) {
@@ -841,8 +845,36 @@ class SolrModel extends CI_Model {
                 $ret[] = 'profile';
             }
         }
+        return $ret;
     }
 
+    private function apniMatch($nameid) {
+        $ret = array();
+        $sql = "SELECT MatchType, IsVerified
+            FROM vicflora_apni
+            WHERE NameID=$nameid";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+        if (!$result) 
+            $ret = array(
+                'apni_match_type' => 'NotMatched',
+                'apni_match_verification_status' => FALSE
+            );
+        elseif (count($result) > 1)
+            $ret = array(
+                'apni_match_type' => 'MultipleMatches',
+                'apni_match_verification_status' => FALSE
+            );
+        else {
+            $row = $result[0];
+            $matchtype = (in_array($row->MatchType, array('Monomial', 'Autonym'))) ? 'FullName' : $row->MatchType;
+            $ret = array(
+                'apni_match_type' => $matchtype,
+                'apni_match_verification_status' => ($row->IsVerified) ? 'Verified' : 'Not verified'
+            );
+        }
+        return $ret;
+    }
     
 }
 
