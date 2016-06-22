@@ -401,15 +401,6 @@ $(function() {
         }
     });
     
-    /*
-     * Edit distribution
-     */
-    var reg = /editdistribution\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/;
-    if (reg.test(location.href)) {
-        var guid = reg.exec(location.href)[1];
-        var url = base_url + '/ajax/ibra_map/' + guid + '/svg/establishment_means';
-        $('#svg-editbioregions').load(base_url + '/ajax/ibra_map/' + guid + '/svg/establishment_means');
-    };
     
     /*
      * WYSIWYG editor for taxon remarks

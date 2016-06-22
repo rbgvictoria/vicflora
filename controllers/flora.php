@@ -12,7 +12,7 @@ class Flora extends CI_Controller {
         $this->load->helper('form');
         
         $this->config->load('vicflora_config');
-        $this->output->enable_profiler(true);
+        $this->output->enable_profiler(false);
     }
     
     public function index() {
@@ -155,6 +155,9 @@ class Flora extends CI_Controller {
         
         $this->load->model('viewtaxonmodel','taxonmodel');
         $this->data['namedata'] = $this->taxonmodel->getTaxonData($guid);
+        $nodeNumber = $this->data['namedata']['NodeNumber'];
+        $highestDescendantNodeNumber = $this->data['namedata']['HighestDescendantNodeNumber'];
+        $rankID = $this->data['namedata']['RankID'];
         
         /*if (isset($this->session->userdata['last_search']) && 
                 (isset($_SERVER['HTTP_REFERER']) && (preg_match('/\/search\??/', $_SERVER['HTTP_REFERER']) || 
@@ -163,11 +166,17 @@ class Flora extends CI_Controller {
             $this->data['browse'] = $this->solrmodel->browse($this->data['namedata']['FullName'], $guid);
         }*/
         
+        $this->data['images'] = array();
+        $this->data['heroImage'] = FALSE;
         if ($this->data['namedata']['TaxonomicStatus'] == 'accepted' &&
-                $this->data['namedata']['RankID'] > 0) {
-            $this->data['breadcrumbs'] = $this->taxonmodel->getClassificationBreadCrumbs($guid);
+                $rankID > 0) {
+            $this->data['breadcrumbs'] = $this->taxonmodel->getClassificationBreadCrumbs($nodeNumber);
             $this->data['siblings'] = $this->taxonmodel->getSiblingsDropdown($guid);
             $this->data['children'] = $this->taxonmodel->getChildrenDropdown($guid);
+            if ($rankID >= 140) {
+                $this->data['images'] = $this->taxonmodel->getThumbnails($nodeNumber, $highestDescendantNodeNumber, $rankID);
+                $this->data['heroImage'] = $this->taxonmodel->getHeroImage($nodeNumber, $highestDescendantNodeNumber, $rankID);
+            }
         }
         
         $this->data['commonname'] = $this->taxonmodel->getCommonNames($guid);
@@ -176,26 +185,34 @@ class Flora extends CI_Controller {
         $this->load->model('classificationmodel');
         $this->data['classification'] = $this->classificationmodel->getAncestors($guid);
         $this->data['subordinates'] = $this->classificationmodel->getChildren($guid);
-        $this->data['profile'] = $this->taxonmodel->getProfiles($guid);
         $this->data['key'] = $this->taxonmodel->getKey($guid);
-        //$this->data['images'] = $this->taxonmodel->getTaxonImages($guid);
-        $this->data['images'] = $this->taxonmodel->getThumbnails($guid);
-        $this->data['heroImage'] = $this->taxonmodel->getHeroImage($guid);
         $this->data['acceptedname'] = $this->taxonmodel->getAcceptedNameByGUID($guid);
         $this->data['synonyms'] = $this->taxonmodel->getSynonyms($guid);
         $this->data['misapplications'] = $this->taxonmodel->getMisapplications($guid);
         $this->data['links'] = $this->taxonmodel->getLinks($guid);
         
         $this->data['distribution'] = FALSE;
+        $profile = $this->taxonmodel->getProfiles($guid);
+        $this->data['profile'] = $profile;
+        if ($profile) {
+            $this->data['profileStr'] = $this->formatProfile($profile[0]['Profile']);
+        }
         $this->data['stateDistribution'] = FALSE;
         $this->data['stateDistributionMap'] = FALSE;
         
         $this->load->model('referencemodel');
         $this->data['taxonReferences'] = $this->referencemodel->getTaxonReferences($guid);
 
-        if ($this->data['namedata']['RankID'] >= 220) {
+        if ($rankID >= 220) {
             $this->load->model('mapmodel');
             $this->data['distribution'] = $this->mapmodel->getDistributionDetail($guid);
+            $vicDist = FALSE;
+            if ($this->data['distribution']) {
+                $vicDist = $this->vicDistributionString($this->data['distribution']);
+            }
+            if ($profile) {
+                $this->data['profileStr'] = $this->formatProfile($profile[0]['Profile'], $vicDist);
+            }
             $this->data['stateDistribution'] = $this->mapmodel->getStateDistribution($guid);
             $this->data['stateDistributionMap'] = $this->state_dist_map($guid, 'png');
             /*$this->data['boundingPolygonMap100'] = $this->bounding_polygon_map100($guid, $this->data['namedata']['RankID'], 'png');
@@ -214,11 +231,132 @@ class Flora extends CI_Controller {
         $this->load->view('taxon_view', $this->data);
     }
     
+    private function formatProfile($profile, $vicDist=FALSE) {
+        $doc = new DOMDocument('1.0', 'utf-8');
+        // Following: http://stackoverflow.com/questions/10659164/php-domdocument-manipulating-and-encoding#answer-10659514
+        $encodingHint = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+        $doc->loadHTML($encodingHint . $profile);
+        $list = $doc->getElementsByTagName('p');
+        if ($list->length) {
+            $prof = array();
+            $classes = array();
+            foreach ($list as $item) {
+                $prof[] = array(
+                    'class' => $item->getAttribute('class'),
+                    'value' => $this->DOMinnerHTML($item)
+                );
+                $classes[] = $item->getAttribute('class');
+            }
+            
+            $description = array();
+            $key = array_search('description', $classes);
+            if ($key !== FALSE) {
+                $description[] = $prof[$key]['value'];
+            }
+            $key = array_search('phenology', $classes);
+            if ($key !== FALSE) {
+                $description[] = $prof[$key]['value'];
+            }
+            
+            if ($description) {
+                $description = '<div class="description"><p>' . implode(' ', $description) . '</p></div>';
+            }
+            else {
+                $description = '';
+            }
+            
+            $distribution = array();
+            if ($vicDist) {
+                $distribution[] = $vicDist;
+            }
+            $key = array_search('distribution_australia', $classes);
+            if ($key !== FALSE) {
+                $dist = $prof[$key]['value'];
+                $distribution[] = (substr($dist, -1) === '.') ? $dist : $dist . '.';
+            }
+            $key = array_search('distribution_world', $classes);
+            if ($key !== FALSE) {
+                $dist = $prof[$key]['value'];
+                $distribution[] = (substr($dist, -1) === '.') ? $dist : $dist . '.';
+            }
+            $key = array_search('habitat', $classes);
+            if ($key !== FALSE) {
+                $dist = $prof[$key]['value'];
+                $distribution[] = (substr($dist, -1) === '.') ? $dist : $dist . '.';
+            }
+            if ($distribution) {
+                $distribution = '<div class="distribution-habitat"><p>' . implode(' ', $distribution) . '</p></div>';
+            }
+            else {
+                $distribution = '';
+            }
+            
+            $notes = array();
+            $keys = array_keys($classes, 'note');
+            if ($keys) {
+                foreach ($keys as $key) {
+                    $notes[] = '<p>' . $prof[$key]['value'] . '</p>';
+                }
+            }
+            if ($notes) {
+                $notes = '<div class="notes">' . implode('', $notes) . '</div>';
+            }
+            else {
+                $notes = '';
+            }
+            
+            return $description . $distribution . $notes;
+        }
+    }
+    
+    private function vicDistributionString($distribution) {
+        $distr = '';
+        $distStr = array();
+        $intr = array();
+        foreach ($distribution as $row) {
+            if (in_array($row['occurrence_status'], array('present', 'endemic')) &&
+                    !in_array($row['establishment_means'], array('cultivated'))) {
+                if (in_array($row['establishment_means'], array('naturalised', 'introduced'))) {
+                    $prefix = '*';
+                    $intr[] = 1;
+                }
+                else {
+                    $prefix = '';
+                    $intr[] = 0;
+                }
+                $distStr[] = '<span class="region" title="' . $row['sub_name_7'] . '">' . $prefix . $row['depi_code'] . '</span>';
+            }
+        }
+        array_multisort($intr, SORT_ASC, $distStr);
+        if ($distStr) {
+            $distr = implode(', ', $distStr) . '.';
+        }
+        return $distr;
+    }
+    
+    private function DOMinnerHTML(DOMNode $element) { 
+        $innerHTML = ""; 
+        $children  = $element->childNodes;
+
+        foreach ($children as $child) 
+        { 
+            $innerHTML .= $element->ownerDocument->saveHTML($child);
+        }
+
+        return $innerHTML; 
+    }
+    
+    private function printRPre($value) {
+        echo '<pre>';
+        print_r($value);
+        echo '</pre>';
+    }
+    
     public function key($keyID=FALSE) {
         if (!$keyID) {
             exit();
         }
-        
+        $this->output->enable_profiler(false);
         $this->data['keyID'] = $keyID;
         $this->load->view('key_view', $this->data);
     }
@@ -328,7 +466,7 @@ class Flora extends CI_Controller {
         $query['service'] = 'WMS';
         $query['version'] = '1.1.0';
         $query['request'] = 'GetMap';
-        $query['layers'] = 'vicflora:cst_vic,vicflora:ibra_taxon_view,vicflora:vicflora_bioregion,vicflora:cst_vic,vicflora:vicflora_occurrence';
+        $query['layers'] = 'vicflora:cst_vic,vicflora:distribution_bioregion_view,vicflora:vicflora_bioregion,vicflora:cst_vic,vicflora:occurrence_view';
         $query['styles'] = ',polygon_establishment_means,polygon_no-fill_grey-outline,polygon_no-fill_black-outline,';
         $query['bbox'] = '140.8,-39.3,150.2,-33.8';
         $query['width'] = $width;
@@ -340,7 +478,7 @@ class Flora extends CI_Controller {
         else {
             $query['format'] = 'image/png';
         }
-        $term = ($rankid == 220) ? 'species_guid' : 'taxon_id';
+        $term = ($rankid == 220) ? 'species_id' : 'accepted_name_usage_id';
         $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');taxon_id='$guid';INCLUDE;FEAT_CODE IN ('mainland','island');$term='$guid'");
         
         $qstring = array();
@@ -364,14 +502,14 @@ class Flora extends CI_Controller {
         $query['service'] = 'WMS';
         $query['version'] = '1.1.0';
         $query['request'] = 'GetMap';
-        $query['layers'] = 'vicflora:cst_vic,vicflora:vicflora_occurrence';
+        $query['layers'] = 'vicflora:cst_vic,vicflora:occurrence_view';
         $query['styles'] = 'polygon_no-fill_black-outline,';
         $query['bbox'] = '140.8,-39.3,150.2,-33.8';
         $query['width'] = 512;
         $query['height'] = 310;
         $query['srs'] = 'EPSG:4326';
         $query['format'] = 'image/png';
-        $term = ($rankid == 220) ? 'species_guid' : 'taxon_id';
+        $term = ($rankid == 220) ? 'species_id' : 'accepted_name_usage_id';
         $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');$term='$guid' AND establishment_means NOT IN ('cultivated') AND occurrence_status NOT IN ('doubtful','absent')");
         
         $qstring = array();
@@ -808,11 +946,21 @@ class Flora extends CI_Controller {
             $this->data['park_name'] = $info['name'];
             $symbol = ($info['area'] < 0.03) ? 'point' : 'polygon';
             $this->data['park_map'] = $this->capad_park_map($parkno, $symbol);
-            $this->data['checklist'] = $this->checklistmodel->getCheckListTaxa($parkno);
+            //$this->data['checklist'] = $this->checklistmodel->getCheckListTaxa($parkno);
+            //$this->load->model('solrmodel');
+            //$this->data['solrresult'] = $this->solrmodel->solrChecklistSearch($this->data['checklist']);
         }
         
         $this->data['parks'] = $this->checklistmodel->getParks();
         $this->load->view('checklist_view', $this->data);
+    }
+    
+    public function ajaxChecklist($park) {
+        $this->load->model('checklistmodel');
+        $data = $this->checklistmodel->getChecklist($park);
+        $json = json_encode($data);
+        header('Content-type: application/json');
+        echo $json;
     }
 }
 

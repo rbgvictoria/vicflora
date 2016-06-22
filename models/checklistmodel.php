@@ -45,76 +45,95 @@ EOT;
         }
     }
     
-    public function getCheckListTaxa($park) {
-        $sql = <<<EOT
-SELECT o."taxon_id", o."scientific_name"
-FROM vicflora.vicflora_capad c
-JOIN vicflora.vicflora_occurrence o ON ST_Intersects(o.geom, c.geom)
-WHERE c.res_number='$park'
-GROUP BY o."taxon_id", o."scientific_name"
-ORDER BY o."scientific_name"
-EOT;
-        $query = $this->pgdb->query($sql);
+    //public function getCheckListTaxa($park) {
+    public function getCheckList($park) {
+        $ret = new stdClass();
+        $geom = $this->getParkGeometry($park);
+        if ($geom) {
+            $names = $this->getParkScientificNames($geom);
+            if ($names) {
+                $ids = $this->getParkTaxonIDs($names);
+                if ($ids) {
+                    $ret->parkNumber = $park;
+                    $ret->numFound = count($ids);
+                    $ret->taxa = $this->getParkTaxonDetail($ids);
+                    return $ret;
+                }
+            }
+        }
+        return FALSE;
+    }
+    
+    private function getParkGeometry($park) {
+        $this->pgdb->select('geom');
+        $this->pgdb->from('vicflora.vicflora_capad');
+        $this->pgdb->where('res_number', $park);
+        $query = $this->pgdb->get();
         if ($query->num_rows()) {
-            $checklist = array();
+            $row = $query->row();
+            return $row->geom;
+        }
+    }
+    
+    private function getParkScientificNames($geom) {
+        $this->pgdb->select('vicflora_scientific_name_id');
+        $this->pgdb->from('vicflora.avh_occurrence');
+        $this->pgdb->where('vicflora_scientific_name_id IS NOT NULL', FALSE, FALSE);
+        $this->pgdb->where("ST_Intersects(geom, '$geom'::geometry(MultiPolygon, 4326))", FALSE, FALSE);
+        $this->pgdb->group_by('vicflora_scientific_name_id');
+        $query = $this->pgdb->get();
+        if ($query->num_rows()) {
+            $ids = array();
             foreach ($query->result() as $row) {
-                $checklist = array_merge($checklist, $this->getClassification($row->taxon_id));
+                $ids[] = $row->vicflora_scientific_name_id;
             }
-            
-            $checklist = array_map("unserialize", array_unique(array_map("serialize", $checklist)));
-            
-            $classification = array();
-            foreach ($checklist as $item) {
-                $classification[] = $item['higherClassification'];
-            }
-            
-            array_multisort($classification, SORT_ASC, $checklist);
-            
-            return $checklist;
-            
+            return $ids;
         }
         else {
             return FALSE;
         }
     }
     
-    private function getClassification($taxonid) {
-        $ret = array();
-        $this->db->select('NodeNumber');
-        $this->db->from('vicflora_taxon t');
-        $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
-        $this->db->where('t.GUID', $taxonid);
-        $query = $this->db->get();
+    private function getParkTaxa($names) {
+        $this->pgdb->select("id as taxon_id, family, genus, genus||' '||specific_epithet as species, scientific_name", FALSE);
+        $this->pgdb->from('vicflora.vicflora_taxon');
+        $this->pgdb->where_in('scientific_name_id', $names);
+        $this->pgdb->group_by('family, genus, specific_epithet, scientific_name, id');
+        $query = $this->pgdb->get();
+        return $query->result();
+    }
+    
+    private function getParkTaxonIDs($names) {
+        $this->pgdb->select('accepted_name_usage_id');
+        $this->pgdb->from('vicflora.vicflora_taxon');
+        $this->pgdb->where_in('scientific_name_id', $names);
+        $this->pgdb->group_by('accepted_name_usage_id');
+        $query = $this->pgdb->get();
         if ($query->num_rows()) {
-            $row = $query->row();
-            $nodenumber = $row->NodeNumber;
-            
-            $this->db->select('t.GUID, n.Name, n.FullName, n.Author, td.Name AS TaxonRank');
-            $this->db->from('vicflora_taxon t');
-            $this->db->join('vicflora_taxontreedefitem td', 't.TaxonTreeDefItemID=td.TaxonTreeDefItemID');
-            $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
-            $this->db->join('vicflora_name n', 't.NameID=n.NameID');
-            $this->db->where('tt.NodeNumber <=', $nodenumber);
-            $this->db->where('tt.HighestDescendantNodeNumber >=', $nodenumber);
-            $this->db->where('td.RankID >=', 140);
-            $this->db->order_by('tt.NodeNumber');
-            $query = $this->db->get();
-            if ($query->num_rows()) {
-                $name = array();
-                foreach ($query->result() as $row) {
-                    $name[] = $row->Name;
-                    $ret[] = array(
-                        'taxonID' => $row->GUID,
-                        'higherClassification' => implode('|', $name),
-                        'scientificName' => $row->FullName,
-                        'scientificNameAuthor' => $row->Author,
-                        'taxonRank' => $row->TaxonRank
-                    );
-                }
+            $ids = array();
+            foreach ($query->result() as $row) {
+                $ids[] = $row->accepted_name_usage_id;
             }
-            
+            return $ids;
         }
-        return $ret;
+        else {
+            return FALSE;
+        }
+    }
+    
+    private function getParkTaxonDetail($ids) {
+        $this->pgdb->select('id, scientific_name as "scientificName", 
+            scientific_name_authorship as "scientificNameAuthorship", 
+            accepted_name_usage_taxon_rank as taxonRank, phylum, class, subclass, 
+            superorder, order, family, genus, 
+            specific_epithet as "specificEpithet", 
+            infraspecific_epithet as "infraspecificEpithet",
+            occurrence_status as "occurrenceStatus",
+            establishment_means as "establishmentMeans"');
+        $this->pgdb->from('vicflora.vicflora_taxon');
+        $this->pgdb->where_in('id', $ids);
+        $query = $this->pgdb->get();
+        return $query->result();
     }
     
     public function getCapadFromMap($long, $lat) {
@@ -128,11 +147,9 @@ EOT;
     
     public function getOccurrencesFromPoint($taxonid,$long, $lat) {
         $sql = "SELECT uuid, taxon_id, scientific_name, catalog_number, decimal_longitude, decimal_latitude, 
-              CASE establishment_means_source WHEN 'AVH' THEN establishment_means  WHEN 'VicFlora' THEN establishment_means ELSE NULL END AS establishment_means,
-              occurrence_status,
-              sub_name_7
-            FROM vicflora.vicflora_occurrence
-            WHERE \"taxon_id\"='$taxonid'
+                establishment_means, occurrence_status, sub_name_7
+            FROM vicflora.occurrence_view
+            WHERE taxon_id='$taxonid'
               AND ST_Dwithin(geom, ST_GeomFromText('POINT($long $lat)', 4326), 0.08)";
         $query = $this->pgdb->query($sql);
         return $query->result();
@@ -225,7 +242,6 @@ EOT;
                 'occurrenceStatus' => $occReg,
                 'establishmentMeans' => $estReg
             );
-
         }
     }
     

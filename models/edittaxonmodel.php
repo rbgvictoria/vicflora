@@ -176,6 +176,11 @@ class EditTaxonModel extends TaxonModel {
                     'TimestampModified' => date('Y-m-d h:i:s'),
                     'ProtologueID' => $protologueid
                 );
+                
+                if (!($this->input->post('name') == $this->input->post('name_old'))) {
+                    $nameArr['name_type'] = $this->nameType($this->input->post('name'));
+                }
+                
                 foreach ($nameArr as $key => $value) {
                     $nameArr[$key] = ($value) ? $value : NULL;
                 }
@@ -609,6 +614,26 @@ class EditTaxonModel extends TaxonModel {
         }
         else 
             return FALSE;
+    }
+    
+    private function nameType($name) {
+        $nameType = NULL;
+        if (strpos($name, ' × ') !== FALSE) {
+            $nameType = 'hybrid formula';
+        }
+        elseif (strpos($name, '×') !== FALSE) {
+            $nameType = 'hybrid name';
+        }
+        elseif (strpos($name, "'") !== FALSE) {
+            $nameType = 'cultivar';
+        }
+        elseif (preg_match('/^[A-Z]?[a-z\-]+$/', $name)) {
+            $nameType = 'scientific';
+        }
+        else {
+            $nameType = 'informal';
+        }
+        return $nameType;
     }
     
     function recordHasChanged($which) {

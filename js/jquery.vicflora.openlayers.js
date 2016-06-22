@@ -227,8 +227,7 @@ function init2() {
         'Victorian bioregions',
         'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
         {
-            layers: 'vicflora:ibra_taxon_view',
-            styles: 'polygon_establishment_means',
+            layers: 'vicflora:distribution_bioregion_view',
             cql_filter: "taxon_id='" + taxonid + "'",
             transparent:true
         },
@@ -243,8 +242,7 @@ function init2() {
         'vicflora:vicflora_occurrence',
         'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
         {
-            layers: 'vicflora:vicflora_occurrence',
-            //styles: 'point_establishment_means',
+            layers: 'vicflora:occurrence_view',
             cql_filter: "taxon_id='" + taxonid + "'",
             transparent:true
         },
@@ -260,6 +258,7 @@ function init2() {
 
         url = base_url + '/ajax/occurrences_from_point/' + taxonid + '/' + position.lon.toFixed(5) + '/' + position.lat.toFixed(5);
         $.getJSON(url, function(data) {
+            console.log(data);
             var html;
             html = '<h3>Occurrence records</h3>';
             html += '<table class="occurrences-at-point table table-bordered table-condensed">';
@@ -291,7 +290,7 @@ function init2() {
                     html += '<option value="">&nbsp;</option>';
                     html += '<option value="present" ';
                     if (occ === 'present') {
-                        html += 'checked';
+                        html += 'selected';
                     }
                     html += '>present</option>';
                     
@@ -378,8 +377,8 @@ function init2() {
                         });
                         console.log(regions);
                         var index = regions.indexOf(data.region);
-                        if ($('table.bioregions [name^="occurrence_status["]').eq(index).val() !== data.occurrenceStatus) {
-                            $('table.bioregions [name^="occurrence_status["]').eq(index).val(data.occurrenceStatus).css('background-color', '#ffff00');
+                        if ($('table.bioregions [name^="occurrence_status["]').eq(index).val() !== data.occurrence_status) {
+                            $('table.bioregions [name^="occurrence_status["]').eq(index).val(data.occurrence_status).css('background-color', '#ffff00');
                         }
                         if ($('#reload').length === 0) {
                             $('#nodelist').append('<div class="text-right"><button id="reload" class="btn btn-default">Reload</button></div>');
@@ -407,8 +406,8 @@ function init2() {
                             regions.push($(this).val());
                         });
                         var index = regions.indexOf(data.region);
-                        if ($('table.bioregions [name^="establishment_means["]').eq(index).val() !== data.establishmentMeans) {
-                            $('table.bioregions [name^="establishment_means["]').eq(index).val(data.establishmentMeans).css('background-color', '#ffff00');
+                        if ($('table.bioregions [name^="establishment_means["]').eq(index).val() !== data.establishment_means) {
+                            $('table.bioregions [name^="establishment_means["]').eq(index).val(data.establishment_means).css('background-color', '#ffff00');
                         }
                         if ($('#reload').length === 0) {
                             $('#nodelist').append('<div class="text-right"><button id="reload" class="btn btn-default">Reload</button></div>');

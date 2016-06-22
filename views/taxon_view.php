@@ -247,57 +247,6 @@
                 <div class="tab-content">
                     <?php if ($profile): ?>
                     <div id="tab-profile" role="tabpanel" class="tab-pane section profile">
-                        <?php 
-                            $prof = $profile[0]['Profile'];
-                            $distr = '';
-                            if ($distribution)  {
-                                $distStr = array();
-                                $intr = array();
-                                foreach ($distribution as $row) {
-                                    if (in_array($row['occurrence_status'], array('present', 'endemic')) &&
-                                            !in_array($row['establishment_means'], array('cultivated'))) {
-                                        if (in_array($row['establishment_means'], array('naturalised', 'introduced'))) {
-                                            $prefix = '*';
-                                            $intr[] = 1;
-                                        }
-                                        else {
-                                            $prefix = '';
-                                            $intr[] = 0;
-                                        }
-                                        $distStr[] = '<span class="region" title="' . $row['sub_name_7'] . '">' . $prefix . $row['depi_code'] . '</span>';
-                                    }
-                                }
-                                array_multisort($intr, SORT_ASC, $distStr);
-                                if ($distStr) {
-                                    $distr = implode(', ', $distStr) . '.';
-                                }
-                            }    
-                            if ($namedata['DistA']) {
-                                $distr .= ' ' . $namedata['DistA'];
-                                if (substr($namedata['DistA'], -1) != '.') {
-                                    $distr .= '.';
-                                }
-                            }
-
-                            if ($namedata['DistW']) {
-                                $distr .= ' ' . $namedata['DistW'] . '.';
-                            }
-
-                            if ($distr && strpos($prof, '<p class="phenology">') !== FALSE) {
-                                $desc = substr($prof, 0, strpos($prof, '</p>', strpos($prof, '<p class="phenology">'))+4);
-                                $remainder = substr($prof, strpos($prof, '</p>', strpos($prof, '<p class="phenology">'))+4);
-                                $prof = $desc . '<p>' . $distr . '</p>' . $remainder;
-                            }
-                            elseif ($distr && strpos($prof, '<p class="description">') !== FALSE) {
-                                $desc = substr($prof, 0, strpos($prof, '</p>')+4);
-                                $remainder = substr($prof, strpos($prof, '</p>')+4);
-                                $prof = $desc . '<p>' . $distr . '</p>' . $remainder;
-                            }
-                            
-                            // Add 'References' label for references.
-                            $prof = str_replace('<p class="references">', '<p class="references"><b>References:</b> ', $prof);
-                            
-                        ?>
                         
                         <div class="row">
                             <?php if ($heroImage || (isset($profileMap) && $profileMap)): ?>
@@ -306,7 +255,7 @@
                             <div class="col-md-12">
                             <?php endif; ?>
                             
-                        <?=$prof;?>
+                        <?=$profileStr;?>
                         <?php if ($profile[0]['Author']): ?>
                         <?php
                             if ($profile[0]['AsFullName']) {

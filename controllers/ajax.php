@@ -319,13 +319,13 @@ class Ajax extends CI_Controller {
         $this->load->model('mapmodel');
         $data = $_REQUEST;
         $uuid = array_shift($data);
-        $occ = $this->checklistmodel->updateOccurrence($uuid, $data);
         if ($this->input->get_post('occurrence_status')) {
             $this->mapmodel->insertVicFloraAssertion($_REQUEST['uuid'], 'occurrenceStatus', $data['occurrence_status']);
         }
         elseif ($this->input->get_post('establishment_means')) {
             $this->mapmodel->insertVicFloraAssertion($_REQUEST['uuid'], 'establishmentMeans', $data['establishment_means']);
         }
+        $occ = $this->mapmodel->getBioregionForOccurrence($uuid);
         header('Content-type: application/json');
         echo json_encode($occ);
     }

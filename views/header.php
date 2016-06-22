@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     
     <link rel="shortcut icon" href="http://www.rbg.vic.gov.au/common/img/favicon.ico">
-    <!--link rel="stylesheet" href="http://openlayers.org/en/v3.3.0/css/ol.css" type="text/css"-->
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.14.1/css/ol.css" type="text/css">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/jqueryui.autocomplete.css" />
     <link rel="stylesheet" type="text/css" href="<?=base_url()?>js/colorbox/example1/colorbox.css" />
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>js/OpenLayers/theme/default/style.css" type="text/css">
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>js/OpenLayers/theme/default/google.css" type="text/css">
+    <!--link rel="stylesheet" type="text/css" href="<?=base_url()?>js/OpenLayers/theme/default/style.css" type="text/css"-->
+    <!--link rel="stylesheet" type="text/css" href="<?=base_url()?>js/OpenLayers/theme/default/google.css" type="text/css"-->
     <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/main.css" />
     <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/vicflora.css?v=<?=filemtime('css/vicflora.css')?>" />
     <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/keybase.player.css?v=<?=filemtime('css/keybase.player.css')?>" />
@@ -32,11 +32,14 @@
     <script src="<?=base_url()?>js/modernizr.custom.13288.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/colorbox/jquery.colorbox-min.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/jspath.min.js"></script>
-    <script src="http://maps.google.com/maps/api/js"></script>
-    <script src="<?=base_url()?>js/OpenLayers/OpenLayers.js" type="text/javascript"></script>
+    <!--script src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js" type="text/javascript"></script>
+    <script src="http://epsg.io/28355.js" type="text/javascript"></script-->
+    <script src="http://openlayers.org/en/v3.14.1/build/ol.js" type="text/javascript"></script>
+    <!--script src="<?=base_url()?>js/OpenLayers/OpenLayers.js" type="text/javascript"></script-->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    <script src="<?=base_url()?>js/jquery.vicflora.openlayers.js?v=<?=filemtime('js/jquery.vicflora.openlayers.js')?>"></script>
+    <!--script src="<?=base_url()?>js/jquery.vicflora.openlayers.js?v=<?=filemtime('js/jquery.vicflora.openlayers.js')?>"></script-->
+    <script src="<?=base_url()?>js/jquery.vicflora.ol3.js?v=<?=filemtime('js/jquery.vicflora.ol3.js')?>"></script>
     <script src="<?=base_url()?>js/jquery.keybase.key.js?v=<?=filemtime('js/jquery.keybase.key.js')?>"></script>
     <script src="<?=base_url()?>js/vicflora.js?v=<?=filemtime('js/vicflora.js')?>"></script>
     <script src="<?=base_url()?>js/colorbox/jquery.vicflora.colorbox.js?v=<?=filemtime('js/colorbox/jquery.vicflora.colorbox.js')?>"></script>

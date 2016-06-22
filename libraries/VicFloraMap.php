@@ -13,6 +13,8 @@ class VicFloraMap {
     private $recordCount;
     private $intro;
     
+    private $outlierCount;
+    
     public function __construct() {
         $this->ci =& get_instance();
         $this->ci->load->helper('curl');
@@ -46,31 +48,58 @@ class VicFloraMap {
             while ($startIndex < $this->recordCount) {
                 $result = $this->queryBiocache($startDate, $pageSize, $startIndex, $value);
                 if ($result) {
-                    $records = $this->loadOccurrences($result);
-                    $this->loadVicFloraOccurrences($records);
+                    $records = $this->processOccurrences($result);
                 }
                 $startIndex += $pageSize;
-                /*if ($this->ci->input->is_cli_request()) {
-                    if ($startIndex < $this->recordCount) {
-                        echo $startIndex . ' of ' . $this->recordCount . PHP_EOL;
-                    }
-                    else {
-                        echo $this->recordCount . ' of ' . $this->recordCount . PHP_EOL;
-                    }
-                }*/
             }
             $totalRecords += $this->recordCount;
         }
         return $totalRecords;
     }
     
-    public function updateDistribution ($startTime=FALSE, $endTime=FALSE) {
-        $taxa = $this->ci->mapmodel->getUpdatedTaxa($startTime, $endTime);
-        if ($taxa) {
-            foreach ($taxa as $taxon) {
-                $this->ci->mapmodel->updateVicFloraDistribution($taxon['taxon_id']);
+    public function outliers() {
+        $this->truncateOutlierTable();
+        $startIndex = 0;
+        $pageSize = 1000;
+        $this->outlierCount = $startIndex + 1;
+        while ($startIndex < $this->outlierCount) {
+            $result = $this->getOutliers($startIndex, $pageSize);
+            if ($result) {
+                $data = json_decode($result);
+                $this->outlierCount = $data->totalRecords;
+                $outliers = $data->occurrences;
+                foreach ($outliers as $outlier) {
+                    $this->insertOutlierRecord($outlier->uuid);
+                }
+                $startIndex += $pageSize;
             }
         }
+    }
+    
+    private function getOutliers($startIndex, $pageSize) {
+        $params = array();
+        $params['fq'] = array(
+            'data_hub_uid' => 'dh2',
+            'state' => 'Victoria',
+            'class' => 'Equisetopsida',
+            'outlier_layer' => '[* TO *]'
+        );
+        $params['fl'] = array('id');
+        $params['facet'] = 'off';
+        $params['pageSize'] = $pageSize;
+        $params['startIndex'] = $startIndex;
+        $query = createQueryString('biocache_search', $params);
+        $result = doCurl($query, FALSE, TRUE);
+        return $result;
+    }
+    
+    private function insertOutlierRecord($uuid) {
+        $data = array('uuid' => $uuid);
+        $this->pgdb->insert('vicflora.vicflora_outlier', $data);
+    }
+    
+    private function truncateOutlierTable() {
+        $this->pgdb->empty_table('vicflora.vicflora_outlier');
     }
     
     private function queryBiocache($startDate, $pageSize, $startIndex, $establishmentMeans) {
@@ -111,7 +140,7 @@ class VicFloraMap {
         return $result;
     }
     
-    private function loadOccurrences($json) {
+    private function processOccurrences($json) {
         $data = json_decode($json);
         $occurrences = $data->occurrences;
         $records = array();
@@ -119,25 +148,83 @@ class VicFloraMap {
             foreach ($occurrences as $occurrence) {
                 $latitude = (isset($occurrence->decimalLatitude) && $occurrence->decimalLatitude) ? $occurrence->decimalLatitude : NULL;
                 $longitude = (isset($occurrence->decimalLongitude) && $occurrence->decimalLongitude) ? $occurrence->decimalLongitude : NULL;
-                if (isset($occurrence->decimalLatitude) && $occurrence->decimalLatitude &&
-                        isset($occurrence->decimalLongitude) && $occurrence->decimalLongitude) {
-                    $rec = $this->createOccurrenceRecord($occurrence);
-                    $occurrenceID = $this->findOccurrence($occurrence->uuid);
-                    if ($occurrenceID) {
-                        $this->pgdb->where('occurrence_id', $occurrenceID);
-                        $this->pgdb->update('vicflora.avh_occurrence', $rec);
-                        $rec['is_updated_record'] = TRUE;
+                if ($latitude && $longitude) {
+                    $vfOccurrence = $this->findOccurrence($occurrence->uuid);
+                    if ($vfOccurrence) {
+                        $this->updateOccurrenceRecord($occurrence, $vfOccurrence);
                     }
                     else {
-                        $this->pgdb->insert('vicflora.avh_occurrence', $rec);
-                        $rec['is_new_record'] = TRUE;
+                        $this->insertOccurrenceRecord($occurrence);
+                        
                     }
                 }
-                $records[] = $rec;
             }
         }
         $this->recordCount = $data->totalRecords;
         return $records;
+    }
+    
+    private function updateOccurrenceRecord($occurrence, $vfOccurrence) {
+        $rec = $this->createOccurrenceRecord($occurrence);
+        if ($occurrence->raw_scientificName != $vfOccurrence->unprocessed_scientific_name) { 
+            $sciName = $this->processScientificName($occurrence->raw_scientificName);
+            $rec['ala_parsed_name_id'] = $sciName->id;
+            $rec['vicflora_scientific_name_id'] = $sciName->vicflora_scientific_name_id;
+
+        }
+        $this->pgdb->where('uuid', $occurrence->uuid);
+        $this->pgdb->update('vicflora.avh_occurrence', $rec);
+        
+        if ($occurrence->decimalLatitude != $vfOccurrence->decimal_latitude ||
+                $occurrence->decimalLongitude != $vfOccurrence->decimal_longitude) {
+            $this->updateOccurrenceAttributeRecord($occurrence->uuid, $rec['geom']);
+        }
+        
+    }
+    
+    private function insertOccurrenceRecord($occurrence) {
+        $rec = $this->createOccurrenceRecord($occurrence);
+        $sciName = $this->processScientificName($occurrence->raw_scientificName);
+        $rec['ala_parsed_name_id'] = $sciName->id;
+        $rec['vicflora_scientific_name_id'] = $sciName->vicflora_scientific_name_id;
+        $this->pgdb->insert('vicflora.avh_occurrence', $rec);
+        $this->updateOccurrenceAttributeRecord($occurrence->uuid, $rec['geom']);
+    }
+    
+    private function updateOccurrenceAttributeRecord($uuid, $geom) {
+        $bio = $this->getBioregion($geom);
+        if ($bio) {
+            $data = $bio;
+            $nrm = $this->getNrm($geom);
+            if ($nrm) {
+                $data->nrm_region = $nrm->nrm_region;
+            }
+            $data->timestamp_modified = date('Y-m-d H:i:s');
+            
+            $fid = $this->findOccurrenceAttributeRecord($uuid);
+            if ($fid) {
+                $this->pgdb->where('uuid', $fid);
+                $this->pgdb->update('vicflora.occurrence_attribute', $data);
+            }
+            else {
+                $data->uuid = $uuid;
+                $this->pgdb->insert('vicflora.occurrence_attribute', $data);
+            }
+        }
+    }
+    
+    private function findOccurrenceAttributeRecord($uuid) {
+        $this->pgdb->select('uuid');
+        $this->pgdb->from('vicflora.occurrence_attribute');
+        $this->pgdb->where('uuid', $uuid);
+        $query = $this->pgdb->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->uuid;
+        }
+        else {
+            return FALSE;
+        }
     }
     
     private function createOccurrenceRecord($occurrence) {
@@ -174,205 +261,39 @@ class VicFloraMap {
         $row = $query->row();
         return $row->geom;
     }
+    
+    private function getBioregion($geom) {
+        $this->pgdb->select('reg_code_7, reg_name_7, sub_code_7, sub_name_7');
+        $this->pgdb->from('vicflora.vicflora_bioregion');
+        $this->pgdb->where("ST_Intersects('$geom'::geometry(Point,4326), geom)", FALSE, FALSE);
+        $query = $this->pgdb->get();
+        if ($query->num_rows()) {
+            return $query->row();
+        }
+        else {
+            return FALSE;
+        }
+    }
+    
+    public function getNrm($geom) {
+        $this->pgdb->select('nrm_region');
+        $this->pgdb->from('vicflora.vicflora_nrm2014');
+        $this->pgdb->where("ST_Intersects('$geom'::geometry(Point,4326), geom)", FALSE, FALSE);
+        $query = $this->pgdb->get();
+        if ($query->num_rows()) {
+            return $query->row();
+        }
+        else {
+            return FALSE;
+        }
+    }
 
     private function findOccurrence($uuid) {
-        $this->pgdb->select('occurrence_id');
+        $this->pgdb->select('uuid, decimal_latitude, decimal_longitude, unprocessed_scientific_name, geom, establishment_means');
         $this->pgdb->from('vicflora.avh_occurrence');
         $this->pgdb->where('uuid', $uuid);
         $query = $this->pgdb->get();
         if ($query->num_rows()) {
-            $row = $query->row();
-            return $row->occurrence_id;
-        }
-        else {
-            return FALSE;
-        }
-    }
-    
-    private function loadVicFloraOccurrences($records) {
-        foreach ($records as $rec) {
-            $vrec = $this->createVicFloraOccurrenceRecord($rec);
-            if (!$vrec) {
-                continue;
-            }
-            
-            if (isset($rec['is_new_record'])) {
-                $this->insertVicFloraOccurrence($vrec);
-            }
-            elseif (isset($rec['is_updated_record'])) {
-                $vic = $this->findVicFloraOccurrence($rec['uuid']);
-                if ($vic) { // this occurrence is in VicFlora already
-                    if ($vrec['scientific_name'] != $vic->scientific_name
-                            || (isset($rec['ala_scientific_name']) && 
-                                    (!$vic->ala_scientific_name || $rec['ala_scientific_name'] != $vic->ala_scientific_name))
-                            || (isset($rec['ala_unprocessed_scientific_name']) && 
-                                    (!$vic->ala_unprocessed_scientific_name || $rec['ala_unprocessed_scientific_name'] != $vic->ala_unprocessed_scientific_name))
-                            || $rec['decimal_latitude'] != $rec['decimal_latitude']
-                            || $rec['decimal_longitude'] != $rec['decimal_longitude']
-                            || ($rec['establishment_means'] && $rec['establishment_means'] != $vic->establishment_means)
-                            ) {
-                        $this->updateVicFloraOccurrence($vrec, $vic->fid);
-                    }
-                }
-                else { 
-                    // this is a new occurrence for VicFlora
-                    // (meaning it couldn't be matched before)
-                    $vrec['is_updated_record'] = NULL;
-                    $vrec['is_new_record'] = TRUE;
-                    $this->insertVicFloraOccurrence($vrec);
-                }
-            }
-        }
-    }
-    
-    private function updateVicFloraOccurrence($rec, $fid) {
-        $update = $rec;
-        $update['timestamp_modified'] = date('Y-m-d H:i:s');
-        $update['is_updated_record'] = TRUE;
-        $this->pgdb->where('fid', $fid);
-        $this->pgdb->update('vicflora.vicflora_occurrence', $update);
-    }
-    
-    private function insertVicFloraOccurrence($rec) {
-        $insert = $rec;
-        $insert['timestamp_modified'] = date('Y-m-d H:i:s');
-        $insert['is_new_record'] = TRUE;
-        $this->pgdb->insert('vicflora.vicflora_occurrence', $insert);
-    }
-    
-    private function createVicFloraOccurrenceRecord($rec) {
-        $vrec = array();
-        $vrec['uuid'] = $rec['uuid'];
-        $vrec['catalog_number'] = $rec['catalog_number'];
-        $vrec['data_source'] = $rec['data_source'];
-        $name = $this->matchName($rec);
-        if (!$name) {
-            return FALSE;
-        }
-        $vrec = array_merge($vrec, $name);
-        $vrec['decimal_latitude'] = $rec['decimal_latitude'];
-        $vrec['decimal_longitude'] = $rec['decimal_longitude'];
-        $vrec['geom'] = $rec['geom'];
-        $vrec = array_merge($vrec, (array) $this->ci->mapmodel->getBioregion($rec['geom']));
-        $vrec['nrm_region'] = $this->ci->mapmodel->getNrmRegion($rec['geom']);
-        if ($this->dataSource = 'AVH') {
-            if ($rec['establishment_means']) {
-                $vrec['establishment_means'] = $rec['establishment_means'];
-                $vrec['establishment_means_source'] = 'AVH';
-            }
-        }
-        else {
-            unset($vrec['establishment_means']);
-            unset($vrec['occurrence_status']);
-        }
-        if (isset($rec['is_new_record'])) {
-            $vrec['is_new_record'] = TRUE;
-        }
-        elseif (isset($rec['is_updated_record'])) {
-            $vrec['is_updated_record'] = TRUE;
-        }
-        return $vrec;
-    }
-    
-    private function matchName($rec) {
-        $name = array();
-        $taxonID = FALSE;
-        $trec = $this->getTaxonId($rec['scientific_name']);
-        if ($trec) {
-            $taxonID = $trec->GUID;
-        }
-        if (!$taxonID) {
-            $taxonID = $this->getTaxonIdMatched($rec['scientific_name']);
-            if (!$taxonID) {
-                $taxonID = $this->getTaxonIdMatched($rec['unprocessed_scientific_name'], FALSE);
-                if (!$taxonID) { // name cannot be matched to name in VicFlora
-                    return FALSE;
-                }
-            }
-        }
-        $name['ala_scientific_name'] = $rec['scientific_name'];
-        $name['ala_unprocessed_scientific_name'] = $rec['unprocessed_scientific_name'];
-        $nameData = $this->getNameData($taxonID);
-        if (!$nameData) {
-            return FALSE;
-        }
-        return array_merge($name, $nameData);
-    }
-    
-    private function getNameData($taxonID) {
-        $this->db->select('t.GUID, n.FullName, td.Name AS Rank, t.RankID, tt.NodeNumber, t.OccurrenceStatus, t.EstablishmentMeans');
-        $this->db->from('vicflora_taxon t');
-        $this->db->join('vicflora_name n', 't.NameID=n.NameID');
-        $this->db->join('vicflora_taxontreedefitem td', 't.TaxonTreeDefItemID=td.TaxonTreeDefItemID');
-        $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
-        $this->db->where('t.GUID', $taxonID);
-        $query = $this->db->get();
-        if ($query->num_rows()) {
-            $row = $query->row();
-            $name = array(
-                'taxon_id' => $taxonID,
-                'species_guid' => NULL,
-                'genus_guid' => NULL,
-                'scientific_name' => $row->FullName,
-                'species' => NULL,
-                'genus' => NULL,
-                'occurrence_status' => $row->OccurrenceStatus,
-            );
-            switch ($row->EstablishmentMeans) {
-                case 'native (naturalised in part(s) of state)':
-                    $name['establishment_means'] = 'native';
-                    break;
-                case 'naturalised':
-                case 'sparingly established':
-                    $name['establishment_means'] = 'introduced';
-                    break;
-                default:
-                    $name['establishment_means'] = $row->EstablishmentMeans;
-                    break;
-            }
-            if ($row->RankID == 180) {
-                $name['genus_guid'] = $taxonID;
-                $name['genus'] = $row->FullName;
-            }
-            elseif ($row->RankID > 180) {
-                $this->db->select('t.RankID, t.GUID, n.FullName');
-                $this->db->from('vicflora_taxon t');
-                $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
-                $this->db->join('vicflora_name n', 't.NameID=n.NameID');
-                $this->db->where('tt.NodeNumber <=', $row->NodeNumber);
-                $this->db->where('tt.HighestDescendantNodeNumber >=', $row->NodeNumber);
-                $query = $this->db->get();
-                if ($query->num_rows()) {
-                    foreach ($query->result() as $row) {
-                        if ($row->RankID == 180) {
-                            $name['genus_guid'] = $row->GUID;
-                            $name['genus'] = $row->FullName;
-                        }
-                        elseif ($row->RankID == 220) {
-                            $name['species_guid'] = $row->GUID;
-                            $name['species'] = $row->FullName;
-                        }
-                    }
-                }
-            }
-            return $name;
-        }
-        else {
-            return array();
-        }
-    }
-    
-    
-    private function getTaxonId($sciName) {
-        $this->db->select('coalesce(at.GUID, t.GUID) AS GUID, n.FullName, an.FullName, t.TaxonomicStatus', FALSE);
-        $this->db->from('vicflora_taxon t');
-        $this->db->join('vicflora_name n', 't.NameID=n.NameID');
-        $this->db->join('vicflora_taxon at', 't.AcceptedID=at.TaxonID', 'left');
-        $this->db->join('vicflora_name an', 'at.NameID=an.NameID', 'left');
-        $this->db->where('n.FullName', $sciName);
-        $this->db->where("coalesce(at.TaxonomicStatus, t.TaxonomicStatus)='accepted'", FALSE, FALSE);
-        $query = $this->db->get();
-        if ($query->num_rows()) {
             return $query->row();
         }
         else {
@@ -380,31 +301,32 @@ class VicFloraMap {
         }
     }
     
-    private function getTaxonIdMatched($name, $processed=TRUE) {
-        $this->db->select('TaxonID');
-        $this->db->from('vicflora_ala_name_match');
-        if ($processed) {
-            $this->db->where('AlaScientificName', $name);
+    private function processScientificName($scientificName) {
+        $parsedName = $this->findParsedName($scientificName);
+        if ($parsedName) {
+            return $parsedName;
         }
         else {
-            $this->db->where('AlaProvidedName', $name);
-        }
-        $query = $this->db->get();
-        if ($query->num_rows()) {
-            $row = $query->row();
-            return $row->TaxonID;
-        }
-        else {
-            return FALSE;
+            $parsedName = $this->parseName($scientificName);
+            $scientificNameID = NULL;
+            $match = $this->matchName($parsedName->scientificName, $parsedName->canonicalNameComplete, 
+                    $parsedName->canonicalNameWithMarker, $parsedName->canonicalName);
+            if ($match) {
+                $scientificNameID = $match->scientific_name_id;
+                $this->pgdb->where('id', $parsedName->id);
+                $this->pgdb->update('vicflora.ala_name_match', array('vicflora_scientific_name_id', $match->scientific_name_id));
+            }
+            return (object) array(
+                'id' => $parsedName->id,
+                'vicflora_scientific_name_id' => $scientificNameID
+            );
         }
     }
     
-    private function findVicFloraOccurrence($uuid) {
-        $this->pgdb->select('fid, scientific_name, ala_scientific_name, ala_unprocessed_scientific_name,
-            decimal_longitude, decimal_latitude,
-            occurrence_status, establishment_means, establishment_means_source');
-        $this->pgdb->from('vicflora.vicflora_occurrence');
-        $this->pgdb->where('uuid', $uuid);
+    private function findParsedName($scientificName) {
+        $this->pgdb->select('id, vicflora_scientific_name_id');
+        $this->pgdb->from('vicflora.ala_parsed_name');
+        $this->pgdb->where('scientific_name', $scientificName);
         $query = $this->pgdb->get();
         if ($query->num_rows()) {
             return $query->row();
@@ -414,87 +336,97 @@ class VicFloraMap {
         }
     }
     
-    public function stateDistribution() {
-        $states = $this->getStates();
-        foreach ($states as $state) {
-            $taxa = $this->getTaxaForState($state);
-            foreach ($taxa as $name) {
-                $taxon = $this->getTaxonId($name);
-                if (!$taxon) {
-                    $taxon = $this->getTaxonIdMatched($name);
-                    if (!$taxon) {
-                        continue;
-                    }
-                }
-                if (is_object($taxon)) {
-                    $nameData = $this->getNameData($taxon->GUID);
-                    if ($nameData) {
-                        $update = array(
-                            'taxon_id' => $nameData['taxon_id'],
-                            'genus_guid' => $nameData['genus_guid'],
-                            'species_guid' => $nameData['species_guid'],
-                            'scientific_name' => $nameData['scientific_name'],
-                            'genus' => $nameData['genus'],
-                            'species' => $nameData['species'],
-                            'state_province' => $state
-                        );
-                        $stateDistributionId = $this->ci->mapmodel->findStateDistributionRecord($nameData['taxon_id'], $state);
-                        if ($stateDistributionId) {
-                            $update['timestamp_modified'] = date('Y-m-d H:i:s');
-                            $this->ci->mapmodel->updateStateDistributionRecord($update, $stateDistributionId);
-                        }
-                        else {
-                            $update['timestamp_created'] = date('Y-m-d H:i:s');
-                            $this->ci->mapmodel->insertStateDistributionRecord($update);
-                        }
-                    }
-                    else {
-                        print_r($taxon);
-                    }
-                }
-            }
-        }
-    }
-    
-    private function getStates() {
-        $params = array();
-        $params['fq'] = array(
-            'data_hub_uid' => 'dh2'
-        );
-        $params['facets'] = 'state';
-        $params['pageSize'] = 1;
-        $query = createQueryString('biocache_search', $params);
-        $result = doCurl($query, FALSE, TRUE);
+    private function parseName($scientificName) {
+        $result = doCurl('http://api.gbif.org/v1/parser/name', 'name=' . urlencode($scientificName), TRUE);
         $data = json_decode($result);
-        $facets = $data->facetResults;
-        $states = array();
-        foreach ($facets[0]->fieldResult as $facet) {
-            $states[] = $facet->label;
-        }
-        return $states;
+        $rec = $data[0];
+        $newID = $this->getNewParsedNameID();
+        $rec->id = $newID;
+        $this->insertParsedName($rec);
+        return $rec;
     }
     
-    private function getTaxaForState($state) {
-        $params = array();
-        $params['fq'] = array();
-        $params['fq']['data_hub_uid'] = 'dh2';
-        $params['fq']['class'] = 'Equisetopsida';
-        $params['fq']['state'] = '"' . $state . '"';
-        $params['fq'][] = '(rank:species OR rank:subspecies OR rank:variety OR rank:form)';
-        $params['pageSize'] = 1;
-        $params['facets'] = 'taxon_name';
-        $params['flimit'] = 100000;
-        $query = createQueryString('biocache_search', $params);
-        $result = doCurl($query, FALSE, TRUE);
-        $data = json_decode($result);
-        $facets = $data->facetResults;
-        $taxa = array();
-        foreach ($facets[0]->fieldResult as $facet) {
-            $taxa[] = $facet->label;
-        }
-        return $taxa;
+    private function getNewParsedNameID() {
+        $this->pgdb->select('max(id)+1 as new_id', FALSE);
+        $this->pgdb->from('vicflora.ala_parsed_name');
+        $query = $this->pgdb->get();
+        $row = $query->row();
+        return $row->new_id;
     }
     
+    private function insertParsedName($data) {
+        $data = $this->convertKeys($data);
+        if (isset($data->infra_specific_epithet)) {
+            $data->infraspecific_epithet = $data->infra_specific_epithet;
+            unset($data->infra_specific_epithet);
+        }
+        unset($data->authors_parsed);
+        $this->pgdb->insert('vicflora.ala_parsed_name', $data);
+    }
+    
+    private function convertKeys($data) {
+        $keys = array_keys((array) $data);
+        $convert = array();
+        foreach ($keys as $key) {
+            $convert[$key] = strtolower(preg_replace('/[A-Z]/', '_$0', $key));
+        }
+        $ret = array();
+        foreach ((array) $data as $key => $value) {
+            $ret[$convert[$key]] = $value;
+        }
+        return (object) $ret;
+    }
+    
+    private function matchName($scientificName, $canonicalNameComplete, 
+            $canonicalNameWithMarker, $canonicalName) {
+        $match = $this->exactMatch($scientificName, $canonicalNameComplete);
+        if ($match) {
+            return $match;
+        }
+        else {
+            $match = $this->canonicalNameMatch($canonicalNameWithMarker, $canonicalName);
+            return $match;
+        }
+        
+    }
+    
+    private function exactMatch($scientificName, $canonicalNameComplete) {
+        $this->db->select('n.GUID as scientific_name_id');
+        $this->db->from('vicflora_name n');
+        $this->db->join('vicflora_taxon t', 'n.NameID=t.NameID');
+        $this->db->join('vicflora_taxon a', 't.AcceptedID=a.TaxonID');
+        $this->db->where("(n.FullNameWithAuthor='$scientificName' OR 
+            n.FullNameWithAuthor='$canonicalNameComplete')", FALSE, FALSE);
+        $this->db->where('a.RankID >=', 220);
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->scientific_name_id;
+        }
+        else {
+            return FALSE;
+        }
+    }
+    
+    private function canonicalNameMatch($canonicalNameWithMarker, $canonicalName) {
+        $this->db->select('n.GUID as scientific_name_id');
+        $this->db->from('vicflora_name n');
+        $this->db->join('vicflora_taxon t', 'n.NameID=t.NameID');
+        $this->db->join('vicflora_taxon a', 't.AcceptedID=a.TaxonID');
+        $this->db->where("(n.FullName='$canonicalNameWithMarker' OR n.FullName='$canonicalName' 
+            OR REPLACE(FullName, '×', '')='$canonicalName')", FALSE, FALSE);
+        $this->db->where('a.RankID >=', 220);
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->scientific_name_id;
+        }
+        else {
+            return FALSE;
+        }
+    }
 }
 
+
 /* End of file VicFloraMap.php */
+/* Location: ./models/VicFloraMap.php */

@@ -1,14 +1,13 @@
 <?php
+require_once 'floramodel.php';
 
-class MapModel extends CI_Model {
+class MapModel extends FloraModel {
     var $pgdb;
     
     public function __construct() {
         parent::__construct();
         $this->pgdb = $this->load->database('postgis', TRUE);
     }
-    
-    
     
     public function checkOccurrences($guid, $rank) {
         $this->pgdb->select('count(*) AS num', FALSE);
@@ -20,6 +19,30 @@ class MapModel extends CI_Model {
         $query = $this->db->get();
         $row = $query->row();
         return $row->num;
+    }
+    
+    public function getOccurrence($uuid) {
+        $sql = "SELECT uuid, taxon_id, scientific_name, catalog_number, decimal_longitude, decimal_latitude, 
+                establishment_means, occurrence_status, sub_name_7
+            FROM vicflora.occurrence_view
+            WHERE uuid='$uuid'";
+        $query = $this->pgdb->query($sql);
+        return $query->result();
+    }
+    
+    public function getBioregionForOccurrence($uuid) {
+        $sql = "SELECT taxon_id, sub_code_7
+            FROM vicflora.occurrence_view
+            WHERE uuid='$uuid'";
+        $query = $this->pgdb->query($sql);
+        if ($query->num_rows()) {
+            $row = $query->row();
+            $sql = "SELECT taxon_id, sub_code_7, occurrence_status, establishment_means
+                FROM vicflora.distribution_bioregion_view
+                WHERE taxon_id='$row->taxon_id' AND sub_code_7='$row->sub_code_7'";
+            $qry = $this->pgdb->query($sql);
+            return $qry->row();
+        }
     }
     
     public function getBioregions() {
@@ -228,14 +251,10 @@ class MapModel extends CI_Model {
     }
     
     public function getDistributionDetail($guid) {
-        $this->pgdb->select('b.sub_code_7, b.sub_name_7, d.occurrence_status, d.establishment_means, b.depi_code');
-        $this->pgdb->from('vicflora.vicflora_distribution d');
-        $this->pgdb->join('vicflora.vicflora_bioregion b', 'd.locality_id=b.sub_code_7');
-        $this->pgdb->where('d.locality_type', 'IBRA7');
-        $this->pgdb->where('d.taxon_id', $guid);
-        //$this->pgdb->where_in('d.occurrence_status', array('present', 'endemic'));
-        //$this->pgdb->where_not_in('d.establishment_means', array('cultivated'));
-        $this->pgdb->order_by('b.depi_order');
+        $this->pgdb->select('sub_code_7, sub_name_7, depi_code, occurrence_status, establishment_means');
+        $this->pgdb->from('vicflora.distribution_bioregion_view');
+        $this->pgdb->where('taxon_id', $guid);
+        $this->pgdb->order_by('depi_order');
         $query = $this->pgdb->get();
         return $query->result_array();
     }
@@ -261,7 +280,37 @@ class MapModel extends CI_Model {
         }
     }
     
-    public function updateDistributionStatus($taxonid, $sub, $occ, $est) {
+    public function updateDistributionStatus($taxonid, $sub, $term, $value) {
+        $sql = "SELECT $term as tval FROM vicflora.vicflora_taxon WHERE id='$taxonid'";
+        $qry = $this->pgdb->query($sql);
+        $taxonValue = FALSE;
+        if ($qry->num_rows()) {
+            $rec = $qry->row();
+            $taxonValue = $rec->tval;
+        }
+        
+        $assertionType = ($term == 'establishment_means') ? 'establishmentMeans' : 'occurrenceStatus';
+        $this->pgdb->select("uuid, $term AS term_value, {$term}_source AS term_source");
+        $this->pgdb->from('vicflora.occurrence_view');
+        $this->pgdb->where("(taxon_id='$taxonid' OR species_id='$taxonid')", FALSE, FALSE);
+        $this->pgdb->where('sub_code_7', $sub);
+        $query = $this->pgdb->get();
+        if ($query->num_rows()) {
+            foreach ($query->result() as $row) {
+                if ($row->term_source != 'avh') {
+                    if ($value == $taxonValue) {
+                        $this->deleteVicFloraAssertion($row->uuid, $assertionType);
+                    }
+                    else {
+                        $this->insertVicFloraAssertion($row->uuid, $assertionType, $value, 'region');
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    /*public function updateDistributionStatus($taxonid, $sub, $occ, $est) {
         $updArr = array(
             'occurrence_status' => $occ,
             'establishment_means' => $est,
@@ -291,7 +340,7 @@ class MapModel extends CI_Model {
                 }
             }
         }
-    }
+    }*/
     
     private function getOccurrencesForRegion($taxonid, $region) {
         $this->pgdb->select("uuid, CASE WHEN occurrence_status IS NUll THEN 'present'
@@ -390,15 +439,24 @@ class MapModel extends CI_Model {
         return $est;
     }
     
-    public function insertVicFloraAssertion($uuid, $term, $value) {
+    public function insertVicFloraAssertion($uuid, $term, $value, $reason=NULL) {
+        $this->deleteVicFloraAssertion($uuid, $term);
+        
         $ins = array(
             'uuid' => $uuid,
             'term' => $term,
             'asserted_value' => $value,
             'timestamp_modified' => date('Y-m-d H:i:s'),
-            'user_id' => $this->session->userdata('id')
+            'user_id' => $this->session->userdata('id'),
+            'reason' => $reason
         );
         $this->pgdb->insert('vicflora.vicflora_assertion', $ins);
+    }
+    
+    public function deleteVicFloraAssertion($uuid, $term) {
+        $this->pgdb->where('uuid', $uuid);
+        $this->pgdb->where('term', $term);
+        $this->pgdb->delete('vicflora.vicflora_assertion');
     }
     
     private function getNameData($guid) {
@@ -611,15 +669,17 @@ class MapModel extends CI_Model {
     }
     
     public function getAlaNameOverview($taxonID) {
-        $this->pgdb->select("scientific_name, ala_scientific_name, ala_taxon_id, ala_unprocessed_scientific_name, 
+        $this->pgdb->select("t.accepted_name_usage AS scientific_name, o.scientific_name AS ala_scientific_name, 
+            o.taxon_id AS ala_taxon_id, o.unprocessed_scientific_name AS ala_unprocessed_scientific_name, 
             count(CASE WHEN data_source='AVH' THEN 1 ELSE NULL END) as count_avh,
             count(CASE WHEN data_source='VBA' THEN 1 ELSE NULL END) as count_vba", FALSE);
-        $this->pgdb->from('vicflora.vicflora_occurrence');
-        $this->pgdb->where('taxon_id', $taxonID);
-        $this->pgdb->group_by('scientific_name');
-        $this->pgdb->group_by('ala_scientific_name');
-        $this->pgdb->group_by('ala_taxon_id');
-        $this->pgdb->group_by('ala_unprocessed_scientific_name');
+        $this->pgdb->from('vicflora.avh_occurrence o');
+        $this->pgdb->join('vicflora.vicflora_taxon t', 'o.vicflora_scientific_name_id=t.scientific_name_id');
+        $this->pgdb->where('t.accepted_name_usage_id', $taxonID);
+        $this->pgdb->group_by('t.accepted_name_usage');
+        $this->pgdb->group_by('o.scientific_name');
+        $this->pgdb->group_by('o.taxon_id');
+        $this->pgdb->group_by('o.unprocessed_scientific_name');
         $query = $this->pgdb->get();
         return $query->result_array();
     }
@@ -718,7 +778,6 @@ class MapModel extends CI_Model {
     public function insertStateDistributionRecord($data) {
         $this->pgdb->insert('vicflora.vicflora_statedistribution', $data);
     }
-    
 }
 
 /* End of file mapmodel.php */

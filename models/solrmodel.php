@@ -35,6 +35,7 @@ class SolrModel extends CI_Model {
         }
 
         $facets = array(
+            'name_type',
             'taxonomic_status',
             'taxon_rank',
             'occurrence_status',
@@ -212,6 +213,127 @@ class SolrModel extends CI_Model {
         return (object) $result;
     }
     
+    public function solrChecklistSearch($ids) {
+        $facets = array(
+            'subclass',
+            'superorder',
+            'order',
+            'family',
+            'establishment_means',
+            'threat_status',
+            'media'
+        );
+
+        $fields = array(
+            'id',
+            'taxon_rank',
+            'scientific_name',
+            'scientific_name_authorship',
+            'taxonomic_status',
+            'family',
+            'occurrence_status',
+            'establishment_means',
+            'accepted_name_usage_id',
+            'accepted_name_usage',
+            'accepted_name_usage_authorship',
+            'accepted_name_usage_taxon_rank',
+            'name_according_to',
+            'sensu',
+            'threat_status',
+            'profile',
+            'vernacular_name'
+        );
+        
+        $limit = (count($ids) < 1000) ? count($ids) : 1000;
+        $i = 0;
+        $q = array();
+        while ($i < $limit) {
+            $q[] = 'id:' . $ids[$i];
+            $i++;
+        }
+        
+        $q = implode(' OR ', $q);
+        
+        $this->client->getPlugin('postbigrequest');
+        $this->query = $this->client->createSelect();
+        
+        $this->query->setQueryDefaultField('scientific_name');
+        $this->query->setQuery($q);
+        $this->query->setStart(0);
+        $this->query->setRows($limit);
+        $this->query->setFields($fields);
+        
+        $this->query->addSorts(array('scientific_name' => 'asc'));
+        $this->setFacets($facets);
+        
+        $resultSet = $this->client->select($this->query);
+        $result = array();
+        
+        $result['numFound'] = $resultSet->getNumFound();
+        
+        $result['docs'] = array();
+        foreach ($resultSet as $doc) {
+            $fl = array();
+            foreach ($fields as $field) {
+                $fl[$field] = $doc->$field;
+            }
+            $result['docs'][] = (object) $fl;
+        }
+        
+        $result['facets'] = array();
+        foreach ($facets as $facetfield) {
+            $facetData = $resultSet->getFacetSet()->getFacet($facetfield);
+            $facet = array();
+            $facet['name'] = $facetfield;
+            $facet['label'] = $this->facet_config[$facetfield]['label'];
+            $items = array();
+            $facet['items'] = array();
+            foreach ($facetData as $item => $count) {
+                $items[$item] = $count;
+            }
+            if (isset($this->facet_config[$facetfield]['customsort'])) {
+                foreach ($this->facet_config[$facetfield]['customsort'] as $key) {
+                    if (isset($items[$key]))
+                        $facet['items'][] = array(
+                            'name' => $key,
+                            'label' => ucfirst($key),
+                            'count' => $items[$key]
+                        );
+
+                }
+            }
+            elseif (isset($this->facet_config[$facetfield]['itemlabels'])) {
+                foreach ($this->facet_config[$facetfield]['itemlabels'] as $key => $label) {
+                    if (isset($items[$key]))
+                        $facet['items'][] = array(
+                            'name' => $key,
+                            'label' => $label,
+                            'count' => $items[$key]
+                        );
+                }
+            }
+            else {
+                foreach ($items as $key => $value)
+                    $facet['items'][] = array(
+                        'name' => $key,
+                        'label' => ucfirst($key),
+                        'count' => $value
+                    );
+            }
+            $result['facets'][] = $facet;
+        }
+        //$request = $this->client->createRequest($this->query);
+        //$result['request_uri'] = $request->getUri();
+        //$result['params'] = (object) $request->getParams();
+        $result['params'] = (object) array(
+            'q' => 'id:' . $ids[0],
+            'start' => 0,
+            'rows' => count($ids)
+        );
+        
+        return (object) $result;
+    }
+    
     public function browse($scientificName, $guid) {
         $ret = array();
         $qstring = urldecode(substr($this->session->userdata['last_search'], strpos($this->session->userdata['last_search'], '?')+1));
@@ -314,7 +436,6 @@ class SolrModel extends CI_Model {
             
         }
         return $ret;
-         
     }
     
     private function facetConfig() {
@@ -323,6 +444,11 @@ class SolrModel extends CI_Model {
         $this->facet_config['taxonomic_status'] = array(
             'label' => 'Taxonomic status',
             'customsort' => array('accepted', 'homotypic synonym', 'heterotypic synonym', 'synonym', 'misapplication')
+        );
+        
+        $this->facet_config['name_type'] = array(
+            'label' => 'Type of name',
+            'customsort' => array('scientific', 'hybrid name', 'hybrid formula', 'cultivar', 'informal')
         );
         
         $this->facet_config['end_or_higher_taxon'] = array(
@@ -516,6 +642,7 @@ class SolrModel extends CI_Model {
                 n.NameID,
                 n.FullName AS scientificName,
                 n.Author AS scientificNameAuthorship,
+                n.name_type,
                 r.GUID AS namePublishedInID,
                 r.Title AS namePublishedIn,
                 r.PublicationYear AS namePublishedInYear,
@@ -559,6 +686,7 @@ class SolrModel extends CI_Model {
         $this->doc->scientific_name_id = $row->scientificNameID;
         $this->doc->scientific_name = Encoding::toUTF8($row->scientificName);
         $this->doc->scientific_name_authorship = $row->scientificNameAuthorship;
+        $this->doc->name_type = $row->name_type;
         $this->doc->name_published_in_id = $row->namePublishedInID;
         $this->doc->name_published_in = $row->namePublishedIn;
         $this->doc->name_published_in_year = $row->namePublishedInYear;
@@ -585,6 +713,12 @@ class SolrModel extends CI_Model {
         if ($row->taxonomicStatus == 'accepted') {
             $this->doc->profile = $this->description($id);
             $this->doc->media = $this->media($id);
+            if ($row->AcceptedRankID == 220) {
+                $this->doc->species_id = $row->acceptedNameUsageID;
+            }
+            elseif ($row->AcceptedRankID > 220) {
+                $this->doc->species_id = $this->getSpeciesID($row->acceptedNameUsageID);
+            }
         }
         
         $this->doc->vernacular_name = $row->vernacularName;
@@ -624,9 +758,26 @@ class SolrModel extends CI_Model {
             $this->doc->apni_match_verification_status = $apni['apni_match_verification_status'];
         }
         
+        $this->doc->last_modified = date('Y-m-d\TH:i:s\Z');
+        
         $updateQuery->addDocuments(array($this->doc), $overwrite=true);
         $updateQuery->addCommit();
         $this->client->update($updateQuery);
+    }
+    
+    public function getSpeciesID($id) {
+        $select = "SELECT p.GUID
+            FROM vicflora_taxon t
+            JOIN vicflora_taxon p ON t.ParentID=p.TaxonID AND p.RankID=220
+            WHERE t.GUID='$id'";
+        $query = $this->db->query($select);
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->GUID;
+        }
+        else {
+            return FALSE;
+        }
     }
     
     public function deleteDocument($guid) {
@@ -765,7 +916,7 @@ class SolrModel extends CI_Model {
         $select = "SELECT count(*) AS tCount
             FROM vicflora_taxon t
             JOIN vicflora_taxon c ON t.TaxonID=c.ParentID
-            WHERE c.TaxonomicStatus='accepted'
+            WHERE c.TaxonomicStatus='accepted' AND (c.DoNotIndex IS NULL OR c.DoNotIndex=0)
               AND t.GUID='$id'";
         $query = $this->db->query($select);
         $row = $query->row();

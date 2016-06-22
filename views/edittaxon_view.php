@@ -369,80 +369,6 @@
     </div>
     </div> <!-- /.edit-form-section clearfix -->
     
-    <!-- APNI -->
-    <div class="edit-form-section clearfix">
-        <h3 class="col-md-12">APNI name match</h3>
-        
-        <div class="col-md-12">
-            <table class="apni-name-match table table-bordered">
-                <thead>
-                    <tr>
-                        <th>APNI No.</th>
-                        <th>APNI full name with authors</th>
-                        <th>Match type</th>
-                        <th>Verified</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if(isset($apni) && $apni):?>
-                    <?php foreach ($apni as $index => $apniname): ?>
-                    <tr>
-                        <td><?=anchor('https://www.anbg.gov.au/cgi-bin/apni?taxon_id=' . $apniname['ApniNo'], $apniname['ApniNo'],
-                                array('target' => '_blank')); ?></td>
-                        <td><?=$apniname['APNIFullNameWithAuthor']?><?=form_hidden("apni_id[$index]", $apniname['ApniID']);?></td>
-                        <td><?=$apniname['MatchType']?></td>
-                        <td><?=form_checkbox(array('name' => "apni_match_verified[$index]", 'value' => '1', 'checked' => $apniname['IsVerified']))?></td>
-                        <td><?=form_checkbox(array('name' => "apni_delete[$index]", 'value' => '1'))?></td>
-                    </tr>
-                    <?php endforeach;?>
-                    <?php endif;?>
-                </tbody>
-            </table>
-        </div>
-        <div class="new-apni-row col-md-12"><button class="apni-manual btn btn-default btn-sm">Add APNI number (manually)</button></div>
-    </div> <!-- /.edit-form-section clearfix -->
-    
-    <!-- Common names -->
-    <?php if (isset($commonnames)): ?>
-    <div class="edit-form-section clearfix">
-        <h3 class="col-md-12">Vernacular names</h3>
-        <div class="col-md-12">
-            <table class="common-names table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Vernacular name</th>
-                        <th>Preferred name</th>
-                        <th>Usage</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ($commonnames): ?>
-                    <?php foreach ($commonnames as $index => $commonname):?>
-                    <tr>
-                        <td><?=form_input(array('name' => "common_name[$index]", 'value' => $commonname['CommonName']))?></td>
-                        <td><?=form_checkbox(array('name' => "preferred[$index]", 'value' => 1, 'checked' => $commonname['IsPreferred']))?></td>
-                        <td><?=form_input(array('name' => "usage[$index]", 'value' => $commonname['NameUsage']))?></td>
-                        <td><?=form_checkbox(array('name' => "delete[$index]", 'value' => 1, 'checked' => FALSE))?>
-                        <?=form_hidden(array(
-                            "common_name_id[$index]" => $commonname['CommonNameID'],
-                            "common_name_old[$index]" => $commonname['CommonName'],
-                            "preferred_old[$index]" => $commonname['IsPreferred'],
-                            "usage_old[$index]" => $commonname['NameUsage']
-                        )); ?>
-
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-            <div class="new-common-name-row"><a href="#" class="btn btn-default btn-sm">Add row</a></div>
-        </div>
-    </div> <!-- /.edit-form-section clearfix -->
-    <?php endif; ?>
-
     <!-- Status -->
     <div class="edit-form-section clearfix" id="status">
         <h3 class="col-md-12">Status</h3>
@@ -625,61 +551,80 @@
         </div>
     </div> <!-- /.edit-form-section clearfix -->
     <?php endif;?>
-    
-    <!-- Distribution -->
+
+    <!-- APNI -->
     <div class="edit-form-section clearfix">
-        <h3 class="col-md-12">Distribution</h3>
-        <!-- Victoria -->
+        <h3 class="col-md-12">APNI name match</h3>
+        
         <div class="col-md-12">
-            <div class="form-group">
-            <?=form_label('Victoria', 'distv', array('class' => 'col-md-2 control-label text-left')); ?>
-                <div class="col-md-10">
-                    <?=form_textarea(array(
-                        'name' => 'distv',
-                        'id' => 'distv',
-                        'value' => check('DistV', $type, $taxondata),
-                        'class' => 'form-control',
-                        'rows' => 2
-                    )); ?>
-                </div>
-            <?=form_hidden('distv_old', check('DistV', $type, $taxondata)); ?>
-            </div>
+            <table class="apni-name-match table table-bordered">
+                <thead>
+                    <tr>
+                        <th>APNI No.</th>
+                        <th>APNI full name with authors</th>
+                        <th>Match type</th>
+                        <th>Verified</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if(isset($apni) && $apni):?>
+                    <?php foreach ($apni as $index => $apniname): ?>
+                    <tr>
+                        <td><?=anchor('https://www.anbg.gov.au/cgi-bin/apni?taxon_id=' . $apniname['ApniNo'], $apniname['ApniNo'],
+                                array('target' => '_blank')); ?></td>
+                        <td><?=$apniname['APNIFullNameWithAuthor']?><?=form_hidden("apni_id[$index]", $apniname['ApniID']);?></td>
+                        <td><?=$apniname['MatchType']?></td>
+                        <td><?=form_checkbox(array('name' => "apni_match_verified[$index]", 'value' => '1', 'checked' => $apniname['IsVerified']))?></td>
+                        <td><?=form_checkbox(array('name' => "apni_delete[$index]", 'value' => '1'))?></td>
+                    </tr>
+                    <?php endforeach;?>
+                    <?php endif;?>
+                </tbody>
+            </table>
         </div>
+        <div class="new-apni-row col-md-12"><button class="apni-manual btn btn-default btn-sm">Add APNI number (manually)</button></div>
+    </div> <!-- /.edit-form-section clearfix -->
+    
+    <!-- Common names -->
+    <?php if (isset($commonnames)): ?>
+    <div class="edit-form-section clearfix">
+        <h3 class="col-md-12">Vernacular names</h3>
+        <div class="col-md-12">
+            <table class="common-names table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Vernacular name</th>
+                        <th>Preferred name</th>
+                        <th>Usage</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($commonnames): ?>
+                    <?php foreach ($commonnames as $index => $commonname):?>
+                    <tr>
+                        <td><?=form_input(array('name' => "common_name[$index]", 'value' => $commonname['CommonName']))?></td>
+                        <td><?=form_checkbox(array('name' => "preferred[$index]", 'value' => 1, 'checked' => $commonname['IsPreferred']))?></td>
+                        <td><?=form_input(array('name' => "usage[$index]", 'value' => $commonname['NameUsage']))?></td>
+                        <td><?=form_checkbox(array('name' => "delete[$index]", 'value' => 1, 'checked' => FALSE))?>
+                        <?=form_hidden(array(
+                            "common_name_id[$index]" => $commonname['CommonNameID'],
+                            "common_name_old[$index]" => $commonname['CommonName'],
+                            "preferred_old[$index]" => $commonname['IsPreferred'],
+                            "usage_old[$index]" => $commonname['NameUsage']
+                        )); ?>
 
-        <!-- Australia -->
-        <div class="col-md-12">
-            <div class="form-group">
-            <?=form_label('Australia', 'dista', array('class' => 'col-md-2 control-label text-left')); ?>
-                <div class="col-md-10">
-                    <?=form_textarea(array(
-                        'name' => 'dista',
-                        'id' => 'dista',
-                        'value' => check('DistA', $type, $taxondata),
-                        'class' => 'form-control',
-                        'rows' => 2
-                    )); ?>
-                </div>
-            <?=form_hidden('dista_old', check('DistA', $type, $taxondata)); ?>
-            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+            <div class="new-common-name-row"><a href="#" class="btn btn-default btn-sm">Add row</a></div>
         </div>
-
-        <!-- World -->
-        <div class="col-md-12">
-            <div class="form-group">
-            <?=form_label('World', 'distw', array('class' => 'col-md-2 control-label text-left')); ?>
-                <div class="col-md-10">
-                    <?=form_textarea(array(
-                        'name' => 'distw',
-                        'id' => 'distw',
-                        'value' => check('DistW', $type, $taxondata),
-                        'class' => 'form-control',
-                        'rows' => 2
-                    )); ?>
-                </div>
-            <?=form_hidden('distw_old', check('DistW', $type, $taxondata)); ?>
-            </div>
-        </div>
-    </div> <!-- /.edit-form-section -->
+    </div> <!-- /.edit-form-section clearfix -->
+    <?php endif; ?>
 
     <!-- Notes -->
     <div class="edit-form-section clearfix">

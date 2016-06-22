@@ -90,8 +90,8 @@ class RoboFlow {
         $rec->PixelYDimension = $row['exif:PixelYDimension'];
         $rec->HeroImage = $row['HeroImage'];
         $rec->Rating = $row['xmp:Rating'];
-        $rec->ThumbnailUrlEnabled = (strtolower($row['ThumbnailUrlEnabled'])=='true') ? TRUE : FALSE;
-        $rec->PreviewUrlEnabled = (strtolower($row['PreviewUrlEnabled'])=='true') ? TRUE : FALSE;
+        $rec->ThumbnailUrlEnabled = (isset($row['ThumbnailUrlEnabled']) && strtolower($row['ThumbnailUrlEnabled'])=='true') ? TRUE : FALSE;
+        $rec->PreviewUrlEnabled = (isset($row['PreviewUrlEnabled']) && strtolower($row['PreviewUrlEnabled'])=='true') ? TRUE : FALSE;
         $tax = $this->findTaxon($row['dwc:scientificName']);
         if ($tax) {
             $rec->TaxonID = $tax->TaxonID;

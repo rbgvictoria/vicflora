@@ -151,10 +151,7 @@ $(function() {
     });
     
     $('.facets').on('change', 'input:checkbox', function( event ) {
-        var containingDiv = $(event.target).parent('li').parent('ul').parent('.facet');
-        if (containingDiv.length == 0) {
-            containingDiv = $(event.target).parent('li').parent('ul').parent('li').parent('ul').parent('.facet');
-        }
+        var containingDiv = $(event.target).parents('.facet').eq(0).clone();
         containingDiv.find('input:hidden').remove();
         var checkedboxes = containingDiv.find('input:checkbox:checked');
         if (checkedboxes.length > 0) {
@@ -175,12 +172,14 @@ $(function() {
 
             var name = containingDiv.attr('data-vicflora-facet-name');
 
-            containingDiv.append('<input type="hidden" name="' + name + '" value="' + encodeURI(str) + '"/>');
+            $(event.target).parents('.facet').eq(0)
+                    .append('<input type="hidden" name="' + name + '" value="' + encodeURI(str) + '"/>');
         }
         
-        var icon = containingDiv.find('.apply-filter');
-        if (icon.length == 0) {
-            containingDiv.children('h4').append('<a class="apply-filter" href="#">Apply</a>');
+        var icon = $(event.target).parents('.facet').eq(0).find('.apply-filter');
+        if (icon.length === 0) {
+            $(event.target).parents('.facet').eq(0).children('h4')
+                    .append('<a class="apply-filter" href="#">Apply</a>');
         }
     });
     
@@ -221,9 +220,6 @@ $(function() {
             $(this).find('.facet-footer').eq(0).hide();
         }
     });
-    
-    
-    //$('a.more').button();
     
     $('.facets').on('click', 'a.more', function( event ) {
         event.preventDefault();

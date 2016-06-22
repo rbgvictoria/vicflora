@@ -12,12 +12,14 @@ class TaxonModel extends CI_Model {
         $this->db->select('t.TaxonID, t.GUID, td.Name AS Rank, n.FullName, n.Author, r.Author AS InAuthor, 
             r.JournalOrBook, r.Series, r.Edition, r.Volume, r.Part, r.Page, r.PublicationYear,
             t.Sensu, n.NomenclaturalNote, t.TaxonomicStatus, t.OccurrenceStatus, t.EstablishmentMeans, 
-            t.Remarks, t.RankID, IF(p.ProfileID IS NOT NULL AND (p.AcceptedID IS NULL OR p.TaxonID=p.AcceptedID), p.ProfileID, NULL) AS UnmatchedProfile', FALSE);
+            t.Remarks, t.RankID, tt.NodeNumber, tt.HighestDescendantNodeNumber,
+            IF(p.ProfileID IS NOT NULL AND (p.AcceptedID IS NULL OR p.TaxonID=p.AcceptedID), p.ProfileID, NULL) AS UnmatchedProfile', FALSE);
         $this->db->select("distv.DistributionText AS DistV, dista.DistributionText AS DistA, distw.DistributionText AS DistW");
 
         $this->db->from('vicflora_taxon t');
         $this->db->join('vicflora_name n', 't.NameID=n.NameID');
         $this->db->join('vicflora_taxontreedefitem td', 't.TaxonTreeDefitemID=td.TaxonTreeDefItemID');
+        $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID', 'left');
         $this->db->join('vicflora_reference r', 'n.ProtologueID=r.ReferenceID', 'left');
         $this->db->join('vicflora_profile p', 't.TaxonID=p.TaxonID AND p.IsCurrent=1', 'left', false);
         $this->db->join('vicflora_distributionextra distv', "t.TaxonID=distv.AcceptedID AND distv.Scope='Victoria'", 'left', FALSE);
@@ -29,6 +31,20 @@ class TaxonModel extends CI_Model {
             return $query->row_array();
         else
             return FALSE;
+    }
+    
+    public function getTaxonID($guid) {
+        $this->db->select('TaxonID');
+        $this->db->from('vicflora_taxon');
+        $this->db->where('GUID', $guid);
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->TaxonID;
+        }
+        else {
+            return FALSE;
+        }
     }
     
     public function getTaxonName($guid) {
@@ -317,19 +333,29 @@ class TaxonModel extends CI_Model {
         return $query->result_array();
     }
     
-    public function getThumbnails($guid) {
+    public function getThumbnails($nodeNumber, $highestDescendantNodeNumber, $rankID) {
         $this->db->select('i.CumulusRecordID,i.GUID');
         $this->db->from('cumulus_image i');
         $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.TaxonID');
-        $this->db->join('vicflora_taxon p', "t.ParentID=p.TaxonID");
-        $this->db->where("(t.GUID='$guid' OR (p.GUID='$guid' AND p.RankID=220))", FALSE, FALSE);
+        $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
+        $this->db->where('tt.NodeNumber >=', $nodeNumber);
+        $this->db->where('tt.NodeNumber <=', $highestDescendantNodeNumber);
         $this->db->where('PixelXDimension >', 0);
         $this->db->where('i.ThumbnailUrlEnabled', true);
         $this->db->where('i.PreviewUrlEnabled', true);
         $this->db->group_by('i.ImageID');
-        $this->db->order_by('i.Subtype', 'ASC');
-        $this->db->order_by('i.HeroImage', 'DESC');
-        $this->db->order_by('i.Rating', 'DESC');
+        if ($rankID >= 220) {
+            $this->db->order_by('i.Subtype', 'ASC');
+            $this->db->order_by('i.HeroImage', 'DESC');
+            $this->db->order_by('i.Rating', 'DESC');
+        }
+        else {
+            $this->db->order_by('i.Subtype', 'DESC');
+            $this->db->order_by('i.HeroImage', 'DESC');
+            $this->db->order_by('i.Rating', 'DESC');
+            $this->db->order_by('rand()');
+        }
+        $this->db->limit(12);
         $query = $this->db->get();
         return $query->result();
     }
@@ -371,12 +397,13 @@ class TaxonModel extends CI_Model {
         }
     }
     
-    public function getHeroImage($guid) {
+    public function getHeroImage($nodeNumber, $highestDescendantNodeNumber, $rankID) {
         $this->db->select('i.GUID, i.CumulusRecordID, i.Subtype, i.PixelXDimension, i.PixelYDimension');
         $this->db->from('cumulus_image i');
         $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.TaxonID');
-        $this->db->join('vicflora_taxon p', 't.ParentID=p.TaxonID');
-        $this->db->where("(t.GUID='$guid' OR (p.GUID='$guid' AND p.RankID=220))");
+        $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
+        $this->db->where('tt.NodeNumber >=', $nodeNumber);
+        $this->db->where('tt.NodeNumber <=', $highestDescendantNodeNumber);
         $this->db->where('i.PixelXDimension >', 0);
         $this->db->where('i.ThumbnailUrlEnabled', true);
         $this->db->where('i.PreviewUrlEnabled', true);
@@ -384,6 +411,7 @@ class TaxonModel extends CI_Model {
         $this->db->order_by('i.Subtype', 'DESC');
         $this->db->order_by('i.HeroImage', 'DESC');
         $this->db->order_by('i.Rating', 'DESC');
+        $this->db->order_by('rand()');
         $this->db->limit(1);
         $query = $this->db->get();
         if ($query->num_rows()) {
@@ -427,15 +455,7 @@ class TaxonModel extends CI_Model {
         }
     }
     
-    public function getClassificationBreadCrumbs($guid) {
-        $this->db->select('tt.NodeNumber');
-        $this->db->from('vicflora_taxon t');
-        $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
-        $this->db->where('t.GUID', $guid);
-        $query = $this->db->get();
-        $row = $query->row();
-        $nodeNumber = $row->NodeNumber;
-        
+    public function getClassificationBreadCrumbs($nodeNumber) {
         $this->db->select('t.GUID, n.FullName');
         $this->db->from('vicflora_name n');
         $this->db->join('vicflora_taxon t', 'n.NameID=t.NameID');

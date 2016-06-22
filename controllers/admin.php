@@ -13,8 +13,6 @@ require_once 'third_party/Encoding/Encoding.php';
 require_once 'third_party/uuid/uuid.php';
 
 class Admin extends CI_Controller {
-// a class to allow users to log in and set a session var to say they
-// are logged in.
     var $data;
     
     function __construct() {
@@ -91,7 +89,13 @@ class Admin extends CI_Controller {
             }
             else {
                 $update = $this->taxonmodel->updateTaxon($guid);
+                $this->load->model('mapupdatemodel');
+                $this->mapupdatemodel->updateTaxon($guid);
                 if ($update) {
+                    $this->load->model('keybaseupdatemodel');
+                    $this->keybaseupdatemodel->updateProjectItem($guid);
+                    $this->load->model('mapupdatemodel');
+                    $this->mapupdatemodel->updateTaxon($guid);
                     if (count($update) == 1) {
                         $this->solrmodel->updateSynonyms($guid);
                         $this->solrmodel->updateDocument($guid);
@@ -138,10 +142,14 @@ class Admin extends CI_Controller {
         if ($this->input->post('submit')) {
             $newguid = $this->taxonmodel->updateTaxon($guid);
             if ($newguid) {
+                $this->load->model('keybaseupdatemodel');
+                $this->keybaseupdatemodel->updateProjectItem($newguid[0]);
+                $this->load->model('mapupdatemodel');
+                $this->mapupdatemodel->updateTaxa($newguid[0]);
                 $this->load->model('solrmodel');
                 $this->solrmodel->updateDocument($newguid[0]);
             }
-            redirect('flora/taxon/' . $newguid[0]);
+            //redirect('flora/taxon/' . $newguid[0]);
         }
         
         $this->data['taxondata'] = $this->taxonmodel->getParentData($guid);
@@ -270,6 +278,11 @@ class Admin extends CI_Controller {
         }
     }
     
+    public function solr_delete($guid) {
+        $this->load->model('solrmodel');
+        $this->solrmodel->deleteDocument($guid);
+    }
+    
     private function getSmallerDimension($img_path, $width, $height) {
         list($wid, $hei, $type, $attr)= getimagesize($img_path);
         $ratio = $wid / $hei;
@@ -342,8 +355,11 @@ class Admin extends CI_Controller {
             $est_old = $this->input->post('establishment_means_old');
             $est = $this->input->post('establishment_means');
             foreach ($subcodes as $index => $sub) {
-                if ($occ[$index] != $occ_old[$index] || $est[$index] != $est_old[$index]) {
-                    $this->mapmodel->updateDistributionStatus($this->input->post('taxon_id'), $sub, $occ[$index], $est[$index]);
+                if ($occ[$index] != $occ_old[$index]) {
+                    $this->mapmodel->updateDistributionStatus($this->input->post('taxon_id'), $sub, 'occurrence_status', $occ[$index]);
+                }
+                if ($est[$index] != $est_old[$index]) {
+                    $this->mapmodel->updateDistributionStatus($this->input->post('taxon_id'), $sub, 'establishment_means', $est[$index]);
                 }
             }
         }
@@ -606,25 +622,28 @@ class Admin extends CI_Controller {
         }
         $this->load->model('solrmodel');
         $this->solrmodel->updateAll();
+        $this->solr_unindex();
     }
     
     public function update_cumulus_images($date=FALSE) {
-        if (!$date) {
-            $date = date('Y-m-d');
-        }
         if (!$this->input->is_cli_request() ) {
             show_error('You don\'t have access to this page.', 403);
         }
         $dir = getcwd() . '/roboflow';
         $files = array();
-        if (is_dir($dir)) {
-            if ($dh = opendir($dir)) {
-                while (($file = readdir($dh)) !== false) {
-                    if (strlen($file) > 2 && date('Y-m-d', filemtime($dir . '/' . $file)) == $date) {
-                        $files[] = $file;
+        if (!$date) {
+            $files = scandir($dir, 1);
+        }
+        else {
+            if (is_dir($dir)) {
+                if ($dh = opendir($dir)) {
+                    while (($file = readdir($dh)) !== false) {
+                        if (strlen($file) > 2 && date('Y-m-d', filemtime($dir . '/' . $file)) == $date) {
+                            $files[] = $file;
+                        }
                     }
+                    closedir($dh);
                 }
-                closedir($dh);
             }
         }
         if (!$files) {
@@ -651,10 +670,47 @@ class Admin extends CI_Controller {
         $startTime = date('Y-m-d H:i:s');
         $numLoaded = $this->vicfloramap->updateOccurrences($from, $pageSize, $start);
         $endTime = date('Y-m-d H:i:s');
-        $this->vicfloramap->updateDistribution($startTime, $endTime);
-        $this->update_solr_index();
+        //$this->update_solr_index();
     }
-
+    
+    public function update_keybase($from=FALSE) {
+        if (!$this->input->is_cli_request() ) {
+            show_error('You don\'t have access to this page.', 403);
+        }
+        if ($from) {
+            try {
+                $dt = new DateTime($from);
+                $from = date('Y-m-d H:i:s', $dt->getTimestamp());
+            } catch (Exception $exc) {
+                exit($exc->getTraceAsString());
+            }
+        }
+        $this->load->model('keybaseupdatemodel');
+        $this->keybaseupdatemodel->updateKeyBaseProject($from);
+    }
+    
+    public function update_map_taxa($from=FALSE) {
+        if ($from) {
+            $from = $this->checkDate($from);
+        }
+        $this->load->model('mapupdatemodel');
+        $this->mapupdatemodel->updateTaxa($from);
+    }
+    
+    public function refresh_outliers() {
+        $this->load->library('VicFloraMap');
+        $this->vicfloramap->outliers();
+    }
+    
+    private function checkDate($date) {
+        try {
+            $dt = new DateTime($date);
+            return date('Y-m-d H:i:s', $dt->getTimestamp());
+        } catch (Exception $exc) {
+            exit($exc->getTraceAsString());
+        }
+    }
+    
 }
 
 /* End of file admin.php */

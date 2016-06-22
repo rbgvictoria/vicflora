@@ -16,7 +16,6 @@ if ( ! function_exists('doCurl')) {
         if ($proxy) {
             curl_setopt($ch, CURLOPT_PROXY, "http://10.15.14.4:8080"); 
             curl_setopt($ch, CURLOPT_PROXYPORT, 8080); 
-            curl_setopt ($ch, CURLOPT_PROXYUSERPWD, "helpdesk:glass3d");
         }
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);

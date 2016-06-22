@@ -19,22 +19,20 @@
                     </span>
                 </h2>
             </div>
-        </div>    
-            <!--div id="svg-editbioregions"></div-->
-        <div class="col-lg-9">
-            <div id="edit_distribution_map"></div>
-            <div id="mouse-position"></div>
         </div>
-        <div class="col-lg-3">
-        <?php if (!$bioregion_table): ?>
-            <div class="form-group"><label>Name in ALA</label><input class="form-control" name="ala_scientific_name" placeholder="processed name" />
-                <textarea class="form-control" name="ala_unprocessed_scientific_name" placeholder="provided (as) name" ></textarea></div>
-            <div class="form-group"><button class="btn btn-default" id="create_distribution_map">Create distribution map</button></div>
-        <?php else: ?>
-            <div class="form-group"><label>Name in ALA</label>
-                <textarea class="form-control" name="ala_unprocessed_scientific_name" placeholder="provided (as) name" ></textarea></div>
-            <div class="form-group"><button class="btn btn-default" id="add_occurrences">Add mismatched occurrences</button></div>
-        <?php endif; ?>
+        
+
+        <div class="col-lg-12">
+            <div class="map-frame">
+                <div id="edit_distribution_map"></div>
+                <div class="show-outliers">
+                    <label>
+                        <input type="checkbox" id="show_outliers"/>
+                        Show outliers
+                    </label>
+                </div>
+                <div id="mouse-position"></div>
+            </div>
         </div>
 
         <div class="col-md-12">
@@ -101,7 +99,7 @@
                                     <td><span class="legend-symbol" style="background-color:<?=$row['colour']?>"></span></td>
                                     <td><?=form_hidden("sub_code_7[$index]", $row['sub_code_7'])?><?=$row['sub_name_7']?></td>
                                     <td><?=form_hidden("occurrence_status_old[$index]", $row['occurrence_status'])?><?=form_dropdown("occurrence_status[$index]", $occ_options, $row['occurrence_status'], 'class="form-control input-sm"'); ?></td>
-                                    <td><?=form_hidden("establisment_means_old[$index]", $row['establishment_means'])?><?=form_dropdown("establishment_means[$index]", $est_options, $row['establishment_means'], 'class="form-control input-sm"'); ?></td>
+                                    <td><?=form_hidden("establishment_means_old[$index]", $row['establishment_means'])?><?=form_dropdown("establishment_means[$index]", $est_options, $row['establishment_means'], 'class="form-control input-sm"'); ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </table>

@@ -112,6 +112,24 @@ p.phenology:before {
     font-weight: bold;
 }
 
+p.distribution_australia {
+    font-style: normal;
+}
+
+p.distribution_australia:before {
+    content: "State distribution: ";
+    font-weight: bold;
+}
+
+p.distribution_world {
+    font-style: normal;
+}
+
+p.distribution_world:before {
+    content: "World distribution: ";
+    font-weight: bold;
+}
+
 p.habitat {
     font-style: normal;
 }

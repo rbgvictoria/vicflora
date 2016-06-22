@@ -44,6 +44,8 @@ CKEDITOR.stylesSet.add( 'custom_styles', [
     // Block-level styles.
     { name: 'Description', element: 'p', attributes: { 'class': 'description' } },
     { name: 'Phenology',  element: 'p', attributes: { 'class': 'phenology' } },
+    { name: 'State distribution',  element: 'p', attributes: { 'class': 'distribution_australia' } },
+    { name: 'World distribution',  element: 'p', attributes: { 'class': 'distribution_world' } },
     { name: 'Habitat',  element: 'p', attributes: { 'class': 'habitat' } },
     { name: 'Note',  element: 'p', attributes: { 'class': 'note' } },
     { name: 'References',  element: 'p', attributes: { 'class': 'references' } },
