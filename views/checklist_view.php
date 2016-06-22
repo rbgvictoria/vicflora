@@ -7,9 +7,19 @@
             <?=$park_name?>
             <?php endif; ?>
             </h1>
-            <p>This page allows the user to generate a list of vascular plants for any gazetted reserve in Victoria. 
-            Click on a point on the map below and a list of reserves will appear. Select a reserve and a checklist 
-            of plants will be generated below the map.</p>
+            <p>
+                Create your own checklist for any Victorian park or reserve in the <a href="https://www.environment.gov.au/land/nrs/science/capad"
+                target="_blank">Collaborative Australian Protected Area Database (CAPAD)</a>, based on occurrence data from <a 
+                href="http:avh.chah.org.au" target="_blank">Australia's Virtual Herbarium (AVH)</a> and the <a 
+                href="http://www.depi.vic.gov.au/environment-and-wildlife/biodiversity/victorian-biodiversity-atlas" 
+                target="_blank">Victorian Biodiversity Atlas (VBA)</a> 
+                and using the taxonomy of VicFlora.
+            </p>
+            <p>
+                Click on a point on the map below and a list of reserves will appear. Select a reserve and a checklist 
+                of vascular plant taxa will be generated below the map.
+            </p>
+            <p>&nbsp;</p>
         </div>
 
         <div class="col-md-7">
@@ -19,14 +29,27 @@
             <div id="nodelist">&nbsp;</div>
         </div>
 
+        <div class="col-md-12 clearfix">
+            <div class="row">
+                <div class="col-md-4">
+                    <div id="facets" class="facets form-horizontal">
+                        <div class="content"></div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div id="checklist-result"></div>
+                </div>
+            </div>
+        </div>
+        
         <div class="col-md-12">
             <div class="well well-sm" id="vicflora-checklist-source">
                 <h4>Source</h4>
                 <ul>
-                    <li><b>Protected areas:</b> <i>Collaborative Australian Protected Areas Database</i> (CAPAD) 2012, Commonwealth of Australia 2012</li>
+                    <li><b>Protected areas:</b> <i>Collaborative Australian Protected Areas Database</i> (CAPAD) 2014, Commonwealth of Australia 2014</li>
                     <li><b>Occurrence data:</b>
                         <ul>
-                            <li>AVH (2014). <i>Australia’s Virtual Herbarium</i>, Council of Heads of Australasian Herbaria, 
+                            <li>AVH (<?=date('Y')?>). <i>Australia’s Virtual Herbarium</i>, Council of Heads of Australasian Herbaria, 
                                 &lt;<a href="http://avh.chah.org.au">http://avh.chah.org.au</a>&gt;</li>
                             <li><i>Victorian Biodiversity Atlas</i>, © The State of Victoria, Department of Environment and Primary Industries (published Dec. 2014).</li>
                         </ul>
@@ -35,39 +58,52 @@
             </div>
         </div>
 
-        <div class="col-md-12">
-            <?php if (isset($checklist) && $checklist): ?>
-            <div class ="checklist">
-                <?php foreach ($checklist as $item): ?>
-                <?php if ($item['taxonRank'] == 'family'):?>
-                <h3><?=$item['scientificName']?></h3>
-                <?php elseif ($item['taxonRank'] == 'genus'): ?>
-                <h4><?=$item['scientificName']?></h4>
-                <?php else: ?>
-                <?php
-                    $name = '<span class="namebit">';
-                    $name .= str_replace(array(' subsp. ', ' var. ', ' f. ', ' nothosubsp. ', ' nothovar. '), array(
-                        '</span> subsp. <span class="namebit">', 
-                        '</span> var. <span class="namebit">', '</span> f. <span class="namebit">',
-                        '</span> nothosubsp. <span class="namebit">', 
-                        '</span> nothovar. <span class="namebit">'
-                        ), $item['scientificName']);
-                    $name .= '</span>'
-                ?>
-                <div class="currentname">
-                <?php if ($item['taxonRank'] != 'species'):?>
-                &emsp;
-                <?php endif; ?>
-                <?=anchor(site_url() . 'flora/taxon/' . $item['taxonID'], $name); ?>
-                <?php if ($item['scientificNameAuthor']): ?><?=$item['scientificNameAuthor']?><?php endif;?>
-                </div>
-                <?php endif; ?>
-
-                <?php endforeach; ?>
-            </div>
-            <?php endif; ?>
-        </div>
     </div>
 
 </div>
 <?php require_once('footer.php'); ?>
+
+<?php
+
+/*
+ *       <?php if (isset($checklist) && $checklist): ?>
+        <div class="col-md-12">
+            <div class ="checklist">
+                <?php 
+                    $family ='';
+                    $genus = '';
+                    $species = '';
+                ?>
+                <?php foreach ($checklist as $item): ?>
+                <?php 
+                    if($item->family != $family) {
+                        $family = $item->family;
+                        echo "<h3 class=\"checklist-family\">$family</h3>";
+                    }
+                    if ($item->genus != $genus) {
+                        $genus = $item->genus;
+                        echo "<h4 class=\"checklist-genus\">$genus</h4>";
+                    }
+                    if ($item->species != $species) {
+                        $species = $item->species;
+                        if ($species == $item->scientific_name) {
+                            echo '<div class="currentname checklist-species">';
+                            echo anchor(site_url() . 'flora/taxon/' . $item->taxon_id, '<span class="namebit">' . $item->scientific_name . '</span>');
+                            echo '</div>';
+                        }
+                        else {
+                            echo "<div class=\"checklist-species\"><b>$species</b></div>";
+                        }
+                    }
+                    if ($item->scientific_name != $item->species) {
+                        echo '<div class="currentname checklist-infraspecies">';
+                        echo anchor(site_url() . 'flora/taxon/' . $item->taxon_id, '<span class="namebit">' . $item->scientific_name . '</span>');
+                        echo '</div>';
+                    }
+                ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+ */
