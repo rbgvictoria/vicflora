@@ -77,11 +77,18 @@
                     $fqarr = explode(':', $fq);
 
                     $fcts = array();
-                    foreach ($solrresult->facets as $facet)
+                    foreach ($solrresult->facets as $facet) {
                         $fcts[] = $facet['name'];
-
-                    $key = array_search($fqarr[0], $fcts);
-                    $fq = '<b>' . $solrresult->facets[$key]['label'] . ':</b> ' . $fqarr[1];
+                    }
+                    
+                    if (substr($fqarr[0], 0, 1) == '-') {
+                        $key = array_search(substr($fqarr[0], 1), $fcts);
+                        $fq = '<b>-' . $solrresult->facets[$key]['label'] . ':</b> ' . $fqarr[1];
+                    }
+                    else {
+                        $key = array_search($fqarr[0], $fcts);
+                        $fq = '<b>' . $solrresult->facets[$key]['label'] . ':</b> ' . $fqarr[1];
+                    }
                     
                     $endOrHigher = false;
                     if ($fqarr[0] == 'end_or_higher_taxon')

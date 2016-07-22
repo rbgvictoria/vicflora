@@ -443,31 +443,32 @@ class SolrModel extends CI_Model {
         
         $this->facet_config['taxonomic_status'] = array(
             'label' => 'Taxonomic status',
-            'customsort' => array('accepted', 'homotypic synonym', 'heterotypic synonym', 'synonym', 'misapplication')
+            'customsort' => array('accepted', 'homotypic synonym', 'heterotypic synonym', 'synonym', 'misapplication', null)
         );
         
         $this->facet_config['name_type'] = array(
             'label' => 'Type of name',
-            'customsort' => array('scientific', 'hybrid name', 'hybrid formula', 'cultivar', 'informal')
+            'customsort' => array('scientific', 'hybrid name', 'hybrid formula', 'cultivar', 'informal', null)
         );
         
         $this->facet_config['end_or_higher_taxon'] = array(
             'label' => 'End or higher taxa',
             'itemlabels' => array(
                 'end' => 'End taxa',
-                'higher' => 'Higher taxa'
+                'higher' => 'Higher taxa',
+                null => '(blanks)'
             )
         );
         
         $this->facet_config['taxon_rank'] = array(
             'label' => 'Taxon rank',
             'customsort' => array('kingdom', 'class', 'subclass', 'superorder', 'order', 'family',
-                'genus', 'species', 'subspecies', 'variety', 'forma', 'cultivar')
+                'genus', 'species', 'subspecies', 'variety', 'forma', 'cultivar', null)
         );
         
         $this->facet_config['occurrence_status'] = array(
             'label' => 'Occurrence status',
-            'customsort' => array('present', 'endemic', 'extinct', 'excluded')
+            'customsort' => array('present', 'endemic', 'extinct', 'excluded', null)
         );
         
         $this->facet_config['establishment_means'] = array(
@@ -478,7 +479,9 @@ class SolrModel extends CI_Model {
                 'introduced' => 'Introduced',
                 'naturalised' => 'Naturalised',
                 'sparingly established' => 'Sparingly established',
+                'adventive' => 'Sparingly established',
                 'uncertain' => 'Uncertain',
+                null => '(blanks)'
             )
         );
         
@@ -494,7 +497,8 @@ class SolrModel extends CI_Model {
                 'VROT_v' => 'Vic.: Vulnerable (v)',
                 'VROT_r' => 'Vic.: Rare (r)',
                 'VROT_k' => 'Vic.: Data deficient (k)',
-                'FFG listed' => 'Vic.: FFG listed'
+                'FFG listed' => 'Vic.: FFG listed',
+                null => '(blanks)'
             )
         );
         
@@ -505,7 +509,7 @@ class SolrModel extends CI_Model {
         
         $this->facet_config['epbc'] = array(
             'label' => 'EPBC',
-            'customsort' => array('EX', 'CR', 'EN', 'VU')
+            'customsort' => array('EX', 'CR', 'EN', 'VU', null)
         );
         
         $this->facet_config['vrot'] = array(
@@ -516,12 +520,13 @@ class SolrModel extends CI_Model {
                 'v' => 'Vulnerable (v)',
                 'r' => 'Rare (r)',
                 'k' => 'Data deficient (k)',
+                null => '(blanks)'
             )
         );
         
         $this->facet_config['ffg'] = array(
             'label' => 'FFG',
-            'itemlabels' => array('L' => 'Listed')
+            'itemlabels' => array('L' => 'Listed'),
         );
         
         $this->facet_config['subclass'] = array(
@@ -567,7 +572,7 @@ class SolrModel extends CI_Model {
         $this->facet_config['profile'] = array(
             'label' => 'Profile available',
             'customsort' => array('accepted', 'accepted plus', 'homotypic synonym',
-                'heterotypic synonym', 'misapplication')
+                'heterotypic synonym', 'misapplication', null)
         );
 
         $this->facet_config['apni_match_type'] = array(
@@ -577,6 +582,7 @@ class SolrModel extends CI_Model {
                 'FullName' => 'Full name without authors',
                 'MultipleMatches' => 'Multiple matches',
                 'NotMatched' => 'Not matched',
+                null => '(blanks)'
             )
         );
         
@@ -584,7 +590,8 @@ class SolrModel extends CI_Model {
             'label' => 'APNI match verification status',
             'itemlabels' => array(
                 'Verified' => 'Verified',
-                'Not verified' => 'Not verified'
+                'Not verified' => 'Not verified',
+                null => '(blanks)'
             )
         );
         
@@ -593,7 +600,8 @@ class SolrModel extends CI_Model {
             'itemlabels' => array(
                 'profile' => 'Profile',
                 'illustration' => 'Illustration',
-                'photograph' => 'Photograph'
+                'photograph' => 'Photograph',
+                null => '(blanks)'
             )
         );
         
@@ -603,6 +611,7 @@ class SolrModel extends CI_Model {
         $this->facetConfig();
         $facetset = $this->query->getFacetSet();
         $facetset->setMinCount(1);
+        $facetset->setMissing(TRUE);
         $facetset->setLimit(-1);
         $facetset->setSort('index');
         foreach ($facets as $facetfield) {
@@ -711,7 +720,10 @@ class SolrModel extends CI_Model {
         $this->doc->accepted_name_usage_taxon_rank = $row->acceptedNameUsageTaxonRank;
         
         if ($row->taxonomicStatus == 'accepted') {
-            $this->doc->profile = $this->description($id);
+            $description = $this->description($id);
+            if ($description) {
+                $this->doc->profile = $description;
+            }
             $this->doc->media = $this->media($id);
             if ($row->AcceptedRankID == 220) {
                 $this->doc->species_id = $row->acceptedNameUsageID;
@@ -961,9 +973,9 @@ class SolrModel extends CI_Model {
             $ret[] = 'native';
             $ret[] = 'also naturalised';
         }
-        elseif ($dbvalue =="naturalised") {
+        elseif (in_array ($dbvalue, array('naturalised', 'adventive'))) {
             $ret[] = 'introduced';
-            $ret[] = 'naturalised';
+            $ret[] = $dbvalue;
         }
         else {
             $ret[] = $dbvalue;

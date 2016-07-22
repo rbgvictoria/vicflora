@@ -21,6 +21,7 @@
     <h3>Filters</h3>
     <div class="content">
     <?php foreach($solrresult->facets as $facet):?>
+    <?php if (!(count($facet['items']) == 1 && !$facet['items'][0]['name'])):?>
     <div class="facet collapsible" data-vicflora-facet-name="<?=$facet['name']?>">
         <?php 
             $checkeditems = array();
@@ -33,10 +34,21 @@
         <ul class="form-group">
             <?php foreach($facet['items'] as $item): ?>
             <?php
+                if (!$item['name']) {
+                    if (!$item['count']) {
+                        continue;
+                    }
+                    $item['label'] = '(blanks)';
+                } 
                 $istr = (strpos($item['name'], ' ')) ? '"' . $item['name'] . '"' : $item['name'];
                 $istr = str_replace(array('[', ']'), array('\\[', '\\]'), $istr);
                 $fqarray = $filters;
-                $fqarray[$facet['name']] = $istr;
+                if ($item['name']) {
+                    $fqarray[$facet['name']] = $istr;
+                }
+                else {
+                    $fqarray['-' . $facet['name']] = '*';
+                }
                 
                 $fqstrarr = array();
                 foreach ($fqarray as $key => $value) {
@@ -51,7 +63,7 @@
                 );
                 
                 $indent = false;
-                if (($facet['name'] == 'establishment_means' && in_array($item['name'], array('also naturalised', 'naturalised', 'sparingly established'))) || 
+                if (($facet['name'] == 'establishment_means' && in_array($item['name'], array('also naturalised', 'naturalised', 'adventive'))) || 
                         ($facet['name'] == 'occurrence_status' && in_array($item['name'], array('endemic'))))
                     $indent = ' indent';
             ?>
@@ -66,6 +78,7 @@
             }
         ?>
     </div>
+    <?php endif; ?>
     <?php endforeach; ?>
     </div>
 </div>
