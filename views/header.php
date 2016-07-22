@@ -11,14 +11,11 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/jqueryui.autocomplete.css" />
     <link rel="stylesheet" type="text/css" href="<?=base_url()?>js/colorbox/example1/colorbox.css" />
-    <!--link rel="stylesheet" type="text/css" href="<?=base_url()?>js/OpenLayers/theme/default/style.css" type="text/css"-->
-    <!--link rel="stylesheet" type="text/css" href="<?=base_url()?>js/OpenLayers/theme/default/google.css" type="text/css"-->
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/main.css" />
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/vicflora.css?v=<?=filemtime('css/vicflora.css')?>" />
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/keybase.player.css?v=<?=filemtime('css/keybase.player.css')?>" />
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/vicflora.keybase.player.css?v=<?=filemtime('css/vicflora.keybase.player.css')?>" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/main.css')?>" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/keybase.player.css')?>" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/vicflora.css')?>" />
     <?php if ($this->session->userdata('name')): ?>
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/vicflora.admin.css?v=<?=filemtime('css/vicflora.admin.css')?>" />
+        <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/vicflora.admin.css')?>" />
     <?php endif; ?>
 
     <?php if (isset($css)): ?>
@@ -29,26 +26,20 @@
 
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="<?=base_url()?>js/modernizr.custom.13288.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/colorbox/jquery.colorbox-min.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/jspath.min.js"></script>
-    <!--script src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js" type="text/javascript"></script>
-    <script src="http://epsg.io/28355.js" type="text/javascript"></script-->
     <script src="http://openlayers.org/en/v3.14.1/build/ol.js" type="text/javascript"></script>
-    <!--script src="<?=base_url()?>js/OpenLayers/OpenLayers.js" type="text/javascript"></script-->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    <!--script src="<?=base_url()?>js/jquery.vicflora.openlayers.js?v=<?=filemtime('js/jquery.vicflora.openlayers.js')?>"></script-->
-    <script src="<?=base_url()?>js/jquery.vicflora.ol3.js?v=<?=filemtime('js/jquery.vicflora.ol3.js')?>"></script>
-    <script src="<?=base_url()?>js/jquery.keybase.key.js?v=<?=filemtime('js/jquery.keybase.key.js')?>"></script>
-    <script src="<?=base_url()?>js/vicflora.js?v=<?=filemtime('js/vicflora.js')?>"></script>
-    <script src="<?=base_url()?>js/colorbox/jquery.vicflora.colorbox.js?v=<?=filemtime('js/colorbox/jquery.vicflora.colorbox.js')?>"></script>
-    <!--script src="<?=base_url()?>js/jquery.vicflora.elastic.js"></script-->
+    <script src="<?=base_url()?><?=autoVersion('js/jquery.vicflora.ol3.js')?>"></script>
+    <script src="<?=base_url()?><?=autoVersion('js/jquery.keybase.key.js')?>"></script>
+    <script src="<?=base_url()?><?=autoVersion('js/vicflora.js')?>"></script>
+    <script src="<?=base_url()?><?=autoVersion('js/colorbox/jquery.vicflora.colorbox.js')?>"></script>
     
     <?php if(isset($this->session->userdata['name'])):?>
     <script src="<?=base_url()?>third_party/contextMenu/jquery.contextMenu.js"></script>
     <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/jquery.contextMenu.css" />
-    <script src="<?=base_url()?>js/jquery.vicflora.edit-taxon.js?v=<?=filemtime('js/jquery.vicflora.edit-taxon.js')?>"></script>
+    <script src="<?=base_url()?><?=autoVersion('js/jquery.vicflora.edit-taxon.js')?>"></script>
     <script src="<?=base_url()?>third_party/ckeditor_4.4.0/ckeditor.js"></script>
     <script src="<?=base_url()?>third_party/ckeditor_4.4.0/adapters/jquery.js"></script>
     <?php endif; ?>

@@ -149,7 +149,7 @@ EOT;
         $sql = "SELECT uuid, taxon_id, scientific_name, catalog_number, decimal_longitude, decimal_latitude, 
                 establishment_means, occurrence_status, sub_name_7
             FROM vicflora.occurrence_view
-            WHERE taxon_id='$taxonid'
+            WHERE accepted_name_usage_id='$taxonid'
               AND ST_Dwithin(geom, ST_GeomFromText('POINT($long $lat)', 4326), 0.08)";
         $query = $this->pgdb->query($sql);
         return $query->result();

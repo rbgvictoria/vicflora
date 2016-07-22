@@ -315,7 +315,7 @@ class TaxonModel extends CI_Model {
     }
     
     public function getApniNames($guid) {
-        $this->db->select('a.ApniID, t.GUID, a.MatchType, a.ApniNo, a.APNIFullNameWithAuthor, a.IsVerified');
+        $this->db->select('a.ApniID, t.GUID, a.GUID as ApniScientificNameID, a.MatchType, a.ApniNo, a.APNIFullNameWithAuthor, a.IsVerified');
         $this->db->from('vicflora_taxon t');
         $this->db->join('vicflora_name n', 't.NameID=n.NameID');
         $this->db->join('vicflora_apni a', 'n.NameID=a.NameID');

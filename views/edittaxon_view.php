@@ -475,7 +475,7 @@
                             'native (naturalised in part(s) of state)' => 'native and naturalised',
                             'introduced' => 'introduced',
                             'naturalised' => 'naturalised',
-                            'sparingly established' => 'sparingly established',
+                            'adventive' => 'sparingly established',
                             'uncertain' => 'uncertain'
                         ),
                         ($type == 'add child') ? 'native' : check('EstablishmentMeans', $type, $taxondata),

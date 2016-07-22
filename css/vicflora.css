@@ -722,3 +722,9 @@ span.assertion-ala-name {
 .checklist-infraspecies {
     padding-left: 45px;
 }
+
+/* Override KeyBase stuff
+*******************************/
+.keybase-player-window h3 {
+    background-color: rgb(127,148,87);
+}

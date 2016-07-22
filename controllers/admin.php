@@ -24,6 +24,7 @@ class Admin extends CI_Controller {
         }
         $this->load->helper('url');
         $this->load->helper('form');
+        $this->load->helper('versioning');
         $this->load->helper('captcha');
         $this->load->model('authenticationmodel');
     }

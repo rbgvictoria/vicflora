@@ -47,15 +47,16 @@ class MapUpdateModel extends FloraModel {
         $data['accepted_name_usage_id'] = $row->acceptedNameUsageID;
         $data['scientific_name_id'] = $row->scientificNameID;
         
-        if ($row->taxonomicStatus == 'accepted') {
-            $classification = $this->higherClassification($row->NodeNumber);
+        $node = ($row->NodeNumber) ? $row->NodeNumber : $row->AcceptedNodeNumber;
+        if ($node) {
+            $classification = $this->higherClassification($node);
             $data = array_merge($data, (array) $classification);
-            if ($row->AcceptedRankID == 220) {
-                $data['species_id'] = $guid;
-            }
-            elseif ($row->AcceptedRankID > 220) {
-                $data['species_id'] = $this->getSpeciesID($guid);
-            }
+        }
+        if ($row->AcceptedRankID == 220) {
+            $data['species_id'] = $row->acceptedNameUsageID;
+        }
+        elseif ($row->AcceptedRankID > 220) {
+            $data['species_id'] = $this->getSpeciesID($row->acceptedNameUsageID);
         }
 
         $this->pgdb->select('id');

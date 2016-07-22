@@ -146,7 +146,7 @@
 
             <?php if ($apni && count($apni) == 1):?>
                 <span class="apni">
-                    <?=anchor('http://biodiversity.org.au/apni.name/' . $apni[0]['ApniNo'] . '.html', '<small>APNI</small>', array('target' => '_blank'));?>
+                    <?=anchor($apni[0]['ApniScientificNameID'] . '/api/apni-format', '<small>APNI</small>', array('target' => '_blank'));?>
                 </span>
             <?php endif; ?>
             </p>
@@ -160,8 +160,9 @@
                 <p><span class="vicflora-label">Occurrence status:</span><span class="vicflora-stat-value"><?=ucfirst($namedata['OccurrenceStatus']); ?></span></p>
                 <?php endif; ?>
                 <?php if($namedata['TaxonomicStatus'] == 'accepted'): ?> 
-                <p><span class="vicflora-label">Establishment means:</span><span class="vicflora-stat-value"><?=ucfirst($namedata['EstablishmentMeans'])?></span></p>
-                <?php if ($attributes && array_intersect(array('establishmentMeans', 'EPBC (Jan. 2014)', 'VROT', 'FFG'), 
+                <p><span class="vicflora-label">Establishment means:</span><span class="vicflora-stat-value"><?=($namedata['EstablishmentMeans'] == 
+                        'adventive') ? 'Sparingly established' : ucfirst($namedata['EstablishmentMeans'])?></span></p>
+                <?php if ($attributes && array_intersect(array('EPBC (Jan. 2014)', 'VROT', 'FFG'), 
                         array_keys($attributes))): ?>
                 <?php 
                     $vrot = array(

@@ -7,11 +7,11 @@
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/views/solr_search_view.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/controllers/flora.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/views/edittaxon_view.php</file>
-            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/libraries/StateDistribution.php</file>
-            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/views/solr_result.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/views/editdistribution_view.php</file>
-            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/js/jquery.vicflora.edit-taxon.js</file>
+            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/views/solr_result.php</file>
+            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/libraries/StateDistribution.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/js/jquery.vicflora.ol3.js</file>
+            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/js/jquery.vicflora.edit-taxon.js</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/models/keybaseupdatemodel.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/models/checklistmodel.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/models/mapmodel.php</file>
@@ -24,10 +24,9 @@
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/views/solr_facets.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/css/vicflora.css</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/libraries/VicFloraMap.php</file>
+            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/views/taxon_view.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/models/mapupdatemodel.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/controllers/ajax.php</file>
-            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/views/taxon_view.php</file>
-            <file>file:/C:/Users/nklaze/Documents/Git/vicflora/js/jquery.vicflora.openlayers.js</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/helpers/curl_helper.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/helpers/ala_ws_helper.php</file>
             <file>file:/C:/Users/nklaze/Documents/Git/vicflora/js/vicflora.js</file>
