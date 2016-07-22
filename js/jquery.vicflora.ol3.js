@@ -91,7 +91,7 @@ var EditMap = function() {
           params: {
               LAYERS: 'vicflora:occurrence_view', 
               TRANSPARENT: true,
-              CQL_FILTER: "taxon_id='" + taxonid + "'"
+              CQL_FILTER: "accepted_name_usage_id='" + taxonid + "'"
           },
           serverType: 'geoserver'
         }),
