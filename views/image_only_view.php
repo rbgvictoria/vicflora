@@ -72,7 +72,7 @@
             <?=$image->Creator?>, &copy; <?=($image->RightsHolder) ? $image->RightsHolder : 'Royal Botanic Gardens Victoria';?>,
             <?=date('Y')?>, <?=$license?>.
         </p>
-        <?php if ($image->SubjectCategory == 'Flora of the Otway Plain and Ranges plate'): ?>
+        <?php if (isset($image->SubjectCategory) && $image->SubjectCategory == 'Flora of the Otway Plain and Ranges plate'): ?>
         <p>Reproduced with permission from <i>Flora of the Otway Plain and Ranges 1: Orchids, Irises, Lilies, Grass -trees, 
             Mat-rushes and Other Petaloid Monocotyledons / Flora of the Otway Plain and Ranges 2: Daisies, Heaths, Peas, 
             Saltbushes, Sundews, Wattles and Other Shrubby and Herbaceous Dicotyledons</i> by Enid Mayfield.
