@@ -588,6 +588,17 @@ $(function() {
     if (location.href.indexOf('/st/') > -1) {
         $('.sixteen.columns>h2').before('<div class="edit-static"><a href="' + location.href + '/_edit">Edit</a></div>');
     }
+    
+    $('.legend .fa-list-ul').on('click', function() {
+        $(this).hide();
+        $('.legend img, .legend .fa-remove').show();
+    });
+    
+    $('.legend .fa-remove').on('click', function() {
+        $('.legend img, .legend .fa-remove').hide();
+        $('.legend .fa-list-ul').show();
+    });
+    
 });
 
 function search() {

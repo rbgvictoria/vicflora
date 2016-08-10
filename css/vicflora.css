@@ -728,3 +728,35 @@ span.assertion-ala-name {
 .keybase-player-window h3 {
     background-color: rgb(127,148,87);
 }
+
+/* Distribution map legend
+**************************************/
+.distribution-map-frame {
+    position: relative;
+}
+
+.legend {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    border: solid 1px #ccc;
+    padding: 3px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.legend .fa-list-ul {
+    color: #aaa;
+}
+
+.legend .fa-remove {
+    color: #aaa;
+    display: none;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+
+.legend img {
+    display: none;
+}

@@ -474,7 +474,15 @@
                             <h3>Victoria</h3>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div id="svg-avhdistribution"></div>
+                                    <div class="distribution-map-frame">
+                                        <div id="svg-avhdistribution"></div>
+                                        <div class="legend">
+                                            <i class="fa fa-list-ul fa-lg"></i>
+                                            <img src="<?=base_url()?>images/vicflora-map-legend.png" alt="" />
+                                            <i class="fa fa-remove"></i>
+                                        </div>
+                                        
+                                    </div>
                                     <div><b>Source: </b>AVH (2014). <i>Australia&apos;s Virtual Herbarium</i>, Council of Heads of 
                                         Australasian Herbaria, &lt;<a href="http://avh.chah.org.au">http://avh.chah.org.au</a>&gt;.
                                         <a href="http://avh.ala.org.au/occurrences/search?taxa=<?=str_replace(' ', '+', 
