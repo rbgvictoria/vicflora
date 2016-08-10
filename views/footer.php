@@ -3,7 +3,7 @@
                 <div class="container">
                     <div class="row">
                         <!--div class="licence"><a href="http://creativecommons.org/licenses/by/3.0/au/"><img src="http://i.creativecommons.org/l/by/1.0/88x31.png" alt="CC BY 3.0 AU" height="31" width="88" /></a></div-->
-                        <div class="col-lg-12 copyright text-right">&copy; 2015 Royal Botanic Gardens Victoria</div>
+                        <div class="col-lg-12 copyright text-right">&copy; <?=date('Y')?> Royal Botanic Gardens Victoria</div>
                     </div>
                 </div>
             </div>
