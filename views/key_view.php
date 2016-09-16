@@ -1,10 +1,11 @@
+<?php require_once 'header.php';?>
 <div class="container">
     <div class="keybase-container">
         <div class="row">
             <div class="col-md-12">
-                <div class="breadcrumbs"></div>
+                <ol class="breadcrumb"></ol>
                 <h1 class="key-title"></h1>
-                <div role="tabpanel">
+                <div class="vicflora-tab clearfix">
 
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs" role="tablist">
@@ -20,17 +21,14 @@
                         <div role="tabpanel" class="tab-pane" id="tab_bracketed">
                             <div id="keybase-bracketed" class="keybase-panel"></div>
                         </div>
-                        <div role="tabpanel" class="tab-pane" id="tab_indented">
-                            <div id="keybase-indented" class="keybase-panel"></div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="tab_about"></div>
                     </div> <!-- /.tab-content -->
 
                 </div> <!-- /role:tabpanel -->
                 <div class="keybase-key-source"></div>
-                <div class="keybase-link text-right"><a href="" target="_blank">Open key in KeyBase</a></div>
+                <div class="keybase-link text-right"><a href="" target="_blank">Open key in KeyBase <i class="fa fa-external-link"></i></a></div>
             </div>
 
         </div>
     </div>
 </div>
+<?php require_once 'footer.php';?>

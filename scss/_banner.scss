@@ -1,0 +1,137 @@
+/*
+Copyright 2016 Royal Botanic Gardens Victoria.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* 
+    Created on : 16/08/2016, 2:35:41 PM
+    Author     : nklazenga
+*/
+
+/* Banner
+-------------------------------------------------- */
+
+@import "social-media";
+@import "top-nav";
+
+
+#banner {
+    @include clearfix;
+    background-color: $gray-dark;
+    border-top: solid 3px $brand-primary;
+    margin-bottom: 8px;
+    
+    .navbar-brand {
+        height: auto;
+        padding: 8px 15px;
+        vertical-align: baseline;
+        @media screen and (min-width: 768px) {
+            display: none;
+        }
+        
+        a {
+            display: inline-block;
+            vertical-align: baseline;
+            
+            &.brand-rbg {
+                width: 100px;
+
+                img {
+                    width: 100%;
+                    height: auto;
+                    vertical-align: baseline;
+                }
+            }
+            
+        }
+    }
+    
+    @media screen and (min-width: 768px) {
+        padding-bottom: 10px;
+    }
+}
+
+
+
+
+
+#header {
+    display: none;
+    
+    @media screen and (min-width: 768px) {
+        display: block;
+    }
+}
+
+
+
+#header > div {
+    display: inline-block;
+    vertical-align: baseline;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    line-height: 1;
+    
+    a, img {
+        vertical-align: baseline;
+        padding-bottom: 0;
+        margin-bottom: 0;
+        line-height: 1;
+    }
+}
+
+
+#logo {
+    width: 100px;
+}
+
+#site-name {
+    margin-left: 20px;
+}
+
+#site-name a, .navbar-brand a {
+    font-size: 40px;
+    color: $brand-primary;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+}
+
+#site-name a:hover,
+#site-name a:focus {
+    text-decoration: none;
+}
+
+#subtitle {
+    margin-left: 20px;
+    color: $brand-primary;
+    font-size: 20px;
+    letter-spacing: -2px;
+}
+
+#hidden-login-link {
+    color: transparent;
+}
+
+#hidden-login-link:hover {
+    text-decoration: none;
+    color: transparent;
+}
+
+/* Login link
+-------------------------------------------------- */
+.login {
+    float: right;
+    color: #fff;
+}
+
+

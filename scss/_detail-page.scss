@@ -1,0 +1,216 @@
+/*
+Copyright 2016 Royal Botanic Gardens Victoria.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* 
+    Created on : 15/08/2016, 6:41:26 PM
+    Author     : nklazenga
+*/
+
+
+/* breadcrumb
+-----------------------------------------------------*/
+.breadcrumb {
+    background-color: transparent;
+    border: none;
+    margin-left: -15px;
+
+    li + li:before {
+        content: "> ";
+    }
+    
+    li {
+        
+        .form-control {
+            display: inline-block;
+            width: auto;
+        }
+    }
+}
+
+.back-link {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+/* Taxon names
+-----------------------------------------------------*/
+h2.scientific-name, h2.preferred-common-name {
+    margin-top: 0;
+    @media screen and (min-width: 768px) {
+        margin-top: 20px;
+    }
+}
+
+h2.scientific-name {
+    margin-right: 30px;
+}
+
+h2.preferred-common-name {
+    font-weight: normal;
+}
+
+
+/* VicFlora detail page 
+-----------------------------------------------------*/
+
+select[name="siblings"], select[name="children"] {
+    max-width: 200px;
+    border-color: #ddd;
+}
+
+.vicflora-label {
+    display: inline-block;
+    width: 168px;
+    font-weight: bold;
+    vertical-align: top;
+}
+
+.vicflora-stat-value {
+    display: inline-block;
+}
+
+.status p {
+    margin-bottom: 0;
+}
+
+.tab-pane {
+    padding: 15px 0;
+}
+
+.scientific_name {
+    font-style: italic;
+}
+
+.apni {
+    display: inline-block;
+    margin-left: 15px;
+}
+
+#tab-distribution {
+    figure {
+        margin-bottom: 15px;
+        
+        img {
+            @include img-responsive;
+        }
+        
+        .legend {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            border: solid 1px transparent;
+            padding: 3px;
+            border-radius: 4px;
+
+            .fa-remove {
+                color: #aaa;
+                display: none;
+                position: absolute;
+                top: 3px;
+                right: 3px;
+            }
+            
+            img {
+                margin: -3px;
+                padding: 3px;
+                background-color: #fff;
+                display: none;
+            }
+        }
+    }
+    
+    .table {
+        margin-top: 4px;
+    }
+}
+
+.table th {
+    background-color: $gray-lighter;
+}
+
+@import "bioregions-table";
+
+
+
+.vicflora-tab {
+    margin-top: 30px;
+    
+    .nav-tabs {
+        margin-left: -15px;
+        border-bottom: none;
+        
+        a {
+            font-weight: bold;
+            &:hover {
+                border-color: transparent;
+                background-color: transparent;
+            }
+        }
+        
+        li.active a {
+            border-color: transparent;
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+}
+
+/* Hero image and profile map
+-------------------------------------------------*/
+
+// https://css-tricks.com/snippets/sass/maintain-aspect-ratio-mixin/
+@mixin aspect-ratio($width, $height) {
+  position: relative;
+  &:before {
+    display: block;
+    content: "";
+    width: 100%;
+    padding-top: ($height / $width) * 100%;
+  }
+  > .content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+}
+
+.profile-rigth-pane {
+    margin-top: 25px;
+    @media screen and (min-width: $screen-md-min) {
+        margin-top: 0;
+    }
+}
+
+.hero-image, .profile-map {
+    margin-bottom: 10px;
+    
+    .image-padding {
+        border: solid 1px $gray-lighter;
+        padding: 4px;
+    }
+    
+    .image-box {
+        @include aspect-ratio(3,2);
+        
+        img {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+}

@@ -1,0 +1,105 @@
+/*
+Copyright 2016 Royal Botanic Gardens Victoria.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* 
+    Created on : 18/08/2016, 5:54:19 PM
+    Author     : nklazenga
+*/
+
+/* Search
+-----------------------------------------------------------*/
+#search {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+#search label {
+    font-weight: normal;
+}
+
+
+.query-result-nav {
+    padding: 0;
+}
+
+.query-result-nav .fa {
+    padding: 0 5px;
+    color: #999;
+}
+
+.query-result-nav a>.fa {
+    color: inherit;
+}
+
+.query-result-rows {
+    display: inline-block;
+    width: 12em;
+    text-align: center;
+    border: solid 1px #cccccc;
+    border-radius: 4px;
+    padding: 4px;
+    margin: 0 10px;
+}
+
+.query-result-header {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    
+    .download {
+        display: none;
+        @media (min-width: $screen-md-min) {
+            display: block;
+        }
+    }
+    
+    &::after {
+        display: block;
+        content: '';
+        clear: both;
+    }
+}
+
+.query-result-footer {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+
+
+.num-matches {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.search-name-entry {
+    padding: 5px 0;
+    
+    .fam {
+        @media (min-width: $screen-sm-min) {
+            text-align: right;
+        }
+    }
+    
+    .vernacular-name {
+        display: inline-block;
+        margin-left: 20px;
+        color: #bb9d13;
+        font-size: $brand-primary;
+    }
+}
+
+

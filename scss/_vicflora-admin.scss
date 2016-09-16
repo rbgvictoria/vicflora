@@ -1,0 +1,104 @@
+/*
+Copyright 2016 Royal Botanic Gardens Victoria.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* 
+    Created on : 24/08/2016, 2:52:48 PM
+    Author     : Niels Klazenga
+*/
+
+/* Taxon edit menu
+--------------------------------*/
+.taxon-edit-menu {
+    display: none;
+}
+
+@media only screen and (min-width: 768px) {
+    .taxon-edit-menu {
+        display:block;
+    }
+}
+
+.taxon-edit-menu a, #new_accepted_name {
+    @extend .btn;
+    @extend .btn-sm;
+    @extend .btn-primary;
+}
+
+/* Taxon edit page
+---------------------------------*/
+
+.form-horizontal .control-label.text-left {
+    text-align: left;
+}
+
+.ui-autocomplete {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: left;
+  font: inherit;
+}
+
+#status .ui-autocomplete {
+  z-index: 100000;
+}
+
+.has-changed {
+  background-color: #ff9;
+}
+
+#new_parent, #new_taxon {
+    display: none;
+}
+
+.editor-menu, .new-profile {
+    margin: 16px 0;
+}
+
+.record-update {
+    margin-top: 20px;
+    border-top: solid 1px #999;
+}
+
+.record-update .form-group {
+    margin-bottom: 0;
+}
+
+/* Edit distribution page
+------------------------------------*/
+#edit_distribution_map {
+    width: 840px;
+    height: 490px;
+}
+
+/* Edit glossary page
+------------------------------------*/
+h1 .glossary-term-name {
+  color: #2f8a26;
+}
+
+.rel-delete, .rel-add {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+/* Edit static content page
+------------------------------------*/
+#submit_div {
+    text-align: right;
+    margin-top: 10px;
+}
+

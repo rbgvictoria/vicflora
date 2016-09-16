@@ -1,31 +1,30 @@
 <?php require_once('header.php'); ?>
 <div class="container">
     <div class="row">
+        <div class="col-lg-12">
+            <h1>Search</h1>
+        </div>
     <?=form_open('flora/search', array('method' => 'get')); ?>
-    <div id="full-width-panel" class="col-lg-12">
-        <div id="search" class="clearfix">
-            <?php 
-                $initval = $solrresult->params->q;
-                if ($initval == '*:*') $initval = FALSE;
-                $initval = str_replace('\\', '', $initval);
-                if (!strpos($initval, ':')) $initval = trim($initval, ' *');
-            ?>
-            <div class="form-inline">
-                <div class="form-group">
-                    <?=form_input(array('name' => 'q', 'id' => 'term', 'value' => $initval, 'class' => 'form-control')); ?>
-                    <button class="btn btn-default" type="submit">Find</button>
-                </div>
-            </div>
-            <div class="form-inline">
-                <div class="form-group">
-                    <?=form_checkbox(array('id' => 'excludeHigherTaxa', 'checked' => strpos($this->input->server('QUERY_STRING'), 'end_or_higher_taxon:end'), 'value'=> '1', 'class'=>'form-control'));?>
-                    <?=form_label('Exclude higher taxa', 'excludeHigherTaxa', array('class' => 'control-label')); ?>
-                </div>
+    <div id="left-side-panel" class="col-md-4">
+    <div id="search">
+        <?php 
+            $q = $solrresult->params->q;
+            if (substr($q, 0, 1) === '"' && substr($q, -1) === '"') {
+                $q = trim($q, '"');
+            }
+        ?>
+        <div class="search-form form-horizontal">
+            <div class="input-group">
+                <?=form_input(array('name' => 'q', 'id' => 'term', 'value' => $q, 'class' => 'form-control', 'placeholder' => 'Enter taxon name...')); ?>
+                <div class="submit input-group-addon"><i class="fa fa-search fa-lg"></i></div>
             </div>
         </div>
+        <div class="exclude-higher-taxa form-inline">
+            <?=form_checkbox(array('id' => 'excludeHigherTaxa', 'checked' => strpos($this->input->server('QUERY_STRING'), 'end_or_higher_taxon:end'), 'value'=> '1'));?>
+            <?=form_label(' Exclude higher taxa', 'excludeHigherTaxa', array('class' => 'control-label')); ?>
+        </div>
     </div>
-    
-    <div id="left-side-panel" class="col-md-4">
+
     <div class="query">
         <h3>Query</h3>
         <div class="content">

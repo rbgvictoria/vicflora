@@ -21,10 +21,12 @@
                     );
                     echo form_textarea($data);
             ?>
-            <div id="submit_div"><?=form_submit('submit', 'Submit')?></div>
+            <div id="submit_div">
+                <a href="<?=$_SERVER['HTTP_REFERER']?>" class="btn btn-primary btn-sm">Cancel</a>
+                <button type="submit" name="submit" value="submit" class="btn btn-primary btn-sm">Submit</button>
+            </div>
 
             <div>&nbsp;</div>
-            <!-- <div><a class="colorbox_load_image" href="<?=site_url()?>key/loadimage">Upload image file</a></div> -->
 
 
             <?=form_close()?>

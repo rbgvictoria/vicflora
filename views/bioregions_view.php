@@ -6,7 +6,7 @@
         </div>
         <div class="col-md-8">
             <?php if (isset($map)): ?>
-            <img src="<?=$map?>" alt="Bioregions of Victoria" usemap="#vicflora_bioregion" />
+            <img class="img-responsive" src="<?=$map?>" alt="Bioregions of Victoria" usemap="#vicflora_bioregion" />
             <?php require_once 'includes/bioregions_imagemap_600.php';?>
             <div id="info"></div>
             <?php endif; ?>

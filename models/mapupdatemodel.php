@@ -30,7 +30,7 @@ class MapUpdateModel extends FloraModel {
             case 'native (naturalised in part(s) of state)':
                 $data['establishment_means'] = 'native';
                 break;
-            case 'sparingly established':
+            case 'adventive':
                 $data['establishment_means'] = 'introduced';
                 break;
             default:

@@ -254,6 +254,7 @@ class MapModel extends FloraModel {
         $this->pgdb->select('sub_code_7, sub_name_7, depi_code, occurrence_status, establishment_means');
         $this->pgdb->from('vicflora.distribution_bioregion_view');
         $this->pgdb->where('taxon_id', $guid);
+        $this->pgdb->where_not_in('occurrence_status', array('absent', 'doubtful'));
         $this->pgdb->order_by('depi_order');
         $query = $this->pgdb->get();
         return $query->result_array();

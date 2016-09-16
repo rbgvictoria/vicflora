@@ -1,0 +1,123 @@
+/*
+Copyright 2016 Royal Botanic Gardens Victoria.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* 
+    Created on : 18/08/2016, 3:24:58 PM
+    Author     : nklazenga
+*/
+
+/* Filters/facets
+-----------------------------------------------------------*/
+.query ul {
+    padding-left: 20px;
+}
+
+.query .glyphicon, .facets .glyphicon {
+    font-size: 12px;
+    padding-right: 5px;
+    top: 0;
+}
+
+.query h3>.glyphicon, .facets h3>.glyphicon {
+    padding-left: 5px;
+}
+
+
+
+.facets {
+
+    h4 {
+        margin-top: 12px;
+        margin-bottom: 5px;
+    }
+    
+    .content {
+        display: none;
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        
+        @media (min-width: $screen-md-min) {
+            display: block;
+            max-height: none;
+        }
+    }
+
+    .checkbox {
+        position: relative;
+        label {
+            padding-left: 0;
+        }
+        input {
+            position: relative;
+            top: 2px;
+        }
+    }
+}
+
+.facet ul {
+    padding-left: 35px;
+    max-height: 190px;
+    overflow: auto;
+    margin-bottom: 0;
+    margin-right: 0 !important;
+}
+
+.facet ul li.checkbox {
+    padding-top: 0;
+}
+
+.facet .indent {
+    padding-left: 20px;
+}
+
+.apply-filter {
+    padding: 2px 4px;
+    float: right;
+}
+
+.more, .fewer {
+    cursor: pointer;
+}
+
+.more:after, .fewer:after {
+    content: " ...";
+}
+
+.more:focus, .fewer:focus {
+    text-decoration: none;
+}
+
+.facet ul::-webkit-scrollbar {
+    width: 12px;
+}
+
+.facet ul::-webkit-scrollbar-track   {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+
+.facet ul::-webkit-scrollbar-thumb {
+    border-radius: 10px; 
+    background: #ddd;  
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
+}
+
+.facet ul::-webkit-scrollbar-corner {
+    display: none;
+}
+
+
+

@@ -8,7 +8,7 @@ class AutoCompleteModel extends CI_Model {
     
     public function findNames($searchstring) {
         $ret = array();
-        if (strpos($searchstring, ' ')) {
+        /*if (strpos($searchstring, ' ')) {
             $this->db->select('n.FullName AS Name');
             $this->db->from('vicflora_taxon t');
             $this->db->join('vicflora_name n', 't.NameID=n.NameID');
@@ -27,7 +27,48 @@ class AutoCompleteModel extends CI_Model {
             $this->db->group_by('n.FullName');
         }
         $this->db->order_by('Name');
-        $query = $this->db->get();
+        $query = $this->db->get();*/
+        
+        if (strpos($searchstring, ' ')) {
+            $select = <<<EOT
+SELECT n.FullName as Name
+FROM vicflora_taxon t
+JOIN vicflora_name n ON t.NameID=n.NameID
+WHERE t.RankID >= 220
+  AND t.DoNotIndex IS NULL
+  AND n.FullName LIKE '$searchstring%'
+UNION
+SELECT c.CommonName AS Name
+FROM vicflora_taxon t
+JOIN vicflora_name n ON t.NameID=n.NameID
+JOIN vicflora_commonname c ON t.TaxonID=c.TaxonID
+WHERE t.DoNotIndex IS NULL
+AND c.IsPreferred=1
+AND c.CommonName LIKE '%$searchstring%'
+ORDER BY Name                    
+EOT;
+        }
+        else {
+            $select = <<<EOT
+SELECT n.FullName as Name
+FROM vicflora_taxon t
+JOIN vicflora_name n ON t.NameID=n.NameID
+WHERE t.RankID <= 180
+  AND t.DoNotIndex IS NULL
+  AND n.Name LIKE '$searchstring%'
+UNION
+SELECT c.CommonName AS Name
+FROM vicflora_taxon t
+JOIN vicflora_name n ON t.NameID=n.NameID
+JOIN vicflora_commonname c ON t.TaxonID=c.TaxonID
+WHERE t.DoNotIndex IS NULL
+AND c.IsPreferred=1
+AND c.CommonName LIKE '%$searchstring%'
+ORDER BY Name                    
+EOT;
+        }
+        $query = $this->db->query($select);
+        
         if ($query->num_rows()) {
             foreach ($query->result() as $row)
                 $ret[] = $row->Name;

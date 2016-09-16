@@ -1,0 +1,61 @@
+/*
+Copyright 2016 Royal Botanic Gardens Victoria.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* 
+    Created on : 13/08/2016, 10:55:26 PM
+    Author     : Niels Klazenga, Royal Botanic Gardens Victoria
+*/
+
+$icon-font-path: '../third_party/bower_components/bootstrap-sass/assets/fonts/bootstrap/';
+@function font-path($path) {
+  @return $path;
+}
+
+$font-family-sans-serif:  "Gotham A", "Gotham B", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+$brand-primary: rgb(187, 157, 19);
+$brand-dark-background: rgb(215, 187, 68);
+
+$body-bg: rgb(241, 235, 208);
+$text-color: rgb(65, 70, 63);
+$link-color: #bb9d13;
+
+$gray-dark: rgb(65, 70, 63);
+$gray-light: #999;
+$gray-lighter: #bbb;
+$border-color: $gray-lighter;
+$table-border-color: $border-color;
+
+@import "../third_party/bower_components/bootstrap-sass/assets/stylesheets/bootstrap-sprockets";
+@import "../third_party/bower_components/bootstrap-sass/assets/stylesheets/bootstrap";
+
+@import "custom";
+@import "names";
+
+@import "banner";
+@import "home-page";
+@import "search";
+
+@import "classification";
+@import "detail-page";
+@import "images";
+@import "checklist";
+@import "glossary";
+@import "static-pages";
+
+@import "footer";
+
+@import "vicflora-admin";
+@import "keybase";

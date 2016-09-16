@@ -1,5 +1,3 @@
-var base_url = location.href.substr(0, location.href.indexOf('/', location.href.indexOf('vicflora')));
-
 $(function() {
     /*
      * Configuration for context menu to enable opening of the edit form from
@@ -401,6 +399,16 @@ $(function() {
         }
     });
     
+    
+    /*
+     * WYSIWYG editor for static pages
+     */
+    //$('#taxon_remarks').ckeditor();
+    if ($('#ckeditor1').length) {
+        CKEDITOR.replace("ckeditor1", {
+            customConfig: base_url + '/js/ckeditor.static.config.js'
+        });
+    }
     
     /*
      * WYSIWYG editor for taxon remarks

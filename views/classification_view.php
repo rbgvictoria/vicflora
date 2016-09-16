@@ -18,7 +18,7 @@
             <?php endif; ?>
 
             <?php if ($taxon): ?>
-            <div class="cl-separator-higher"><?=anchor(site_url() . 'flora/classification/' . $ancestors[count($ancestors)-1]['GUID'], '<span class="glyphicon glyphicon-triangle-top"></span>Higher taxa');?></div>
+            <div class="cl-separator-higher"><span class="glyphicon glyphicon-triangle-top"></span>Higher taxa</div>
             <div class="classification currenttaxon">
                 <div class="currentname<?=($taxon['RankID']>=180) ? ' italic' : '';?>">
                     <?php $author = ($taxon['Author']) ? ' <span class="author">' . $taxon['Author'] . '</span>' : ''; ?>

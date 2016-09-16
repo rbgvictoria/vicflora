@@ -30,7 +30,7 @@ var EditMap = function() {
     var boundaries = new ol.layer.Tile({
         title: "State boundaries",
         source: new ol.source.TileWMS({
-          url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+          url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
           params: {
               LAYERS: 'vicflora:cst_vic', 
               TRANSPARENT: true,
@@ -44,7 +44,7 @@ var EditMap = function() {
     var boundaries2 = new ol.layer.Tile({
         title: "State boundaries dup",
         source: new ol.source.TileWMS({
-          url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+          url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
           params: {
               LAYERS: 'vicflora:cst_vic', 
               TRANSPARENT: true,
@@ -59,7 +59,7 @@ var EditMap = function() {
     var bioregions = new ol.layer.Tile({
         title: "Victorian bioregions",
         source: new ol.source.TileWMS({
-          url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+          url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
           params: {
               LAYERS: 'vicflora:vicflora_bioregion', 
               TRANSPARENT: true,
@@ -73,7 +73,7 @@ var EditMap = function() {
     var bioregionsEstablismentMeans = new ol.layer.Tile({
         title: "Victorian bioregions according to establishment means",
         source: new ol.source.TileWMS({
-          url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+          url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
           params: {
               LAYERS: 'vicflora:distribution_bioregion_view', 
               TRANSPARENT: true,
@@ -87,7 +87,7 @@ var EditMap = function() {
     var occurrences = new ol.layer.Tile({
         title: "Occurrences for taxon",
         source: new ol.source.TileWMS({
-          url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+          url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
           params: {
               LAYERS: 'vicflora:occurrence_view', 
               TRANSPARENT: true,
@@ -101,7 +101,7 @@ var EditMap = function() {
     var outliers = new ol.layer.Tile({
         title: "Outliers for taxon",
         source: new ol.source.TileWMS({
-          url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+          url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
           params: {
               LAYERS: 'vicflora:outlier_view', 
               TRANSPARENT: true,
@@ -315,17 +315,12 @@ var Checklist = function() {
     this.pageSize = 50;
     this.orderBy = "scientificName";
     
-    this.mapquest = new ol.layer.Tile({
-        style: 'Road',
-        source: new ol.source.MapQuest({layer: 'osm'})
-    });
-    
     this.carto = new ol.layer.Tile({ 
         source: new ol.source.XYZ({ 
-            url:'http://{1-4}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+            url:'https://cartodb-basemaps-b.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
             attributions: [new ol.Attribution({
-                html: '© <a href="http://cartodb.com/attributions">CartoDB</a> ' +
-                 '© <a href="http://www.openstreetmap.org/copyright">' +
+                html: '© <a href="https://cartodb.com/attributions">CartoDB</a> ' +
+                 '© <a href="https://www.openstreetmap.org/copyright">' +
                  'OpenStreetMap contributors</a>'
             })]
         })
@@ -334,7 +329,7 @@ var Checklist = function() {
     this.boundaries = new ol.layer.Tile({
         title: "State boundaries",
         source: new ol.source.TileWMS({
-          url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+          url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
           params: {
               LAYERS: 'vicflora:vic_boundaries', 
               TRANSPARENT: true
@@ -347,7 +342,7 @@ var Checklist = function() {
     this.capad = new ol.layer.Tile({
         title: "CAPAD 2012 Protected Areas",
         source: new ol.source.TileWMS({
-          url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+          url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
           params: {
               LAYERS: 'vicflora:vicflora_capad',
               STYLES: 'green_polygon',
@@ -401,7 +396,7 @@ var Checklist = function() {
         capad_selected = new ol.layer.Tile({
             title: "Selected park or reserve",
             source: new ol.source.TileWMS({
-              url: 'http://data.rbg.vic.gov.au/geoserver/vicflora/wms',
+              url: 'https://data.rbg.vic.gov.au/geoserver/vicflora/wms',
               params: {
                   LAYERS: 'vicflora:vicflora_capad',
                   STYLES: 'capad_selected',
@@ -434,17 +429,19 @@ var Checklist = function() {
         var start = typeof start !== 'undefined' ? start : 0;
         $('#facets .preparing').remove();
         $('#checklist-result').html('');
-        var taxa = that.orderTaxa(that.taxa);
-        /*$.each(taxa, function(index, item) {
-            that.displayResultItem(item);
-        });*/
-        var end = (start + that.pageSize < taxa.length) ? start + that.pageSize : taxa.length;
-        console.log([start, end]);
-        for (i = start; i < end; i++) {
-            that.displayResultItem(taxa[i]);
+        
+        if (typeof that.taxa !== 'undefined') {
+            var taxa = that.orderTaxa(that.taxa);
+            /*$.each(taxa, function(index, item) {
+                that.displayResultItem(item);
+            });*/
+            var end = (start + that.pageSize < taxa.length) ? start + that.pageSize : taxa.length;
+            for (i = start; i < end; i++) {
+                that.displayResultItem(taxa[i]);
+            }
+            that.getResultHeader(start);
+            that.getResultFooter(start);
         }
-        that.getResultHeader(start);
-        that.getResultFooter(start);
     };
     
     this.displayResultItem = function(item) {
@@ -470,32 +467,34 @@ var Checklist = function() {
     };
     
     this.orderTaxa = function(taxa) {
-        taxa.sort(function(a, b) {
-            if (a.scientificName > b.scientificName) {
-                return 1;
-            }
-            if (a.scientificName < b.scientificName) {
-                return -1;
-            }
-            return 0;
-        });
-        
-        if (that.orderBy === 'family') {
+        if (typeof taxa !== 'undefined') {
             taxa.sort(function(a, b) {
-                if (a.family > b.family) {
+                if (a.scientificName > b.scientificName) {
                     return 1;
                 }
-                if (a.family < b.family) {
+                if (a.scientificName < b.scientificName) {
                     return -1;
                 }
                 return 0;
             });
+
+            if (that.orderBy === 'family') {
+                taxa.sort(function(a, b) {
+                    if (a.family > b.family) {
+                        return 1;
+                    }
+                    if (a.family < b.family) {
+                        return -1;
+                    }
+                    return 0;
+                });
+            }
         }
-        
         return taxa;
     };
     
     this.getFacets = function() {
+        $('#facets h3').show();
         $('#facets .content').html('');
         var fields = ['subclass', 'superorder', 'order', 'family', 'occurrenceStatus', 'establishmentMeans'];
         var facets = [];
@@ -547,7 +546,7 @@ var Checklist = function() {
                 field.find('input').each(function() {
                     $(this).removeAttr('checked');
                 });
-                field.find('input').eq(index).attr('checked', 'checked');
+                field.find('input').eq(index).prop('checked', true);
                 var filter = that.getFilter(field);
                 if (filter.values.length > 0) {
                     that.applyFilter(filter);
@@ -571,6 +570,7 @@ var Checklist = function() {
     };
     
     this.applyFilters = function() {
+        console.log('Hello');
         $.each(that.filters, function(field, values) {
             var filter = {
                 field: field,
@@ -593,10 +593,11 @@ var Checklist = function() {
         $('#filters').remove();
         if (!$.isEmptyObject(that.filters)) {
             var filterDiv = $('<div/>', {id: "filters"}).prependTo('#facets');
-            $('<div/>', {
+            var appliedFilterDiv = $('<div/>', {
+                class: 'applied-filters',
                 html: '<h4>Filters applied</h4>'
             }).appendTo(filterDiv);
-            var ul = $('<ul/>').appendTo(filterDiv);
+            var ul = $('<ul/>').appendTo(appliedFilterDiv);
             
             $.each(that.filters, function(field, values) {
                 var li = $('<li/>', {
@@ -717,21 +718,20 @@ var Checklist = function() {
             class: "query-result-header"
         }).appendTo(row);
         
+        var sort = that.sortOrderDiv();
         $('<div/>', {
-            class: "num-matches col-md-3",
+            class: "col-sm-3 pull-right"
+        }).append(sort).appendTo(headerDiv);
+        
+        $('<div/>', {
+            class: "num-matches col-sm-3",
             html: that.taxa.length + " matches"
         }).appendTo(headerDiv);
         
-        var nav = that.getNav(start);
+        var nav = that.getNav(start, 'header');
         $('<div/>', {
-            class: "col-md-6",
+            class: "col-sm-6"
         }).append(nav).appendTo(headerDiv);
-        
-        var sort = that.sortOrderDiv();
-        $('<div/>', {
-            class: "col-md-3"
-        }).append(sort).appendTo(headerDiv);
-        
     };
     
     this.getResultFooter = function(start) {
@@ -739,11 +739,11 @@ var Checklist = function() {
             class: "query-result-footer"
         }).appendTo('#checklist-result');
         
-        var nav = that.getNav(start);
+        var nav = that.getNav(start, 'footer');
         nav.appendTo(footerDiv);
     };
     
-    this.getNav = function(start) {
+    this.getNav = function(start, where) {
         var navDiv = $('<div/>', {
             class: "query-result-nav text-center"
         });
@@ -798,8 +798,8 @@ var Checklist = function() {
             navDiv.append(lastIcon);
         }
         
-        $('.query-result-nav').off('click', 'a');
-        $('.query-result-nav').on('click', 'a', function(event) {
+        $('.query-result-' + where).off('click', 'a');
+        $('.query-result-' + where).on('click', 'a', function(event) {
             event.preventDefault();
             var start = Number($(this).attr('data-vicflora-checklist-nav-start'));
             that.displayResult(start);
@@ -809,12 +809,9 @@ var Checklist = function() {
     };
     
     this.sortOrderDiv = function() {
-        var form = $('<div/>', {class: "form-inline"});
-        var formGroup = $('<div/>', {class: "form-group"}).appendTo(form);
-        $('<label/>', {class: "sr-only", html: "sort alphabetically by..."}).appendTo(formGroup);
-        var inputGroup = $('<div/>', {class: "input-group"}).appendTo(formGroup);
-        $('<div/>', {class: "input-group-addon"})
-                .append('<i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>').appendTo(inputGroup);
+        var form = $('<div/>', {class: "form-horizontal sort-by"});
+        $('<label/>', {class: "sr-only", html: "sort alphabetically by..."}).appendTo(form);
+        var inputGroup = $('<div/>', {class: "input-group"}).appendTo(form);
         var select = $('<select/>', {
             class: "form-control input-sm"
         }).appendTo(inputGroup);
@@ -836,6 +833,8 @@ var Checklist = function() {
             that.orderBy = $(this).val();
             that.displayResult();
         });
+        $('<div/>', {class: "input-group-addon"})
+                .append('<i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>').appendTo(inputGroup);
         return form;
     };
 };

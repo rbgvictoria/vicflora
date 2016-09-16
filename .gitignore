@@ -1,4 +1,4 @@
 /config/database.php
 /js/colorbox/
-nbproject/
-third_party/bower_components/
+/nbproject/
+/third_party/bower_components/

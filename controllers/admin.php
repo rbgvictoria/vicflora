@@ -20,12 +20,13 @@ class Admin extends CI_Controller {
 
         if (!$this->input->is_cli_request()) {
             $this->load->library('session');
-            $this->output->enable_profiler();
+            $this->output->enable_profiler(FALSE);
         }
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->helper('versioning');
         $this->load->helper('captcha');
+        $this->config->load('vicflora_config');
         $this->load->model('authenticationmodel');
     }
 
@@ -215,6 +216,9 @@ class Admin extends CI_Controller {
     }
     
     public function st() {
+        if (!$this->session->userdata('id')) {
+            redirect('admin/login');
+        }
         $this->load->model('staticpagesmodel');
         
         $uri = str_replace('admin/st/', '', $this->uri->uri_string());
@@ -226,8 +230,6 @@ class Admin extends CI_Controller {
         $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent($cleanuri);
         if (strpos($uri, '/_edit')) {
             if (isset($this->session->userdata['id'])) {
-                $this->data['js'][] = base_url() . 'js/ckeditor_customconfig.js';
-
                 if ($this->input->post('submit')) {
                     $this->staticpagesmodel->updateStaticContent($this->input->post());
                     redirect('/admin/st/' . $cleanuri);
@@ -671,7 +673,6 @@ class Admin extends CI_Controller {
         $startTime = date('Y-m-d H:i:s');
         $numLoaded = $this->vicfloramap->updateOccurrences($from, $pageSize, $start);
         $endTime = date('Y-m-d H:i:s');
-        //$this->update_solr_index();
     }
     
     public function update_keybase($from=FALSE) {

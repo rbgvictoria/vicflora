@@ -8,7 +8,7 @@ class SolrModel extends CI_Model {
     private $pgdb;
     
     public function __construct() {
-        require_once('../../lib/vendor/autoload.php');
+        require_once($this->config->item('solr_solarium')); 
         require_once('third_party/Encoding/Encoding.php');
         parent::__construct();
         $solrconfig = array(
@@ -56,91 +56,67 @@ class SolrModel extends CI_Model {
             $facets[] = 'apni_match_verification_status';
         }
         // parse query string
-        $qstring = urldecode($this->input->server('QUERY_STRING'));
-        $qarray = explode('&', $qstring);
-        
-        $q = '*:*';
-        $fq = array();
-        $rows = 50;
-        $start = 0;
-        $fieldlist = FALSE;
-        foreach ($qarray as $item) {
-            $item = explode('=', $item);
-            if (isset($item[1])) {
-                if ($item[0] == 'q') {
-                    $q = $item[1];
-                    if (strpos($q, ':')===FALSE && strpos($q, '*')===FALSE && strpos($q, '+')===FALSE && strpos($q, '\\')===FALSE && strpos($q, ' AND ')===FALSE && 
-                            strpos($q, ' OR ')===FALSE && strpos($q, '[')===FALSE && strpos($q, '{')===FALSE) {
-                        $q = str_replace(' ', '\\ ', $q);
-                        $q = str_replace('(', '\\(', $q);
-                        $q = str_replace(')', '\\)', $q);
-                        $q .= '*';
-                    }
-                }
-                if ($item[0] == 'fq')
-                    $fq[] = $item[1];
-                if ($item[0] == 'rows')
-                    $rows = $item[1];
-                if ($item[0] == 'start' && $item[1] > 0)
-                    $start = $item[1];
-                if ($item[0] == 'fl')
-                    $fieldlist = explode(',', $item[1]);
-                    
-            }
-        }
+        $in = $this->parseQueryString();
         
         if ($download) {
-            $rows = 11000;
-            $start = 0;
+            $in->rows = 11000;
+            $in->start = 0;
         }
         
         $this->query = $this->client->createSelect();
-        $this->query->setQueryDefaultField('scientific_name');
-        $this->query->setQuery($q);
+        $this->query->setQueryDefaultField('text');
+        $this->query->setQuery($in->q);
 
         // parse fq
-        if ($fq) {
-            foreach ($fq as $index => $value) {
-                $arr = explode(':', $value);
-                if (count($arr) == 2 && $arr[0] && $arr[1]) {
-                    $fquery = $this->query->createFilterQuery($arr[0]);
-                    $fquery->setQuery($fq[$index]);
+        if ($in->fq) {
+            foreach ($in->fq as $index => $value) {
+                if (substr($value, 0, 1) === '(') {
+                    $fquery = $this->query->createFilterQuery(substr($value, 1, strpos($value, ':')-1));
+                    $fquery->setQuery($in->fq[$index]);
+                }
+                else {
+                    $arr = explode(':', $value);
+                    if (count($arr) == 2 && $arr[0] && $arr[1]) {
+                        $fquery = $this->query->createFilterQuery($arr[0]);
+                        $fquery->setQuery($in->fq[$index]);
+                    }
                 }
             }
         }
         
-        $this->query->setStart($start);
-        $this->query->setRows($rows);
+        $this->query->setStart($in->start);
+        $this->query->setRows($in->rows);
         
         $fields = array();
-        if ($fieldlist) {
-            foreach ($fieldlist as $field) {
+        if ($in->fieldlist) {
+            foreach ($in->fieldlist as $field) {
                 if ($field == 'taxon_id')
                     $fields[] = 'id';
                 else
                     $fields[] = $field;
             }
         }
-        else 
-        $fields = array(
-            'id',
-            'taxon_rank',
-            'scientific_name',
-            'scientific_name_authorship',
-            'taxonomic_status',
-            'family',
-            'occurrence_status',
-            'establishment_means',
-            'accepted_name_usage_id',
-            'accepted_name_usage',
-            'accepted_name_usage_authorship',
-            'accepted_name_usage_taxon_rank',
-            'name_according_to',
-            'sensu',
-            'threat_status',
-            'profile',
-            'vernacular_name'
-        );
+        else {
+            $fields = array(
+                'id',
+                'taxon_rank',
+                'scientific_name',
+                'scientific_name_authorship',
+                'taxonomic_status',
+                'family',
+                'occurrence_status',
+                'establishment_means',
+                'accepted_name_usage_id',
+                'accepted_name_usage',
+                'accepted_name_usage_authorship',
+                'accepted_name_usage_taxon_rank',
+                'name_according_to',
+                'sensu',
+                'threat_status',
+                'profile',
+                'vernacular_name'
+            );
+        }
         
         $this->query->setFields($fields);
         
@@ -177,13 +153,14 @@ class SolrModel extends CI_Model {
                 }
                 if (isset($this->facet_config[$facetfield]['customsort'])) {
                     foreach ($this->facet_config[$facetfield]['customsort'] as $key) {
-                        if (isset($items[$key]))
+                        if (isset($items[$key])) {
                             $facet['items'][] = array(
                                 'name' => $key,
                                 'label' => ucfirst($key),
-                                'count' => $items[$key]
+                                'count' => $items[$key],
+                                'fq' => ($key) ? $facetfield . ':' . $key : '-' . $facetfield . ':*'
                             );
-
+                        }
                     }
                 }
                 elseif (isset($this->facet_config[$facetfield]['itemlabels'])) {
@@ -192,7 +169,8 @@ class SolrModel extends CI_Model {
                             $facet['items'][] = array(
                                 'name' => $key,
                                 'label' => $label,
-                                'count' => $items[$key]
+                                'count' => $items[$key],
+                                'fq' => ($key) ? $facetfield . ':' . $key : '-' . $facetfield . ':*'
                             );
                     }
                 }
@@ -201,7 +179,8 @@ class SolrModel extends CI_Model {
                         $facet['items'][] = array(
                             'name' => $key,
                             'label' => ucfirst($key),
-                            'count' => $value
+                            'count' => $value,
+                            'fq' => ($key) ? $facetfield . ':' . $key : '-' . $facetfield . ':*'
                         );
                 }
                 $result['facets'][] = $facet;
@@ -211,6 +190,53 @@ class SolrModel extends CI_Model {
         $result['params'] = (object) $request->getParams();
         
         return (object) $result;
+    }
+    
+    private function parseQueryString() {
+        $ret = new stdClass();
+        $qstring = urldecode($this->input->server('QUERY_STRING'));
+        $qarray = explode('&', $qstring);
+        
+        $q = '*:*';
+        $fq = array();
+        $rows = 50;
+        $start = 0;
+        $fieldlist = FALSE;
+        foreach ($qarray as $item) {
+            $item = explode('=', $item);
+            if (isset($item[1])) {
+                if ($item[0] == 'q') {
+                    if ($item[1]) {
+                        $q = $item[1];
+                    }
+                    if ($q != '*:*' && strpos($q, ':')===FALSE && !(substr($q, 0, 1) === '"' && substr($q, -1) === '"') && strpos($q, '*') === FALSE && strpos($q, ' ') !== FALSE) {
+                        $q = '"' . $q . '"';
+                    }
+                    elseif (!$q) {
+                        $q = '*:*';
+                    }
+                    elseif ($q != '*:*' && strpos($q, ' ') === FALSE && strpos($q, '*') === FALSE) {
+                        $q .= '*';
+                    }
+                    
+                }
+                if ($item[0] == 'fq')
+                    $fq[] = $item[1];
+                if ($item[0] == 'rows')
+                    $rows = $item[1];
+                if ($item[0] == 'start' && $item[1] > 0)
+                    $start = $item[1];
+                if ($item[0] == 'fl')
+                    $fieldlist = explode(',', $item[1]);
+                    
+            }
+        }
+        $ret->q = $q;
+        $ret->fq = $fq;
+        $ret->rows = $rows;
+        $ret->start = $start;
+        $ret->fieldlist = $fieldlist;
+        return $ret;
     }
     
     public function solrChecklistSearch($ids) {

@@ -7,47 +7,29 @@
 <div class="container">
 <?php if (isset($this->session->userdata['last_search']) || isset($breadcrumbs)): ?>
     <div class="row">
-        <?php if (isset($breadcrumbs) || isset($siblings)  || isset($children)): ?>
-        <?php if (isset($this->session->userdata['last_search'])): ?>
-        <div class="col-md-8">
-        <?php else: ?>
         <div class="col-lg-12">
-        <?php endif; ?>
-            <div class="classicfcation-bread-crumbs">
+        <?php if (isset($this->session->userdata['last_search'])):?>
+            <div class="back-link pull-right">
+                <span><?=anchor($this->session->userdata['last_search'], 'Back to last search result', array('class' => 'btn btn-primary btn-sm'));?></span>
+            </div>
+        <?php endif;?>
+        <?php if (isset($breadcrumbs) || isset($siblings)  || isset($children)): ?>
+            <ol class="breadcrumb pull-left">
                 <?php foreach ($breadcrumbs as $crumb): ?>
-                <span class="crumb"><?=anchor(site_url() . 'flora/taxon/' . $crumb->GUID, $crumb->FullName);?></span>
+                <li><?=anchor(site_url() . 'flora/taxon/' . $crumb->GUID, $crumb->FullName);?></li>
                 <?php endforeach; ?>
                 <?php if($siblings): ?>
-                <span class="crumb"><?=form_dropdown('siblings', $siblings, array($namedata['GUID']), 'id="nav-siblings"');?></span>
+                <li><?=form_dropdown('siblings', $siblings, array($namedata['GUID']), 'id="nav-siblings" class="form-control input-sm"');?></li>
                 <?php endif; ?>
                 <?php if($children): ?>
-                <span class="crumb"><?=form_dropdown('children', $children, FALSE, 'id="nav-children"');?></span>
+                <li><?=form_dropdown('children', $children, FALSE, 'id="nav-children" class="form-control input-sm"');?></li>
                 <?php endif; ?>
-            </div>
-        </div> <!-- /.col- -->    
+            </ol>
         <?php endif; ?>
-            
-            
-        <?php if (isset($this->session->userdata['last_search'])):?>
-        <?php if (isset($breadcrumbs) || isset($siblings)): ?>
-        <div class="col-md-4">
-        <?php else: ?>
-        <div class="col-lg-12">
-        <?php endif; ?>
-        
-            <div class="back-link text-right">
-                <?php if (isset($browse) && $browse && $browse['previous']):?>
-                <span title="Previous"><?=anchor(site_url() . 'flora/taxon/' . $browse['previous'], '<i class="fa fa-backward fa-lg"></i>')?></span>
-                <?php endif;?>
-                <?php if (isset($browse) && $browse && $browse['next']):?>
-                <span title="Next"><?=anchor(site_url() . 'flora/taxon/' . $browse['next'], '<i class="fa fa-forward fa-lg"></i>')?></span>
-                <?php endif;?>
-                <span><?=anchor($this->session->userdata['last_search'], 'Back to last search result');?></span>
-            </div>
         </div> <!-- /.col- -->    
-        <?php endif;?>
     </div>
 <?php endif;?>
+    
 <?php if (isset($this->session->userdata['id'])): ?>
     <div class="row">
         <div class="col-lg-12">
@@ -67,12 +49,8 @@
     </div> <!-- /.row -->
 <?php endif; ?>
     <div class="row">
-        <?php 
-            $width = ($namedata['TaxonomicStatus'] == 'accepted' && $commonname) ? 8 : 12;
-        ?>
-        
-        <div class="col-md-<?=$width?>">
-            <h2>
+        <div class="col-md-12">
+            <h2 class="scientific-name pull-left">
             <?php if ($namedata['TaxonomicStatus'] == 'accepted'): ?>
                 <span class="currentname <?=($namedata['RankID']>=180) ? ' italic' : '';?>">
             <?php else: ?>
@@ -85,28 +63,11 @@
                 class="author"><?=$namedata['Author']?></span><?php endif; ?>
                 </span>
             </h2>
-        </div>
 
-        <?php if ($namedata['TaxonomicStatus'] == 'accepted' && $commonname): ?>
-        <div class="col-md-4">
-            <h3 class="preferred-common-name text-right"><?=$commonname[0]['CommonName']?></h3>
-            <?php if (count($commonname) > 1): ?>
-            <div class="text-right">
-                <?php 
-                    $names = array();
-                    for ($i = 1; $i < count($commonname); $i++) {
-                        $name = '<span>';
-                        $name .= $commonname[$i]['CommonName'];
-                        $name .= ($commonname[$i]['NameUsage']) ? ' (' . $commonname[$i]['NameUsage'] . ')' : '';
-                        $name .= '</span>';
-                        $names[] = $name;
-                    } 
-                    echo implode('; ', $names);
-                ?>
-            </div>
+            <?php if ($namedata['TaxonomicStatus'] == 'accepted' && $commonname): ?>
+            <h2 class="preferred-common-name pull-left"><?=$commonname[0]['CommonName']?></h2>
             <?php endif; ?>
-        </div>
-        <?php endif; ?>
+            </div>
     </div> <!-- /.row -->
     
     <div class="row">
@@ -146,7 +107,7 @@
 
             <?php if ($apni && count($apni) == 1):?>
                 <span class="apni">
-                    <?=anchor($apni[0]['ApniScientificNameID'] . '/api/apni-format', '<small>APNI</small>', array('target' => '_blank'));?>
+                    <?=anchor($apni[0]['ApniScientificNameID'] . '/api/apni-format', '<small>APNI <i class="fa fa-external-link"></i></small>', array('target' => '_blank'));?>
                 </span>
             <?php endif; ?>
             </p>
@@ -221,7 +182,7 @@
     
     <div class="row">
         <div class="col-lg-12">
-            <div id="detail-page-tab">
+            <div id="detail-page-tab" class="vicflora-tab" role="tabpanel">
             
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist">
@@ -304,7 +265,7 @@
                         <?php endif; ?>
                                 
 
-                        <?php if ($key): ?>
+                        <?php if ($key && $namedata['GUID'] !== 'd3590e10-e8ac-4848-9e33-9fbbaf171f7a'): ?>
                         <div>&nbsp;</div>
                         <?php 
                             $keyto = 'Key to the ';
@@ -323,12 +284,13 @@
                             }
                             $keyto .= ' of <i>' . $key['Name'] . '</i>';
                         ?>
-                        <div><?=anchor(site_url() . 'flora/key/' . $key['KeysID'], $keyto, array('class' => 'btn btn-default colorbox_key'))?></div>
+                        <div><?=anchor(site_url() . 'flora/key/' . $key['KeysID'], $keyto, array('class' => 'btn btn-primary colorbox_key'))?></div>
                         <?php endif; ?>
                         </div>
                                 
                         <?php if ($heroImage || (isset($profileMap) && $profileMap)): ?>
                         <div class="col-md-4 profile-rigth-pane">
+                            <div class="row">
                             <?php if ($heroImage):?>
                             <?php
                                 $width = $heroImage->PixelXDimension;
@@ -353,21 +315,35 @@
                                     $size = $height;
                                 }
                             ?>
-                            <div class="hero-image">
-                                <div>
-                                <img src="http://images.rbg.vic.gov.au/sites/P/Library/<?=$heroImage->CumulusRecordID?>?b=<?=$size?>"
-                                     alt="Hero image"
-                                     width="<?=$width?>" height="<?=$height?>" />
+                            <div class="hero-image col-sm-6 col-md-12">
+                                <div class="image-padding">
+                                    <div>
+                                        <div class="image-box">
+                                            <div class="content">
+                                                <img class="img-responsive" src="<?=$this->config->item('preview_baseurl')?><?=$heroImage->CumulusRecordID?>?b=<?=$size?>"
+                                                     alt="Hero image" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <?php endif; ?>
                             
                             <?php if (isset($profileMap) && $profileMap): ?>
-                            <div class="profile-map">
-                                <img src="<?=$profileMap?>" alt="Distribution map" width="512" height="310" />
+                            <div class="profile-map col-sm-6 col-md-12">
+                                <div class="image-padding">
+                                    <div>
+                                        <div class="image-box">
+                                            <div class="content">
+                                                <img class="img-responsive" src="<?=$profileMap?>" alt="Distribution map" width="512" height="310" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <?php endif; ?>
-                        </div>
+                            </div> <!-- /.row -->
+                        </div> <!-- /.profile-right-pane -->
                         <?php endif; ?>
                                 
                         </div> <!-- /.row -->
@@ -378,9 +354,15 @@
                     <div id="tab-images" role="tabpanel" class="tab-pane section images">
                         <div class="row thumbnail-row">
                         <?php foreach ($images as $image): ?>
-                            <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
-                        <?=anchor(site_url() . 'flora/image/' . $image->GUID, '<span><img alt="" src="http://images.rbg.vic.gov.au/sites/T/Library/' . $image->CumulusRecordID . '" /></span>', array('class' => 'thumbnail thumb colorbox_ajax')); ?>
-                            </div>
+                            <figure class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+                                <a href="<?=$this->config->item('preview_baseurl')?><?=$image->id?>?b=<?=$image->b?>" 
+                                   class="thumbnail thumb" data-size="<?=$image->width?>x<?=$image->height?>" 
+                                   data-alt="<?=$image->alt?>" data-caption="<?=$image->caption?>">
+                                    <span>
+                                        <img alt="" src="<?=$this->config->item('thumbnail_baseurl')?><?=$image->id?>" />
+                                    </span>
+                                </a>
+                            </figure>
                         <?php endforeach; ?>
                         </div>
                     </div>
@@ -474,23 +456,23 @@
                             <h3>Victoria</h3>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="distribution-map-frame">
+                                    <figure class="distribution-map-frame">
                                         <div id="svg-avhdistribution"></div>
                                         <div class="legend">
-                                            <i class="fa fa-list-ul fa-lg"></i>
+                                            <button class="btn btn-primary btn-sm"><i class="fa fa-bars fa-lg"></i></button>
                                             <img src="<?=base_url()?>images/vicflora-map-legend.png" alt="" />
                                             <i class="fa fa-remove"></i>
                                         </div>
                                         
-                                    </div>
-                                    <div><b>Source: </b>AVH (2014). <i>Australia&apos;s Virtual Herbarium</i>, Council of Heads of 
+                                    <figcaption><b>Source: </b>AVH (2014). <i>Australia&apos;s Virtual Herbarium</i>, Council of Heads of 
                                         Australasian Herbaria, &lt;<a href="http://avh.chah.org.au">http://avh.chah.org.au</a>&gt;.
                                         <a href="http://avh.ala.org.au/occurrences/search?taxa=<?=str_replace(' ', '+', 
-                                                $namedata['FullName']);?>" target="_blank">Find <?=$namedata['FullName']?> in AVH</a>;
+                                                $namedata['FullName']);?>" target="_blank">Find <?=$namedata['FullName']?> in AVH <i class="fa fa-external-link"></i></a>;
                                                 <i>Victorian Biodiversity Atlas</i>, © The State of Victoria, Department of Environment and Primary Industries (published Dec. 2014)
                                                 <a href="http://biocache.ala.org.au/occurrences/search?taxa=<?=str_replace(' ', '+', 
-                                                $namedata['FullName']);?>&fq=data_resource_uid:dr1097" target="_blank">Find <?=$namedata['FullName']?> in Victorian Biodiversity Atlas</a>
-                                    </div>
+                                                $namedata['FullName']);?>&fq=data_resource_uid:dr1097" target="_blank">Find <?=$namedata['FullName']?> in Victorian Biodiversity Atlas <i class="fa fa-external-link"></i></a>
+                                    </figcaption>
+                                    </figure>
                                 </div>
                                 <div class="col-md-6">
                                     <?php 
@@ -528,7 +510,9 @@
                         <h3>State distribution</h3>
                         <div class="row">
                             <div class="col-md-6">
-                                <img src="<?=$stateDistributionMap?>" alt="Distribution map" width="242" height="242"/>
+                                <figure>
+                                    <img src="<?=$stateDistributionMap?>" alt="Distribution map" width="242" height="242"/>
+                                </figure>
                             </div>
                             <div class="col-md-6">
                                 <table class="table table-bordered table-condensed">

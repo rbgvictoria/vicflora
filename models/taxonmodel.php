@@ -357,7 +357,13 @@ class TaxonModel extends CI_Model {
         }
         $this->db->limit(12);
         $query = $this->db->get();
-        return $query->result();
+        $ret = array();
+        if ($query->num_rows()) {
+            foreach ($query->result() as $row) {
+                $ret[] = $this->getImage($row->GUID);
+            }
+        }
+        return $ret;
     }
     
     public function getImageMetadata($guid) {
@@ -382,7 +388,7 @@ class TaxonModel extends CI_Model {
         $this->db->select("i.CumulusRecordID, 
             i.PixelXDimension, i.PixelYDimension,
             n.FullName AS ScientificName, if(t.TaxonID!=st.TaxonID, sn.FullName, NULL) AS AsName, 
-            i.Subtype, i.Caption, i.SubjectPart, i.Creator, i.RightsHolder, i.License,
+            i.Subtype, i.Caption, i.SubjectPart, i.Creator, i.RightsHolder, i.License, i.rights,
             i.Source, i.SubjectCategory", FALSE);
         $this->db->from('cumulus_image i');
         $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.TaxonID');
@@ -393,8 +399,100 @@ class TaxonModel extends CI_Model {
         $query = $this->db->get();
         if ($query->num_rows()) {
             $row = $query->row();
-            return $row;
+            $imgSize = $this->imageSize($row->Subtype, $row->PixelXDimension, $row->PixelYDimension);
+            $imgCaption = $this->imageCaption($row);
+            $image = (object) array(
+                'id' => $row->CumulusRecordID,
+                'guid' => $guid,
+                'alt' => $imgCaption->alt,
+                'caption' => $imgCaption->caption,
+                'width' => $imgSize->width,
+                'height' => $imgSize->height,
+                'b' => $imgSize->size
+            );
+            return $image;
         }
+        else {
+            return FALSE;
+        }
+    }
+    
+    private function imageSize($subtype, $width, $height) {
+        $sizeObj = new stdClass();
+        $sizeObj->width = $width;
+        $sizeObj->height = $height;
+        if ($subtype == 'Illustration') {
+            $sizeObj->width = $width / 2;
+            $sizeObj->height = $height / 2;
+        }    
+
+        if ($width > $height) {
+            if ($width > 1024) {
+                $sizeObj->height = $height * (1024 / $width);
+                $sizeObj->width = 1024;
+            }
+            $sizeObj->size = $width;
+        }
+        else {
+            if ($height > 1024) {
+                $sizeObj->width = $width * (1024 / $height);
+                $sizeObj->height = 1024;
+            }
+            $sizeObj->size = $height;
+        }
+        return $sizeObj;
+    }
+    
+    private function imageCaption($data) {
+        $scientificName = FALSE;
+        if (isset($data->ScientificName)) {
+            $scientificName = '<i>' . $data->ScientificName . '</i>';
+            if ($data->AsName) {$scientificName .= ' (as <i>' . $data->AsName . '</i>)';}
+            $search = array(' subsp. ', ' var. ', ' f. ');
+            $replace = array(
+                '</i> subsp. <i>',
+                '</i> var. <i>',
+                '</i> f. <i>'
+            );
+            $scientificName = str_replace($search, $replace, $scientificName);
+        }
+        
+        if (substr($data->License, 0, 5) === 'CC BY') {
+            $bits = explode(' ', $data->License);
+            $url = 'https://creativecommons.org/licenses/';
+            $url .= strtolower($bits[1]);
+            $url .= (isset($bits[2])) ? '/' . $bits[2] : '/4.0';
+            if (isset($bits[3])) {$url .= '/' .strtolower ($bits[3]);}
+            $license = "<a href='$url'>$data->License</a>";
+        }
+        elseif ($data->License == 'All rights reserved') {
+            $license = 'All rights reserved';
+        }
+        elseif ($data->SubjectCategory == 'Flora of the Otway Plain and Ranges plate') {
+            $license = 'not to be reproduced without prior permission from CSIRO Publishing.';
+        }
+        else {
+            $license = "<a href='https://creativecommons.org/licenses/by/4.0'>CC BY 4.0</a>";
+        }
+        
+        $alt = ($scientificName) ? $scientificName : $data->Caption;
+        
+        $caption = ($scientificName) ? $scientificName : '. ';
+        $caption .= ($data->Caption && $scientificName) ? '. ' : '';
+        $caption .= ($data->Caption) ? $data->Caption . '. ' : '';
+        $caption .= '<br/>';
+        $caption .= ($data->Subtype === 'Illustration') ? 'Illustration: ' : 'Photo: ';
+        $caption .= $data->Creator . ', &copy ' . date('Y') . ' ';
+        $caption .= ($data->RightsHolder) ? $data->RightsHolder : 'Royal Botanic Gardens Victoria';
+        $caption .= ', ' . $license . '.';
+        if ($data->SubjectCategory === 'Flora of the Otway Plain and Ranges plate') {
+            $caption .= '<br/>' . $data->rights;
+        }
+        
+        return (object) array(
+            'alt' => $alt,
+            'caption' => $caption
+        );
     }
     
     public function getHeroImage($nodeNumber, $highestDescendantNodeNumber, $rankID) {
@@ -430,15 +528,17 @@ class TaxonModel extends CI_Model {
         $this->db->join('vicflora_name n', 't.NameID=n.NameID');
         $this->db->join('keybase.items i', 'n.FullName=i.Name');
         $this->db->join('keybase.keys k', 'i.ItemsID=k.TaxonomicScopeID');
-        $this->db->where('t.TaxonomicStatus', 'Accepted');
+        $this->db->where('c.TaxonomicStatus', 'Accepted');
+        $this->db->where('(c.DoNotIndex IS NULL OR c.DoNotIndex!=1)', FALSE, FALSE);
         $this->db->where('k.ProjectsID', 10);
         $this->db->where('t.GUID', $guid);
         $query = $this->db->get();
         if ($query->num_rows()) {
             return $query->row_array();
         }
-        else
+        else {
             return FALSE;
+        }
     }
     
     public function getTaxonDataForMap($guid) {
@@ -462,7 +562,7 @@ class TaxonModel extends CI_Model {
         $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
         $this->db->where('tt.NodeNumber <', $nodeNumber);
         $this->db->where('tt.HighestDescendantNodeNumber >=', $nodeNumber);
-        $this->db->where_in('t.RankID', array(70, 90, 100, 140, 180, 220));
+        $this->db->where_in('t.RankID', array(60, 100, 140, 180, 220));
         $this->db->order_by('t.RankID');
         $query = $this->db->get();
         return $query->result();

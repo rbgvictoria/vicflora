@@ -28,7 +28,8 @@ class GlossaryModel extends CI_Model {
     
     public function getGlossaryImages($term) {
         $ret = array();
-        $this->db->select('i.GUID, i.CumulusRecordID');
+        $this->db->select('i.GUID, i.CumulusRecordID, i.PixelXDimension, i.PixelYDimension, i.Caption,'
+                . 'i.Creator, i.RightsHolder, i.License');
         $this->db->from('keybase_glossary.term t');
         $this->db->join('glossaryterm_image gi', 't.TermID=gi.TermID');
         $this->db->join('cumulus_image i', 'gi.ImageID=i.ImageID');
@@ -37,15 +38,74 @@ class GlossaryModel extends CI_Model {
         $query = $this->db->get();
         if ($query->num_rows()) {
             foreach ($query->result() as $row) {
+                $sizeObj = $this->imageSize($row->PixelXDimension, $row->PixelYDimension);
+                $caption = $this->imageCaption($row);
                 $ret[] = array(
-                    'imageUrl' => site_url() . 'flora/glossary_image/' . $row->GUID,
-                    'thumbnailUrl' => 'http://images.rbg.vic.gov.au/sites/T/library/' . $row->CumulusRecordID . '?b=256'
+                    'id' => $row->CumulusRecordID,
+                    'width' => $sizeObj->width,
+                    'height' => $sizeObj->height,
+                    'alt' => $caption->alt,
+                    'caption' => $caption->caption
                 );
             }
         }
         return $ret;
     }
     
+    private function imageCaption($data) {
+        if (substr($data->License, 0, 5) === 'CC BY') {
+            $bits = explode(' ', $data->License);
+            $url = 'https://creativecommons.org/licenses/';
+            $url .= strtolower($bits[1]);
+            $url .= (isset($bits[2])) ? '/' . $bits[2] : '/4.0';
+            if (isset($bits[3])) {$url .= '/' .strtolower ($bits[3]);}
+            $license = "<a href='$url'>$data->License</a>";
+        }
+        elseif ($data->License == 'All rights reserved') {
+            $license = 'All rights reserved';
+        }
+        else {
+            $license = "<a href='https://creativecommons.org/licenses/by/4.0'>CC BY 4.0</a>";
+        }
+        
+        $alt = $data->Caption;
+        
+        $caption = $data->Caption;
+        $caption .= '<br/>';
+        $caption .= 'Illustration: ';
+        $caption .= $data->Creator . ', &copy ' . date('Y') . ' ';
+        $caption .= ($data->RightsHolder) ? $data->RightsHolder : 'Royal Botanic Gardens Victoria';
+        $caption .= ', ' . $license . '.';
+        
+        return (object) array(
+            'alt' => $alt,
+            'caption' => $caption
+        );
+    }
+    
+    private function imageSize($width, $height) {
+        $width = $width / 2;
+        $height = $height / 2;
+        $sizeObj = new stdClass();
+        $sizeObj->width = $width;
+        $sizeObj->height = $height;
+        if ($width > $height) {
+            if ($width > 1024) {
+                $sizeObj->height = ceil($height * (1024 / $width));
+                $sizeObj->width = 1024;
+            }
+            $sizeObj->size = $width;
+        }
+        else {
+            if ($height > 1024) {
+                $sizeObj->width = ceil($width * (1024 / $height));
+                $sizeObj->height = 1024;
+            }
+            $sizeObj->size = $height;
+        }
+        return $sizeObj;
+    }
+
     public function getGlossaryImage($guid) {
         $this->db->select("i.CumulusRecordID, 
             i.PixelXDimension, i.PixelYDimension,

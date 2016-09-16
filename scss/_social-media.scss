@@ -1,0 +1,91 @@
+/*
+Copyright 2016 Royal Botanic Gardens Victoria.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* 
+    Created on : 16/08/2016, 2:25:12 PM
+    Author     : nklazenga
+*/
+
+/* RBG Victoria branding
+-------------------------------------------------- */
+.social-media {
+    display: none;
+    float: right;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+@media (min-width: 768px) {
+    .social-media {
+        display: block;
+    }
+}
+
+.social-media>li {
+    float:right;
+}
+
+.social-media a[target=_blank] {
+    background-image: none;
+}
+
+.social-media>li>a {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.social-media>li:last-of-type>a {
+    margin-right: 10px;
+}
+
+.social-media span.icon {
+    display: inline-block;
+    height: 22px;
+    width: 22px;
+    background-image: url(https://www.rbg.vic.gov.au/common/img/sprite-icons.png);
+    background-color: rgb(65, 70, 63);
+    color: #fff;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.social-media .icon-facebook-solid {
+    background-repeat: no-repeat;
+    background-position: -26px 5px;
+}
+
+.social-media .icon-facebook-solid:hover {
+    background-position: -108px 5px;
+}
+
+.social-media .icon-twitter-solid {
+    background-repeat: no-repeat;
+    background-position: 5px 4px;
+}
+
+.social-media .icon-twitter-solid:hover {
+    background-position: -77px 4px;
+}
+
+.social-media .icon-instagram-solid {
+    background-repeat: no-repeat;
+    background-position: -51px 4px;    
+}
+
+.social-media .icon-instagram-solid:hover {
+    background-position: -133px 4px;
+}
+
+

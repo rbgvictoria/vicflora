@@ -73,7 +73,7 @@
             </div>
             <?php if ($type == 'edit' && $taxondata['RankID'] <= 180 && $taxondata['TaxonomicStatus'] == 'accepted'): ?>
             <div class="col-md-4" id="change-parent">
-                <a href="#" class="btn btn-default">Change parent</a>
+                <a href="#" class="btn btn-primary">Change parent</a>
                 <div class="col-md-10">
                 <input id="new_parent" class="form-control" value="<?=$name?>"/>
                 </div>
@@ -421,7 +421,7 @@
                     ); ?>
                 </div>
                 <div class="col-md-2">
-                    <button type="button" id="new_accepted_name" class="btn btn-default" data-toggle="modal" data-target="#acceptedNameModal">
+                    <button type="button" id="new_accepted_name" class="btn btn-primary" data-toggle="modal" data-target="#acceptedNameModal">
                         Add new accepted name
                     </button>
                 </div>
@@ -583,7 +583,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="new-apni-row col-md-12"><button class="apni-manual btn btn-default btn-sm">Add APNI number (manually)</button></div>
+        <div class="new-apni-row col-md-12"><button class="apni-manual btn btn-primary btn-sm">Add APNI number (manually)</button></div>
     </div> <!-- /.edit-form-section clearfix -->
     
     <!-- Common names -->
@@ -621,7 +621,7 @@
                     <?php endif; ?>
                 </tbody>
             </table>
-            <div class="new-common-name-row"><a href="#" class="btn btn-default btn-sm">Add row</a></div>
+            <div class="new-common-name-row"><a href="#" class="btn btn-primary btn-sm">Add row</a></div>
         </div>
     </div> <!-- /.edit-form-section clearfix -->
     <?php endif; ?>
@@ -689,7 +689,7 @@
     <!-- Submit -->
     <div class="edit-form-section clearfix">
         <div class="col-md-12 text-center">
-            <?=form_submit(array('name' => 'submit', 'value' => 'Save', 'class' => 'btn btn-default')); ?>
+            <?=form_submit(array('name' => 'submit', 'value' => 'Save', 'class' => 'btn btn-primary')); ?>
         </div>
     </div>
     
@@ -828,7 +828,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" id="save-new-accepted-name">Save</button>
       </div>
     </div>

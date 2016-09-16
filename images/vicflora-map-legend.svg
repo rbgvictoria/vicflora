@@ -10,8 +10,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="41.861721mm"
-   height="61.602634mm"
-   viewBox="0 0 148.32893 218.27705"
+   height="55.393745mm"
+   viewBox="0 0 148.32893 196.27705"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="130.51949"
-     inkscape:cy="102.05339"
+     inkscape:cx="76.055204"
+     inkscape:cy="79.696252"
      inkscape:document-units="px"
      inkscape:current-layer="g4212"
      showgrid="false"
@@ -94,15 +94,14 @@
                   <text
                      xml:space="preserve"
                      style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                     x="9.5394115"
-                     y="88.253815"
+                     x="2.8356013"
+                     y="-68.226494"
                      id="text3336-7"
-                     sodipodi:linespacing="125%"
-                     transform="translate(-6.7038102,-134.48031)"><tspan
+                     sodipodi:linespacing="125%"><tspan
                        sodipodi:role="line"
                        id="tspan3338-3"
-                       x="9.5394115"
-                       y="88.253815"
+                       x="2.8356013"
+                       y="-68.226494"
                        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start">Establishment means</tspan></text>
                   <g
                      id="g4510">
@@ -137,40 +136,11 @@
                      id="g4517">
                     <g
                        transform="translate(-7.047554,-138.85056)"
-                       id="g4212">
-                      <g
-                         id="g4193">
-                        <rect
-                           style="fill:#fcfc99;fill-opacity:1"
-                           y="56.45332"
-                           x="10.792579"
-                           height="20"
-                           width="30"
-                           id="rect3358-5" />
-                        <text
-                           sodipodi:linespacing="125%"
-                           id="text3336-2-2"
-                           y="70.853958"
-                           x="48.840748"
-                           style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                           xml:space="preserve"><tspan
-                             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;writing-mode:lr-tb;text-anchor:start"
-                             y="70.853958"
-                             x="48.840748"
-                             id="tspan3338-6-5"
-                             sodipodi:role="line">doubtful</tspan></text>
-                        <rect
-                           y="63.45332"
-                           x="22.79258"
-                           height="6"
-                           width="6"
-                           id="rect4210"
-                           style="fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-                      </g>
-                    </g>
+                       id="g4212" />
                   </g>
                   <g
-                     id="g4524">
+                     id="g4524"
+                     transform="translate(0,-22)">
                     <g
                        transform="translate(-7.047554,-95.310347)"
                        id="g4245">
@@ -203,7 +173,8 @@
                     </g>
                   </g>
                   <g
-                     id="g4531">
+                     id="g4531"
+                     transform="translate(0,-22)">
                     <g
                        transform="translate(-7.047554,-73.540214)"
                        id="g4278">
@@ -236,7 +207,8 @@
                     </g>
                   </g>
                   <g
-                     id="g4538">
+                     id="g4538"
+                     transform="translate(0,-22)">
                     <g
                        id="g4278-5"
                        transform="translate(-7.047554,-51.770099)">
@@ -269,7 +241,8 @@
                     </g>
                   </g>
                   <g
-                     id="g4545">
+                     id="g4545"
+                     transform="translate(0,-22)">
                     <g
                        transform="translate(-7.047554,-30.000002)"
                        id="g4338">
@@ -303,7 +276,7 @@
                   </g>
                   <g
                      id="g4377"
-                     transform="translate(-7.047554,0)">
+                     transform="translate(-7.047554,-22)">
                     <rect
                        id="rect3358-5-2-4-3-3"
                        width="30"

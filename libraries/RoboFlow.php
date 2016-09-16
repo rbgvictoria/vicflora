@@ -1,5 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
 
+require_once 'third_party/Encoding/Encoding.php';
+
 class RoboFlow {
     private $ci;
     private $db;
@@ -76,7 +78,8 @@ class RoboFlow {
         $rec->Creator = $row['dcterms:creator'];
         $rec->RightsHolder = $row['dcterms:rightsHolder'];
         $rec->License = $row['dcterms:license'];
-        $rec->ScientificName = $row['dwc:scientificName'];
+        $rec->Rights = $row['dc:rights'];
+        $rec->ScientificName = Encoding::toUTF8($row['dwc:scientificName']);
         $rec->CatalogNumber = $row['dwc:catalogNumber'];
         $rec->RecordedBy = $row['dwc:recordedBy'];
         $rec->RecordNumber = $row['dwc:recordNumber'];
@@ -92,7 +95,7 @@ class RoboFlow {
         $rec->Rating = $row['xmp:Rating'];
         $rec->ThumbnailUrlEnabled = (isset($row['ThumbnailUrlEnabled']) && strtolower($row['ThumbnailUrlEnabled'])=='true') ? TRUE : FALSE;
         $rec->PreviewUrlEnabled = (isset($row['PreviewUrlEnabled']) && strtolower($row['PreviewUrlEnabled'])=='true') ? TRUE : FALSE;
-        $tax = $this->findTaxon($row['dwc:scientificName']);
+        $tax = $this->findTaxon(Encoding::toUTF8($row['dwc:scientificName']));
         if ($tax) {
             $rec->TaxonID = $tax->TaxonID;
             $rec->AcceptedID = $tax->AcceptedID;
@@ -102,12 +105,13 @@ class RoboFlow {
     }
     
     private function findTaxon($scientificName) {
+        $scientificName = str_replace('×', '', $scientificName);
         $this->db->select('t.TaxonID, at.TaxonID AS AcceptedID');
         $this->db->from('vicflora_taxon t');
         $this->db->join('vicflora_name n', 't.NameID=n.NameID');
         $this->db->join('vicflora_taxon at', 't.AcceptedID=at.TaxonID', 'left');
         $this->db->join('vicflora_name an', 'at.NameID=an.NameID', 'left');
-        $this->db->where('n.FullName', $scientificName);
+        $this->db->where("REPLACE(n.FullName, '×', '')=" . $this->db->escape($scientificName), FALSE, FALSE);
         $query = $this->db->get();
         if ($query->num_rows()) {
             return $query->row();
@@ -162,6 +166,7 @@ class ImageRecord {
     var $Creator = NULL;
     var $RightsHolder = NULL;
     var $License = NULL;
+    var $Rights = NULL;
     var $ScientificName = NULL;
     var $TaxonID = NULL;
     var $AcceptedID = NULL;

@@ -17,9 +17,9 @@
     }
 ?>
 
-<div class="facets form-horizontal">
+<div class="facets">
     <h3>Filters</h3>
-    <div class="content">
+    <div class="content form-horizontal">
     <?php foreach($solrresult->facets as $facet):?>
     <?php if (!(count($facet['items']) == 1 && !$facet['items'][0]['name'])):?>
     <div class="facet collapsible" data-vicflora-facet-name="<?=$facet['name']?>">

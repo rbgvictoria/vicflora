@@ -2,8 +2,9 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-12 clearfix">
             <?php if (isset($pages)): ?>
+            <div class="pull-right"><a href="<?=site_url()?>admin/add_static_page" class="btn btn-primary btn-sm">Add page</a></div>
             <h1>Static pages</h1>
             <ul>
                 <?php foreach ($pages as $page): ?>
@@ -11,20 +12,23 @@
                 <?php endforeach; ?>
             </ul>
             <?php endif; ?>
-
-            <?php if (substr($staticcontent['Uri'], 0, 10) == 'bioregions'): ?>
-            <div class="row">
-                <div class="col-sm-9 col-md-10">
-                    <h1><?=$staticcontent['PageTitle']?></h1>
-                </div>
-                <div class="col-sm-3 col-md-2 text-right">
-                    <span class="btn btn-default"><?=anchor(site_url() . 'flora/bioregions', 'All bioregions')?></span>
-                </div>
-                
+            
+            
+            <?php if (($this->session->userdata('id') && strpos($_SERVER['PATH_INFO'], 'admin/st') !== FALSE) || substr($staticcontent['Uri'], 0, strlen('bioregions/')) === 'bioregions/'): ?>
+            <div class="pull-right">
+            <?php if (substr($staticcontent['Uri'], 0, strlen('bioregions/')) === 'bioregions/'): ?>
+                <a class="btn btn-primary btn-sm" href="<?=site_url()?>flora/bioregions">All regions</a>
+            <?php endif; ?>
+            <?php if ($this->session->userdata('id') && strpos($_SERVER['PATH_INFO'], 'admin/st') !== FALSE): ?>
+                <a class="btn btn-primary btn-sm" href="<?=site_url()?>admin/st">Index</a>
+                <a class="btn btn-primary btn-sm" href="<?=site_url()?>admin/st/<?=$staticcontent['Uri']?>/_edit">Edit</a>
+            <?php endif; ?>
             </div>
-            <?php else: ?>
+            <?php endif; ?>
+            
+        </div> <!-- /.col -->
+        <div class="col-lg-12">
             <h1><?=$staticcontent['PageTitle']?></h1>
-            <?php endif;?>
             <div id="staticcontent"><?=$staticcontent['PageContent']?></div>
         </div>
     </div>

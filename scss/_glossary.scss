@@ -1,0 +1,114 @@
+/*
+Copyright 2016 Royal Botanic Gardens Victoria.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* 
+    Created on : 19/08/2016, 2:54:24 PM
+    Author     : Niels Klazenga
+*/
+
+/* Glossary
+-------------------------------------*/
+#glossary-first-letter {
+    margin: -1px;
+    padding-bottom: 5px;
+}
+
+#glossary-first-letter a {
+    display: inline-block;
+    text-align: center;
+    width: 26px;
+    padding: 3px;
+    border: solid 1px $brand-primary;
+    border-radius: 4px;
+    margin: 1px;
+    color: $brand-primary;
+}
+
+#glossary-first-letter a:hover {
+    text-decoration: none;
+}
+
+#glossary-first-letter .active {
+    background-color: $brand-primary;
+    color: #fff;
+    text-decoration: none;
+}
+
+#glossary-first-letter a.active, #term-list li.active {
+    font-weight: bold;
+}
+
+#definition {
+    display: none;
+    h2 {
+        margin-top: 0;
+        color: $brand-primary;
+    }
+
+    .row.thumbnail-row {
+        margin-top: 30px;
+    }
+    
+    @media (min-width: $screen-sm-min) {
+        display: block;
+    }
+}
+
+#glossary-terms {
+    border-right: solid 1px $brand-primary;
+    height: 100%;
+}
+
+#term-list {
+    padding-top: 15px;
+    overflow-y: auto;
+    margin-right: -14px;
+}
+
+#term-list ul {
+    padding-left: 0;
+    list-style-position: inside;
+    list-style-type: none;
+    
+    .definition {
+        @extend .well-sm;
+        margin-right: 15px;
+        p {
+            font-weight: normal;
+        }
+    }
+}
+
+a.glossary-link {
+    font-weight: bold;
+}
+
+.glossary-relationships {
+    margin-top: 30px;
+    
+    h4 {
+        margin-bottom: 0;
+    }
+}
+
+.glossary-rel-type {
+    font-weight: bold;
+    color: #999;
+    font-size: 80%;
+}
+
+.glossary-rel-type::after {
+    content: ':';
+}

@@ -9,16 +9,23 @@
  * GeoServer base url
  */
 
-$config['geoserver_url'] = 'http://data.rbg.vic.gov.au/geoserver';
+$config['geoserver_url'] = 'https://data.rbg.vic.gov.au/geoserver';
 
 
 /*
  * SOLR
  */
 
-$config['solr_solarium'] = '../../lib/vendor/autoload.php';
+$config['solr_solarium'] = '../lib/vendor/autoload.php';
 $config['solr_host'] = 'localhost';
 $config['solr_port'] = '65002';
+
+$cumulusBaseUrl = 'https://data.rbg.vic.gov.au/images/';
+$config['asset_baseurl'] = $cumulusBaseUrl . 'A/Library/';
+$config['preview_baseurl'] = $cumulusBaseUrl . 'P/Library/';
+$config['thumbnail_baseurl'] = $cumulusBaseUrl . 'T/Library/';
+
+
 
 
 /*

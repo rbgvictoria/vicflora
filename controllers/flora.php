@@ -13,12 +13,13 @@ class Flora extends CI_Controller {
         $this->load->helper('versioning');
         
         $this->config->load('vicflora_config');
-        $this->output->enable_profiler(false);
+        $this->output->enable_profiler(FALSE);
     }
     
     public function index() {
         $this->session->unset_userdata('last_search');
         $this->load->model('staticpagesmodel');
+        $this->data['carousel'] = $this->staticpagesmodel->getHomepageImages();
         $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent('home');
         $this->load->view('home_view', $this->data);
     }
@@ -34,6 +35,13 @@ class Flora extends CI_Controller {
         $this->session->unset_userdata('last_search');
         $this->load->model('staticpagesmodel');
         $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent('help');
+        $this->load->view('staticview', $this->data);
+    }
+    
+    public function acknowledgements() {
+        $this->session->unset_userdata('last_search');
+        $this->load->model('staticpagesmodel');
+        $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent('acknowledgements');
         $this->load->view('staticview', $this->data);
     }
     
@@ -133,7 +141,7 @@ class Flora extends CI_Controller {
     
     public function classification($guid=FALSE) {
         if (!$guid) 
-            $guid = '947325be-f912-44dc-8a2d-c5f6e345b1bd';
+            $guid = '6abc498a-70de-11e6-a989-005056b0018f';
         
         $this->session->unset_userdata('last_search');
         
@@ -159,13 +167,6 @@ class Flora extends CI_Controller {
         $nodeNumber = $this->data['namedata']['NodeNumber'];
         $highestDescendantNodeNumber = $this->data['namedata']['HighestDescendantNodeNumber'];
         $rankID = $this->data['namedata']['RankID'];
-        
-        /*if (isset($this->session->userdata['last_search']) && 
-                (isset($_SERVER['HTTP_REFERER']) && (preg_match('/\/search\??/', $_SERVER['HTTP_REFERER']) || 
-                preg_match("/$guid/", $_SERVER['HTTP_REFERER']) || preg_match('/\/taxon\??/', $_SERVER['HTTP_REFERER'])))) {
-            $this->load->model('solrmodel');
-            $this->data['browse'] = $this->solrmodel->browse($this->data['namedata']['FullName'], $guid);
-        }*/
         
         $this->data['images'] = array();
         $this->data['heroImage'] = FALSE;
@@ -367,7 +368,6 @@ class Flora extends CI_Controller {
             redirect(site_url());
         $this->output->enable_profiler(false);
         $this->load->model('viewtaxonmodel','taxonmodel');
-        //$this->data['image'] = $this->taxonmodel->getImageMetadata($guid);
         $this->data['image'] = $this->taxonmodel->getImage($guid);
         $this->load->view('image_only_view', $this->data);
     }
@@ -435,7 +435,7 @@ class Flora extends CI_Controller {
     
     public function imageMap ($width=400, $return=false) {
         $this->output->enable_profiler(FALSE);
-        $url = "http://10.15.15.107:65002/geoserver/vicflora/wms";
+        $url = "https://data.rbg.vic.gov.au/geoserver/vicflora/wms";
         $query = array();
         $query['service'] = 'WMS';
         $query['version'] = '1.1.0';
@@ -477,10 +477,10 @@ class Flora extends CI_Controller {
             $query['format'] = 'image/svg';
         }
         else {
-            $query['format'] = 'image/png';
+            $query['format'] = 'image/svg';
         }
         $term = ($rankid == 220) ? 'species_id' : 'accepted_name_usage_id';
-        $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');taxon_id='$guid';INCLUDE;FEAT_CODE IN ('mainland','island');$term='$guid'");
+        $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');taxon_id='$guid' AND occurrence_status NOT IN ('doubtful', 'absent');INCLUDE;FEAT_CODE IN ('mainland','island');$term='$guid' AND occurrence_status NOT IN ('doubtful', 'absent')");
         
         $qstring = array();
         foreach ($query as $key => $value) {
@@ -506,10 +506,10 @@ class Flora extends CI_Controller {
         $query['layers'] = 'vicflora:cst_vic,vicflora:occurrence_view';
         $query['styles'] = 'polygon_no-fill_black-outline,';
         $query['bbox'] = '140.8,-39.3,150.2,-33.8';
-        $query['width'] = 512;
-        $query['height'] = 310;
+        $query['width'] = 600;
+        $query['height'] = 363;
         $query['srs'] = 'EPSG:4326';
-        $query['format'] = 'image/png';
+        $query['format'] = 'image/svg';
         $term = ($rankid == 220) ? 'species_id' : 'accepted_name_usage_id';
         $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');$term='$guid' AND establishment_means NOT IN ('cultivated') AND occurrence_status NOT IN ('doubtful','absent')");
         
@@ -778,7 +778,7 @@ class Flora extends CI_Controller {
     }
         
     public function maplink($guid, $rankid) {
-        $url = "http://data.rbg.vic.gov.au/geoserver/vicflora/wms";
+        $url = "https://data.rbg.vic.gov.au/geoserver/vicflora/wms";
         $query = array();
         $query['service'] = 'WMS';
         $query['version'] = '1.1.0';
