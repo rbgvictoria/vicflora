@@ -371,7 +371,7 @@ class Admin extends CI_Controller {
         $legend = $this->legendBioregion('establishment_means');
         
         if ($this->data['taxondata']['RankID'] >= 220) {
-            $distribution = $this->mapmodel->getDistributionDetail($guid);
+            $distribution = $this->mapmodel->getDistributionDetail($guid, $this->data['taxondata']['RankID']);
             $codes = array();
             foreach ($legend as $item) {
                 $codes[] = $item['code'];
