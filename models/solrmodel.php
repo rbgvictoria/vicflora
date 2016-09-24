@@ -624,7 +624,6 @@ class SolrModel extends CI_Model {
         $this->facet_config['media'] = array(
             'label' => 'Media',
             'itemlabels' => array(
-                'profile' => 'Profile',
                 'illustration' => 'Illustration',
                 'photograph' => 'Photograph',
                 null => '(blanks)'
@@ -1012,13 +1011,12 @@ class SolrModel extends CI_Model {
     private function media($id) {
         $ret = array();
         $select = "SELECT t.taxonID, count(IF(i.Subtype='Illustration', 1, NULL)) AS numIllustrations,
-                  count(IF(i.Subtype='Photograph', 1, NULL)) AS numPhotographs, count(p.ProfileID) AS hasProfile
+                  count(IF(i.Subtype='Photograph', 1, NULL)) AS numPhotographs
                 FROM vicflora_taxon t
                 JOIN vicflora_name n ON t.NameID=n.NameID
                 LEFT JOIN vicflora_taxon ct ON t.TaxonID=ct.ParentID AND t.RankID=220
                 LEFT JOIN vicflora_name cn ON ct.NameID=cn.NameID
                 LEFT JOIN cumulus_image i ON coalesce(t.TaxonID, ct.TaxonID)=i.TaxonID AND PixelXDimension>0
-                LEFT JOIN vicflora_profile p ON t.TaxonID=p.AcceptedID AND p.IsCurrent=true
                 WHERE t.GUID='$id' OR ct.GUID='$id'
                 GROUP BY t.TaxonID";
         $query = $this->db->query($select);
@@ -1029,9 +1027,6 @@ class SolrModel extends CI_Model {
             }
             if ($row->numPhotographs) {
                 $ret[] = 'photograph';
-            }
-            if ($row->hasProfile) {
-                $ret[] = 'profile';
             }
         }
         return $ret;

@@ -161,7 +161,8 @@ class Ajax extends CI_Controller {
         $this->load->model('viewtaxonmodel', 'taxonmodel');
         $this->load->model('mapmodel');
         $legend = $this->legendBioregion($fill);
-        $distribution = $this->mapmodel->getDistributionDetail($guid);
+        $rankID = $this->taxonmodel->getRankID($guid);
+        $distribution = $this->mapmodel->getDistributionDetail($guid, $rankID);
         
         $codes = array();
         foreach ($legend as $item) {

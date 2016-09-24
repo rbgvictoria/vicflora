@@ -481,6 +481,7 @@
                                             $codes[] = $item['code'];
                                         }
                                     ?>
+                                    
                                     <table class="bioregions table table-bordered table-condensed">
                                         <tr>
                                             <th>&nbsp;</th>

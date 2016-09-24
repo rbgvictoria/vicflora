@@ -250,11 +250,18 @@ class MapModel extends FloraModel {
         return $query->result();
     }
     
-    public function getDistributionDetail($guid) {
+    public function getDistributionDetail($guid, $rankid) {
         $this->pgdb->select('sub_code_7, sub_name_7, depi_code, occurrence_status, establishment_means');
-        $this->pgdb->from('vicflora.distribution_bioregion_view');
+        
+        if ($rankid == 220){
+            $this->pgdb->from('vicflora.distribution_bioregion_species_view');
+        }
+        else {
+            $this->pgdb->from('vicflora.distribution_bioregion_view');
+        }
         $this->pgdb->where('taxon_id', $guid);
         $this->pgdb->where_not_in('occurrence_status', array('absent', 'doubtful'));
+        $this->pgdb->group_by('sub_code_7, sub_name_7, depi_code, occurrence_status, establishment_means, depi_order');
         $this->pgdb->order_by('depi_order');
         $query = $this->pgdb->get();
         return $query->result_array();
@@ -743,11 +750,17 @@ class MapModel extends FloraModel {
         $this->pgdb->update('vicflora.vicflora_occurrence', $update);
     }
     
-    public function getStateDistribution($guid) {
+    public function getStateDistribution($guid, $rankid) {
         $this->pgdb->select('d.state_province, s.state_abbr');
         $this->pgdb->from('vicflora.vicflora_statedistribution d');
         $this->pgdb->join('vicflora.australia_states s', 'd.state_province=s.state');
-        $this->pgdb->where('d.taxon_id', $guid);
+        if ($rankid == 220) {
+            $this->pgdb->where('d.species_guid', $guid);
+        }
+        else {
+            $this->pgdb->where('d.taxon_id', $guid);
+        }
+        $this->pgdb->group_by('d.state_province, s.state_abbr, s.state_order');
         $this->pgdb->order_by('s.state_order');
         $query = $this->pgdb->get();
         return $query->result_array();

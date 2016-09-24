@@ -69,7 +69,7 @@ class RoboFlow {
         $rec->Modified = $row['dcterms:modified'];
         $rec->DCType = $row['dcterms:type'];
         $rec->Subtype = ($row['ac:subtype'] == 'Illustration') ? 'Illustration' : 'Photograph';
-        $rec->Caption = $row['ac:caption'];
+        $rec->Caption = (substr($row['ac:caption'], -1) == '.') ? $row['ac:caption'] : $row['ac:caption'] . '.';
         $rec->SubjectCategory = $row['iptc:CVTerm'];
         $rec->SubjectPart = $row['ac:subjectPart'];
         $rec->SubjectOrientation = $row['ac:subjectOrientation'];

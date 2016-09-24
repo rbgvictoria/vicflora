@@ -1,4 +1,4 @@
-var base_url = 'https://vicflora.rbg.vic.gov.au';
+var base_url = 'https://vicflora.rbg.vic.gov.au/dev';
 var uri = location.href.substr(base_url.length + 1).split('/');
 if (uri[uri.length - 1].indexOf('?') > -1) {
     uri[uri.length - 1] = uri[uri.length - 1].substr(0, uri[uri.length - 1].indexOf('?'));
@@ -246,8 +246,11 @@ $(function() {
                 $('#svg-avhdistribution').append(data);
             }
         });
-        
+            
+        var url = base_url + '/ajax/bioregion_legend/' + guid + '/establishment_means';
+        console.log(url);
         $.getJSON(base_url + '/ajax/bioregion_legend/' + guid + '/establishment_means', function(data) {
+            console.log(data);
             var items = [];
             var headerrow = '<tr>';
             headerrow += '<th>&nbsp;</th>';
@@ -256,12 +259,11 @@ $(function() {
             headerrow += '<th>Establishment means</th>';
             headerrow += '</tr>';
             items.push(headerrow);
-
             $.each(data, function(index, item) {
                 if (item.occurrence_status === 'absent') {
                     item.colour = '#e9e9e9;';
                 }
-                
+
                 var row = '<tr>';
                 row += '<td><span class="legend-symbol" style="background-color:' + item.colour + '">&nbsp;</span></td>';
                 row += '<td>' + item.sub_name_7 + '</td>';
@@ -270,7 +272,6 @@ $(function() {
                 row += '</tr>';
                 items.push(row);
             });
-
             $('table.bioregions').html(items.join(''));
         });
         

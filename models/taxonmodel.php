@@ -47,6 +47,20 @@ class TaxonModel extends CI_Model {
         }
     }
     
+    public function getRankID($guid) {
+        $this->db->select('RankID');
+        $this->db->from('vicflora_taxon');
+        $this->db->where('GUID', $guid);
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->RankID;
+        }
+        else {
+            return FALSE;
+        }
+    }
+    
     public function getTaxonName($guid) {
         $this->db->select('n.FullName');
         $this->db->from('vicflora_taxon t');
@@ -479,7 +493,7 @@ class TaxonModel extends CI_Model {
         
         $caption = ($scientificName) ? $scientificName : '. ';
         $caption .= ($data->Caption && $scientificName) ? '. ' : '';
-        $caption .= ($data->Caption) ? $data->Caption . '. ' : '';
+        $caption .= ($data->Caption) ? $data->Caption . ' ' : '';
         $caption .= '<br/>';
         $caption .= ($data->Subtype === 'Illustration') ? 'Illustration: ' : 'Photo: ';
         $caption .= $data->Creator . ', &copy ' . date('Y') . ' ';

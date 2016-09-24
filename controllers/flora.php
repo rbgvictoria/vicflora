@@ -207,7 +207,7 @@ class Flora extends CI_Controller {
 
         if ($rankID >= 220) {
             $this->load->model('mapmodel');
-            $this->data['distribution'] = $this->mapmodel->getDistributionDetail($guid);
+            $this->data['distribution'] = $this->mapmodel->getDistributionDetail($guid, $rankID);
             $vicDist = FALSE;
             if ($this->data['distribution']) {
                 $vicDist = $this->vicDistributionString($this->data['distribution']);
@@ -215,8 +215,8 @@ class Flora extends CI_Controller {
             if ($profile) {
                 $this->data['profileStr'] = $this->formatProfile($profile[0]['Profile'], $vicDist);
             }
-            $this->data['stateDistribution'] = $this->mapmodel->getStateDistribution($guid);
-            $this->data['stateDistributionMap'] = $this->state_dist_map($guid, 'png');
+            $this->data['stateDistribution'] = $this->mapmodel->getStateDistribution($guid, $rankID);
+            $this->data['stateDistributionMap'] = $this->state_dist_map($guid, $rankID, 'png');
             /*$this->data['boundingPolygonMap100'] = $this->bounding_polygon_map100($guid, $this->data['namedata']['RankID'], 'png');
             $this->data['boundingPolygonMap99'] = $this->bounding_polygon_map99($guid, $this->data['namedata']['RankID'], 'png');
             $this->data['boundingPolygonMap99C'] = $this->bounding_polygon_map99C($guid, $this->data['namedata']['RankID'], 'png');
@@ -463,11 +463,14 @@ class Flora extends CI_Controller {
     
     public function map($guid, $rankid, $format=FALSE, $width=400) {
         $url = $this->config->item('geoserver_url') . "/vicflora/wms";
+        
+        $distributionView = ($rankid == 220) ? 'distribution_bioregion_species_view' : 'distribution_bioregion_view';
+        
         $query = array();
         $query['service'] = 'WMS';
         $query['version'] = '1.1.0';
         $query['request'] = 'GetMap';
-        $query['layers'] = 'vicflora:cst_vic,vicflora:distribution_bioregion_view,vicflora:vicflora_bioregion,vicflora:cst_vic,vicflora:occurrence_view';
+        $query['layers'] = "vicflora:cst_vic,vicflora:$distributionView,vicflora:vicflora_bioregion,vicflora:cst_vic,vicflora:occurrence_view";
         $query['styles'] = ',polygon_establishment_means,polygon_no-fill_grey-outline,polygon_no-fill_black-outline,';
         $query['bbox'] = '140.8,-39.3,150.2,-33.8';
         $query['width'] = $width;
@@ -594,20 +597,24 @@ class Flora extends CI_Controller {
         }
     }
         
-    public function state_dist_map($guid, $format) {
+    public function state_dist_map($guid, $rankID, $format) {
         $url = $this->config->item('geoserver_url') . "/vicflora/wms";
         $query = array();
         $query['service'] = 'WMS';
         $query['version'] = '1.1.0';
         $query['request'] = 'GetMap';
         $query['layers'] = 'vicflora:australia_states,vicflora:state_taxon_view';
-        $query['styles'] = '';
+        $query['styles'] = 'polygon,red_polygon_black_outline';
         $query['bbox'] = '112.9215,-43.8604,153.63834,-9.14129';
         $query['width'] = 242;
         $query['height'] = 242;
         $query['srs'] = 'EPSG:4326';
         $query['format'] = 'image/svg';
-        $query['cql_filter'] = urlencode("INCLUDE;taxon_id='$guid'");
+        $term = 'taxon_id';
+        if ($rankID == 220) {
+            $term = 'species_id';
+        }
+        $query['cql_filter'] = urlencode("INCLUDE;$term='$guid'");
         
         $qstring = array();
         foreach ($query as $key => $value) {
