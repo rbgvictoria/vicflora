@@ -9,7 +9,7 @@
 
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#tab_player" aria-controls="player" role="tab" data-toggle="tab">Player</a></li>
+                        <li role="presentation" class="active"><a href="#tab_player" aria-controls="player" role="tab" data-toggle="tab">Interactive key</a></li>
                         <li role="presentation"><a href="#tab_bracketed" aria-controls="bracketed" role="tab" data-toggle="tab">Bracketed key</a></li>
                     </ul>
 
