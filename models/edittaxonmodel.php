@@ -983,7 +983,7 @@ class EditTaxonModel extends TaxonModel {
         $this->db->insert('vicflora_profile', $ins);
     }
     
-    private function getRankID($taxontreedefitemid) {
+    public function getRankID($taxontreedefitemid) {
         $this->db->select('RankID');
         $this->db->from('vicflora_taxontreedefitem');
         $this->db->where('TaxonTreeDefItemID', $taxontreedefitemid);

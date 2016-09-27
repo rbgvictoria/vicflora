@@ -250,7 +250,7 @@ class MapModel extends FloraModel {
         return $query->result();
     }
     
-    public function getDistributionDetail($guid, $rankid) {
+    public function getDistributionDetail($guid, $rankid, $doubtful=FALSE) {
         $this->pgdb->select('sub_code_7, sub_name_7, depi_code, occurrence_status, establishment_means');
         
         if ($rankid == 220){
@@ -260,7 +260,9 @@ class MapModel extends FloraModel {
             $this->pgdb->from('vicflora.distribution_bioregion_view');
         }
         $this->pgdb->where('taxon_id', $guid);
-        $this->pgdb->where_not_in('occurrence_status', array('absent', 'doubtful'));
+        if (!$doubtful) {
+            $this->pgdb->where_not_in('occurrence_status', array('absent', 'doubtful'));
+        }
         $this->pgdb->group_by('sub_code_7, sub_name_7, depi_code, occurrence_status, establishment_means, depi_order');
         $this->pgdb->order_by('depi_order');
         $query = $this->pgdb->get();

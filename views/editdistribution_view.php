@@ -104,7 +104,7 @@
                                 <?php endforeach; ?>
                             </table>
                         </div>
-                        <div class="submit text-right"><?=form_submit('submit', 'Submit'); ?></div>
+                        <div class="text-right"><?=form_submit('editBioregions', 'Submit'); ?></div>
                         <?=form_close(); ?>
                         <?php endif; ?>
                     </div>

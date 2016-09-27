@@ -351,7 +351,7 @@ class Admin extends CI_Controller {
         }
         $this->load->model('edittaxonmodel', 'taxonmodel');
         
-        if ($this->input->post('submit')) {
+        if ($this->input->post('editBioregions')) {
             $subcodes = $this->input->post('sub_code_7');
             $occ_old = $this->input->post('occurrence_status_old');
             $occ = $this->input->post('occurrence_status');
@@ -371,7 +371,7 @@ class Admin extends CI_Controller {
         $legend = $this->legendBioregion('establishment_means');
         
         if ($this->data['taxondata']['RankID'] >= 220) {
-            $distribution = $this->mapmodel->getDistributionDetail($guid, $this->data['taxondata']['RankID']);
+            $distribution = $this->mapmodel->getDistributionDetail($guid, $this->data['taxondata']['RankID'], TRUE);
             $codes = array();
             foreach ($legend as $item) {
                 $codes[] = $item['code'];
