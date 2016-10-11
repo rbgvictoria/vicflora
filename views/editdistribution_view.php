@@ -114,9 +114,9 @@
                         <table class="table table-bordered table-condensed">
                             <thead>
                                 <tr>
-                                    <th>ALA Scientific name</th>
+                                    <th>Provided name</th>
+                                    <th>Processed name</th>
                                     <th>ALA Taxon ID</th>
-                                    <th>ALA Provided name</th>
                                     <th># AVH</th>
                                     <th># VBA</th>
                                 </tr>
@@ -124,9 +124,9 @@
                             <tbody>
                                 <?php foreach ($overview_by_name as $row): ?>
                                 <tr>
+                                    <td><?=$row['ala_unprocessed_scientific_name']?></td>
                                     <td><?=$row['ala_scientific_name']?></td>
                                     <td><?=$row['ala_taxon_id']?></td>
-                                    <td><?=$row['ala_unprocessed_scientific_name']?></td>
                                     <td><?=$row['count_avh']?></td>
                                     <td><?=$row['count_vba']?></td>
                                 </tr>

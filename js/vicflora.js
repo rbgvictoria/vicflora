@@ -1,4 +1,4 @@
-var base_url = 'https://vicflora.rbg.vic.gov.au/dev';
+var base_url = 'https://vicflora.rbg.vic.gov.au';
 var uri = location.href.substr(base_url.length + 1).split('/');
 if (uri[uri.length - 1].indexOf('?') > -1) {
     uri[uri.length - 1] = uri[uri.length - 1].substr(0, uri[uri.length - 1].indexOf('?'));
@@ -40,7 +40,8 @@ $(function() {
         var q = 'q=*:*';
         var form = $(this).parents('form').eq(0);
         if (form.find('[name=q]').eq(0).val()) {
-            var q = 'q=' + form.find('[name=q]').eq(0).val();
+            var val = form.find('[name=q]').eq(0).val().replace('&', '%26');
+            var q = 'q=' + val;
         }
         
         var query = q;
