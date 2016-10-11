@@ -29,7 +29,7 @@ $(function() {
             return false;
         }
     })
-    .autocomplete("instance")._renderItem = function(ul, item) {
+    .autocomplete().data("uiAutocomplete")._renderItem = function(ul, item) {
         ul.addClass('vicflora-reference-lookup-autocomplete-list');
         return $( "<li>" )
             .append( "<a><b>" + item.label + "</b><br>" + item.description + "</a>" )
@@ -103,6 +103,8 @@ $(function() {
         });
     });
     
+});
+
     var createTaxonReference = function(id) {
         var reg = /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/;
         var data = {
@@ -130,5 +132,3 @@ $(function() {
         });
     };
     
-    
-});

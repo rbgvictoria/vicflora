@@ -11,7 +11,7 @@ class Reference extends CI_Controller {
         $this->load->helper('form');
         $this->load->helper('versioning');
         $this->load->helper('curl');
-        $this->output->enable_profiler(TRUE);
+        $this->output->enable_profiler(false);
         $this->config->load('vicflora_config');
         $this->load->model('referencemodel');
         

@@ -174,7 +174,8 @@ class Admin extends CI_Controller {
     }
     
     public function editprofile($guid) {
-        $this->data['js'][] = site_url() . 'js/jquery.vicflora.reference.js';
+        $this->load->helper('versioning');
+        $this->data['js'][] = site_url() . autoVersion('js/jquery.vicflora.reference.js');
         $this->load->model('edittaxonmodel', 'taxonmodel');
         $this->load->model('solrmodel');
         
