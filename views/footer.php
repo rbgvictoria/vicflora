@@ -11,7 +11,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 col-lg-5">
-                        <div class="copyright">&copy; <?=date('Y')?> Royal Botanic Gardens Victoria</div>
+                        <div class="copyright"><a href="https://www.rbg.vic.gov.au/copyright">copyright</a></div>
                     </div>
                 </div>
             </div>

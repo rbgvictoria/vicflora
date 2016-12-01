@@ -7128,6 +7128,11 @@ footer.footer {
     .copyright {
       padding-top: 0;
       text-align: right; } }
+  .copyright a {
+    color: #d7bb44; }
+    .copyright a:hover, .copyright a:focus {
+      color: #bb9d13;
+      text-decoration: none; }
 
 /*
 Copyright 2016 Royal Botanic Gardens Victoria.

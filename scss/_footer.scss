@@ -74,5 +74,15 @@ footer.footer {
         text-align: right;
     }
     
+    a {
+        color: $brand-dark-background;
+        
+        &:hover, &:focus {
+            color: $brand-primary;
+            text-decoration: none;
+        }
+
+    }
+    
 }
 
