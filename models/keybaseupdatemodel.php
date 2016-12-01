@@ -26,6 +26,7 @@ class KeyBaseUpdateModel extends FloraModel {
         $this->db->select('guid');
         $this->db->from('vicflora_taxon');
         $this->db->where('TaxonomicStatus', 'accepted');
+        $this->db->where('DoNotIndex IS NULL', FALSE, FALSE);
         if ($from) {
             $this->db->where('TimestampModified >', $from);
         }
@@ -56,6 +57,7 @@ class KeyBaseUpdateModel extends FloraModel {
         $data->taxonRank = $row->acceptedNameUsageTaxonRank;
         $data->scientificName = $row->scientificName;
         $data->scientificNameAuthorship = $row->scientificNameAuthorship;
+        $data->timestampModified = date('Y-m-d H:i:s');
         
         if ($row->NodeNumber) {
             $data = (object) array_merge((array) $data, (array) $this->higherClassification($row->NodeNumber));
@@ -72,6 +74,7 @@ class KeyBaseUpdateModel extends FloraModel {
                 $data->itemsID = $this->insertKeyBaseItem($data->scientificName);
             }
             if ($data->itemsID) {
+                $data->timestampCreated = date('Y-m-d H:i:s');
                 $this->insertKeyBaseProjectItem($data);
             }
         }
@@ -199,7 +202,9 @@ class KeyBaseUpdateModel extends FloraModel {
         $row = $query->row();
         $data = array(
             'ItemsID' => $row->newID,
-            'Name' => $scientificName
+            'Name' => $scientificName,
+            'TimestampCreated' => date('Y-m-d H:i:s'),
+            'TimestampModified' => date('Y-m-d H:i:s')
         );
         $this->db->insert('keybase.items', $data);
         return $row->newID;
@@ -227,6 +232,8 @@ class KeyBaseUpdateModel extends FloraModel {
 }
 
 class KeyBaseRecord {
+    var $timestampCreated = NULL;
+    var $timestampModified = NULL;
     var $projectsID = NULL;
     var $itemsID = NULL;
     var $taxonID = NULL;
