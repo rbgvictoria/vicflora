@@ -480,7 +480,7 @@ class TaxonModel extends CI_Model {
             $license = "<a href='$url'>$data->License</a>";
         }
         elseif ($data->License == 'All rights reserved') {
-            $license = 'All rights reserved';
+            $license = 'all rights reserved';
         }
         elseif ($data->SubjectCategory == 'Flora of the Otway Plain and Ranges plate') {
             $license = 'not to be reproduced without prior permission from CSIRO Publishing.';
@@ -492,12 +492,15 @@ class TaxonModel extends CI_Model {
         $alt = ($scientificName) ? $scientificName : $data->Caption;
         
         $caption = ($scientificName) ? $scientificName : '. ';
-        $caption .= ($data->Caption && $scientificName) ? '. ' : '';
-        $caption .= ($data->Caption) ? $data->Caption . ' ' : '';
+        $caption .= (trim($data->Caption) && $scientificName) ? '. ' : '';
+        $caption .= (trim($data->Caption)) ? trim($data->Caption) . ' ' : '';
         $caption .= '<br/>';
         $caption .= ($data->Subtype === 'Illustration') ? 'Illustration: ' : 'Photo: ';
         $caption .= $data->Creator . ', &copy ' . date('Y') . ' ';
-        $caption .= ($data->RightsHolder) ? $data->RightsHolder : 'Royal Botanic Gardens Victoria';
+        if ($data->RightsHolder == 'Royal Botanic Gardens Victoria') {
+            $data->RightsHolder = 'Royal Botanic Gardens Board';
+        }
+        $caption .= ($data->RightsHolder) ? $data->RightsHolder : 'Royal Botanic Gardens Board';
         $caption .= ', ' . $license . '.';
         if ($data->SubjectCategory === 'Flora of the Otway Plain and Ranges plate') {
             $caption .= '<br/>' . $data->rights;

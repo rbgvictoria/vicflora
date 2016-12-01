@@ -95,12 +95,12 @@ class RoboFlow {
         $rec->Rating = $row['xmp:Rating'];
         $rec->ThumbnailUrlEnabled = (isset($row['ThumbnailUrlEnabled']) && strtolower($row['ThumbnailUrlEnabled'])=='true') ? TRUE : FALSE;
         $rec->PreviewUrlEnabled = (isset($row['PreviewUrlEnabled']) && strtolower($row['PreviewUrlEnabled'])=='true') ? TRUE : FALSE;
+        $rec->FileFormat = (isset($row['FileFormat'])) ? $row['FileFormat'] : NULL;
         $tax = $this->findTaxon(Encoding::toUTF8($row['dwc:scientificName']));
         if ($tax) {
             $rec->TaxonID = $tax->TaxonID;
             $rec->AcceptedID = $tax->AcceptedID;
         }
-        
         return $rec;
     }
     
@@ -185,6 +185,7 @@ class ImageRecord {
     var $Rating = NULL;
     var $ThumbnailUrlEnabled = NULL;
     var $PreviewUrlEnabled = NULL;
+    var $FileFormat = NULL;
 }
 
 /* End of file RoboFlow.php */
