@@ -258,7 +258,7 @@ class ReferenceModel extends CI_Model {
         if ($data->InAuthor) {
             $desc .= $data->InAuthor . ', ';
         }
-        $desc .= $data->InTitle . ', ';
+       $desc .= preg_replace('/~([^~]*)~/', '<i>$1</i>' , $data->InTitle) . ', ';
         if ($data->InPublisher || $data->InPlaceOfPublication) {
             if ($data->InPublisher) {
                 $desc .= $data->InPublisher;
