@@ -206,7 +206,10 @@ $(function() {
         }
     });
     
-    if (uri[1] === 'glossary') {
+    if (uri.indexOf('dev') > -1) {
+        uri.shift();
+    }
+    if (uri.indexOf('glossary') > -1) {
         glossary();
     }
     
@@ -328,7 +331,7 @@ var glossary = function() {
     var hash = location.hash;
     if (!hash) {
         if (uri.length > 2) {
-            hash = '#' + uri[2];
+            hash = '#' + uri[uri.length-1];
         }
         else {
             hash = '#a';
