@@ -13,7 +13,7 @@ class Flora extends CI_Controller {
         $this->load->helper('versioning');
         
         $this->config->load('vicflora_config');
-        $this->output->enable_profiler();
+        $this->output->enable_profiler(false);
     }
     
     public function index() {
@@ -196,9 +196,6 @@ class Flora extends CI_Controller {
         $this->data['distribution'] = FALSE;
         $profile = $this->taxonmodel->getProfiles($guid);
         $this->data['profile'] = $profile;
-        if ($profile) {
-            $this->data['profileStr'] = $this->formatProfile($profile[0]['Profile']);
-        }
         $this->data['stateDistribution'] = FALSE;
         $this->data['stateDistributionMap'] = FALSE;
         
@@ -228,6 +225,11 @@ class Flora extends CI_Controller {
             $this->data['bioregion_legend'] = $this->legendBioregion();
             //$this->data['vicgrid_map'] = $this->vicgrid_map($guid, $this->data['namedata']['RankID']);
             //$this->data['maplink'] = $this->maplink($guid, $this->data['namedata']['RankID']);
+        }
+        else {
+            if ($profile) {
+                $this->data['profileStr'] = $this->formatProfile($profile[0]['Profile']);
+            }
         }
         
         $this->load->view('taxon_view', $this->data);
@@ -307,8 +309,24 @@ class Flora extends CI_Controller {
                 $notes = '';
             }
             
-            return $description . $distribution . $notes;
+            $treatment = $this->scientificNameLinks($description . $distribution . $notes);
+            
+            return $treatment;
         }
+    }
+    
+    private function scientificNameLinks($text) {
+        $this->load->model('viewtaxonmodel','taxonmodel');
+        preg_match_all('/<span class="scientific_name">([^<]+)<\/span>/', $text, $matches);
+        $matches = array_map('array_unique', $matches);
+        foreach ($matches[0] as $index =>$value) {
+            $sciName = $matches[1][$index];
+            $guid = $this->taxonmodel->getScientificNameLink($sciName);
+            if ($guid) {
+                $text = str_replace($value, '<a href="' . site_url() . 'flora/taxon/'. $guid . '">' . $value . '</a>', $text);
+            }
+        }
+        return $text;
     }
     
     private function vicDistributionString($distribution) {

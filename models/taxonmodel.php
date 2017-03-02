@@ -629,6 +629,22 @@ class TaxonModel extends CI_Model {
         }
         return $ret;
     }
+    
+    public function getScientificNameLink($sciName) {
+        $this->db->select('t.GUID');
+        $this->db->from('vicflora_name n');
+        $this->db->join('vicflora_taxon t', 'n.NameID=t.NameID');
+        $this->db->where("n.FullName='$sciName' OR CONCAT(SUBSTRING(n.FullName, 1, 1), '. ', SUBSTRING(n.FullName, LOCATE(' ', n.FullName)+1))='$sciName'", FALSE, FALSE);
+        $this->db->where('(t.DoNotIndex IS NULL OR t.DoNotIndex=0)', FALSE, FALSE);
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->GUID;
+        }
+        else {
+            return FALSE;
+        }
+    }
 }
 
 
