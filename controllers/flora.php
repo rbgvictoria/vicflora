@@ -13,7 +13,7 @@ class Flora extends CI_Controller {
         $this->load->helper('versioning');
         
         $this->config->load('vicflora_config');
-        $this->output->enable_profiler(FALSE);
+        $this->output->enable_profiler();
     }
     
     public function index() {

@@ -538,7 +538,7 @@ class TaxonModel extends CI_Model {
     }
     
     public function getKey($guid) {
-        $this->db->select('n.FullName, td.Name AS Rank, k.Name, k.KeysID');
+        $this->db->select('n.FullName, td.Name AS Rank, k.Title, k.KeysID');
         $this->db->from('vicflora_taxon t');
         $this->db->join('vicflora_taxon c', 't.TaxonID=c.ParentID');
         $this->db->join('vicflora_taxontreedefitem td', 'c.TaxonTreeDefItemID=td.TaxonTreeDefItemID');

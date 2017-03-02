@@ -282,7 +282,7 @@
                                     $keyto .= $key['Rank'];
                                     break;
                             }
-                            $keyto .= ' of <i>' . $key['Name'] . '</i>';
+                            $keyto .= ' of <i>' . $key['Title'] . '</i>';
                         ?>
                         <div><?=anchor(site_url() . 'flora/key/' . $key['KeysID'], $keyto, array('class' => 'btn btn-primary colorbox_key'))?></div>
                         <?php endif; ?>
