@@ -975,7 +975,7 @@ class EditTaxonModel extends TaxonModel {
             'AcceptedID' => $taxonid,
             'Profile' => $profile,
             'TaxonomicStatus' => 'accepted',
-            'SourceID' => $sourceid,
+            'SourceID' => $sourceid ?: null,
             'IsCurrent' => 1,
             'IsUpdated' => NULL,
             'CreatedByID' => $this->session->userdata('id')

@@ -24,7 +24,7 @@ class ReferenceModel extends CI_Model {
                 );
             }
         }
-        return $ret;
+        return $this->db->last_query();
     }
     
     public function getReferenceData($id) {

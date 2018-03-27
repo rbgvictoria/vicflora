@@ -20,7 +20,7 @@ class Admin extends CI_Controller {
 
         if (!$this->input->is_cli_request()) {
             $this->load->library('session');
-            $this->output->enable_profiler(FALSE);
+            $this->output->enable_profiler(true);
         }
         $this->load->helper('url');
         $this->load->helper('form');
@@ -620,12 +620,17 @@ class Admin extends CI_Controller {
         $this->vicflorataxontree->updateTaxonTree();
     }
     
-    public function update_solr_index() {
+    public function update_solr_index($id=false) {
         if (!$this->input->is_cli_request() ) {
             show_error('You don\'t have access to this page.', 403);
         }
         $this->load->model('solrmodel');
-        $this->solrmodel->updateAll();
+        if ($id) {
+            $this->solrmodel->updateDocument($id);
+        }
+        else {
+            $this->solrmodel->updateAll();
+        }
         $this->solr_unindex();
     }
     
@@ -634,29 +639,47 @@ class Admin extends CI_Controller {
             show_error('You don\'t have access to this page.', 403);
         }
         $dir = getcwd() . '/roboflow';
-        $files = array();
-        if (!$date) {
-            $files = scandir($dir, 1);
-        }
-        else {
-            if (is_dir($dir)) {
-                if ($dh = opendir($dir)) {
-                    while (($file = readdir($dh)) !== false) {
-                        if (strlen($file) > 2 && date('Y-m-d', filemtime($dir . '/' . $file)) == $date) {
-                            $files[] = $file;
-                        }
+        $library = array();
+        $vcsb = array();
+        if (is_dir($dir)) {
+            if ($dh = opendir($dir)) {
+                while (($file = readdir($dh)) !== false) {
+                    if (strpos($file, 'library') !== false) {
+                        $library[] = array(
+                            'filename' => $file,
+                            'filemtime' => filemtime($dir . '/' . $file)
+                        );
                     }
-                    closedir($dh);
+                    elseif (strpos($file, 'vcsb') !== false) {
+                        $vcsb[] = array(
+                            'filename' => $file,
+                            'filemtime' => filemtime($dir . '/' . $file)
+                        );
+                    }
                 }
+                closedir($dh);
             }
         }
-        if (!$files) {
-            echo "No files were found for this date.\n";
+        
+        $startTime = date('Y-m-d H:i:s');
+        $this->load->library('RoboFlow');
+        $library_dates = array();
+        foreach ($library as $file) {
+            $library_dates[] = $file['filemtime'];
         }
-        else {
-            $this->load->library('RoboFlow');
-            $this->roboflow->update($dir . '/' . $files[0]);
+        array_multisort($library_dates, SORT_DESC, $library);
+        echo "Processing: " . $library[0]['filename'] . "\r\n";
+        $this->roboflow->update($dir . '/' . $library[0]['filename']);
+        
+        $vcsb_dates = array();
+        foreach ($vcsb as $file) {
+            $vcsb_dates[] = $file['filemtime'];
         }
+        array_multisort($vcsb_dates, SORT_DESC, $vcsb);
+        echo "Processing: " . $vcsb[0]['filename'] . "\r\n";
+        $this->roboflow->update($dir . '/' . $vcsb[0]['filename']);
+        
+        $this->roboflow->deleteOldRecords($startTime);
     }
     
     public function update_maps($from=FALSE, $pageSize=1000, $start=0) {

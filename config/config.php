@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'https://vicflora.rbg.vic.gov.au';
+$config['base_url']	= 'https://vicflora.rbg.vic.gov.au/devo';
 
 /*
 |--------------------------------------------------------------------------

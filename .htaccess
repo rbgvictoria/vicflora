@@ -1,3 +1,5 @@
+Header add Access-Control-Allow-Origin "rbg.vic.gov.au"
 RewriteEngine on
-RewriteCond $1 !^(index\.php|css|images|js|third_party|robots\.txt)
-RewriteRule ^(.*)$ /dev/vicflora/index.php/$1 [L]
+RewriteRule ^(js|css)/(.+)\.(\d+)\.(js|css)$ $1/$2.$4 [L]
+RewriteCond $1 !^(index\.php|favicon\.ico|css|captcha|images|js|third_party|robots\.txt)
+RewriteRule ^(.*)$ index.php/$1 [L]

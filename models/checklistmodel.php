@@ -48,6 +48,7 @@ EOT;
     //public function getCheckListTaxa($park) {
     public function getCheckList($park) {
         $ret = new stdClass();
+        $info = (object) $this->getParkInfo($park);
         $geom = $this->getParkGeometry($park);
         if ($geom) {
             $names = $this->getParkScientificNames($geom);
@@ -55,6 +56,7 @@ EOT;
                 $ids = $this->getParkTaxonIDs($names);
                 if ($ids) {
                     $ret->parkNumber = $park;
+                    $ret->parkName = $info->name;
                     $ret->numFound = count($ids);
                     $ret->taxa = $this->getParkTaxonDetail($ids);
                     return $ret;

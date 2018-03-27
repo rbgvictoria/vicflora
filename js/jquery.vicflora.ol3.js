@@ -411,6 +411,7 @@ var Checklist = function() {
     };
     
     this.getChecklist = function(resNumber) {
+        that.resNumber = resNumber;
         $('#facets').prepend('<span class="preparing"><i class="fa fa-spinner fa-spin fa-2x"></i> <b>Preparing checklist...</b></span>');
         
         var url = base_url + '/flora/ajaxChecklist/' + resNumber;
@@ -732,6 +733,15 @@ var Checklist = function() {
         $('<div/>', {
             class: "col-sm-6"
         }).append(nav).appendTo(headerDiv);
+        
+        $('<div/>', {
+            class: "col-md-12"
+        }).append('<button class="download btn btn-primary" data-href="' + base_url + '/flora/downloadChecklist/' + that.resNumber + '">Download checklist</button>').appendTo(headerDiv);
+        
+        $('button.download').on('click', function() {
+           var href = $(this).data('href');
+           location.href = href;
+        });
     };
     
     this.getResultFooter = function(start) {

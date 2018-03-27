@@ -58,15 +58,15 @@
     <div class="container">
 
       
-          <div class="row">
-              <div class="col-lg-12 clearfix">
-                <ul class="social-media">
-                    <li><a href="https://twitter.com/RBG_Victoria" target="_blank"><span class="icon icon-twitter-solid"></span></a></li>
-                    <li><a href="https://www.facebook.com/BotanicGardensVictoria" target="_blank"><span class="icon icon-facebook-solid"></span></a></li>
-                    <li><a href="https://instagram.com/royalbotanicgardensvic/" target="_blank"><span class="icon icon-instagram-solid"></span></a></li>
-                </ul>
-              </div> <!-- /.col -->
-              
+        <div class="row">
+            <div class="col-lg-12 clearfix">
+              <ul class="social-media">
+                  <li><a href="https://twitter.com/RBG_Victoria" target="_blank"><span class="icon icon-twitter-solid"></span></a></li>
+                  <li><a href="https://www.facebook.com/BotanicGardensVictoria" target="_blank"><span class="icon icon-facebook-solid"></span></a></li>
+                  <li><a href="https://instagram.com/royalbotanicgardensvic/" target="_blank"><span class="icon icon-instagram-solid"></span></a></li>
+              </ul>
+            </div> <!-- /.col -->
+
             <nav class="navbar navbar-default">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -112,6 +112,7 @@
             </nav>
 
             <div class="col-lg-12">
+                <!-- Place for alert -->
                 <div id="header">
                     <div class="login">
                         <?php if ($this->session->userdata('name')): ?>

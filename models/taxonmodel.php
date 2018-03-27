@@ -12,7 +12,7 @@ class TaxonModel extends CI_Model {
         $this->db->select('t.TaxonID, t.GUID, td.Name AS Rank, n.FullName, n.Author, r.Author AS InAuthor, 
             r.JournalOrBook, r.Series, r.Edition, r.Volume, r.Part, r.Page, r.PublicationYear,
             t.Sensu, n.NomenclaturalNote, t.TaxonomicStatus, t.OccurrenceStatus, t.EstablishmentMeans, 
-            t.Remarks, t.RankID, tt.NodeNumber, tt.HighestDescendantNodeNumber,
+            t.Remarks, t.RankID, tt.NodeNumber, tt.HighestDescendantNodeNumber, tt.Depth,
             IF(p.ProfileID IS NOT NULL AND (p.AcceptedID IS NULL OR p.TaxonID=p.AcceptedID), p.ProfileID, NULL) AS UnmatchedProfile', FALSE);
         $this->db->select("distv.DistributionText AS DistV, dista.DistributionText AS DistA, distw.DistributionText AS DistW");
 
@@ -70,6 +70,22 @@ class TaxonModel extends CI_Model {
         if ($query->num_rows()) {
             $row = $query->row();
             return $row->FullName;
+        }
+    }
+    
+    public function getGenus($guid) {
+        $this->db->select("SUBSTRING(n.FullName, 1, LOCATE(' ', n.FullName)-1) AS genus", FALSE);
+        $this->db->from('vicflora_name n');
+        $this->db->join('vicflora_taxon t', 'n.NameID=t.NameID');
+        $this->db->where('t.RankID >=', 180);
+        $this->db->where('t.GUID', $guid);
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->genus;
+        }
+        else {
+            return FALSE;
         }
     }
     
@@ -357,6 +373,7 @@ class TaxonModel extends CI_Model {
         $this->db->where('PixelXDimension >', 0);
         $this->db->where('i.ThumbnailUrlEnabled', true);
         $this->db->where('i.PreviewUrlEnabled', true);
+        $this->db->where('i.Creator IS NOT NULL', false, false);
         $this->db->group_by('i.ImageID');
         if ($rankID >= 220) {
             $this->db->order_by('i.Subtype', 'ASC');
@@ -399,7 +416,7 @@ class TaxonModel extends CI_Model {
     }
     
     public function getImage($guid) {
-        $this->db->select("i.CumulusRecordID, 
+        $this->db->select("i.CumulusCatalogue, i.CumulusRecordID, 
             i.PixelXDimension, i.PixelYDimension,
             n.FullName AS ScientificName, if(t.TaxonID!=st.TaxonID, sn.FullName, NULL) AS AsName, 
             i.Subtype, i.Caption, i.SubjectPart, i.Creator, i.RightsHolder, i.License, i.rights,
@@ -417,6 +434,7 @@ class TaxonModel extends CI_Model {
             $imgCaption = $this->imageCaption($row);
             $image = (object) array(
                 'id' => $row->CumulusRecordID,
+                'catalog' => $row->CumulusCatalogue,
                 'guid' => $guid,
                 'alt' => $imgCaption->alt,
                 'caption' => $imgCaption->caption,
@@ -513,7 +531,7 @@ class TaxonModel extends CI_Model {
     }
     
     public function getHeroImage($nodeNumber, $highestDescendantNodeNumber, $rankID) {
-        $this->db->select('i.GUID, i.CumulusRecordID, i.Subtype, i.PixelXDimension, i.PixelYDimension');
+        $this->db->select('i.GUID, i.CumulusCatalogue, i.CumulusRecordID, i.Subtype, i.PixelXDimension, i.PixelYDimension');
         $this->db->from('cumulus_image i');
         $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.TaxonID');
         $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');
@@ -522,6 +540,7 @@ class TaxonModel extends CI_Model {
         $this->db->where('i.PixelXDimension >', 0);
         $this->db->where('i.ThumbnailUrlEnabled', true);
         $this->db->where('i.PreviewUrlEnabled', true);
+        $this->db->where('i.Creator IS NOT NULL', false, false);
         $this->db->group_by('i.ImageID');
         $this->db->order_by('i.Subtype', 'DESC');
         $this->db->order_by('i.HeroImage', 'DESC');
@@ -549,6 +568,7 @@ class TaxonModel extends CI_Model {
         $this->db->where('(c.DoNotIndex IS NULL OR c.DoNotIndex!=1)', FALSE, FALSE);
         $this->db->where('k.ProjectsID', 10);
         $this->db->where('t.GUID', $guid);
+        $this->db->order_by('td.RankID');
         $query = $this->db->get();
         if ($query->num_rows()) {
             return $query->row_array();

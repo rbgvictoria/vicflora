@@ -44,7 +44,7 @@ class StaticPagesModel extends CI_Model {
     public function getHomepageImages() {
         $this->db->select('CumulusRecordID, Caption, Creator, RightsHolder, License');
         $this->db->from('cumulus_image');
-        $this->db->where('SubjectCategory','Botanical art, home page');
+        $this->db->where('SubjectCategory','Flora of Victoria Plate');
         $this->db->order_by('RAND()');
         $this->db->limit(6);
         $query = $this->db->get();

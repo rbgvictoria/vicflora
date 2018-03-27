@@ -210,7 +210,7 @@ class Flora extends CI_Controller {
                 $vicDist = $this->vicDistributionString($this->data['distribution']);
             }
             if ($profile) {
-                $this->data['profileStr'] = $this->formatProfile($profile[0]['Profile'], $vicDist);
+                $this->data['profileStr'] = $this->formatProfile($guid, $profile[0]['Profile'], $vicDist);
             }
             $this->data['stateDistribution'] = $this->mapmodel->getStateDistribution($guid, $rankID);
             $this->data['stateDistributionMap'] = $this->state_dist_map($guid, $rankID, 'png');
@@ -228,14 +228,14 @@ class Flora extends CI_Controller {
         }
         else {
             if ($profile) {
-                $this->data['profileStr'] = $this->formatProfile($profile[0]['Profile']);
+                $this->data['profileStr'] = $this->formatProfile($guid, $profile[0]['Profile']);
             }
         }
         
         $this->load->view('taxon_view', $this->data);
     }
     
-    private function formatProfile($profile, $vicDist=FALSE) {
+    private function formatProfile($taxonID, $profile, $vicDist=FALSE) {
         $doc = new DOMDocument('1.0', 'utf-8');
         // Following: http://stackoverflow.com/questions/10659164/php-domdocument-manipulating-and-encoding#answer-10659514
         $encodingHint = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
@@ -309,21 +309,27 @@ class Flora extends CI_Controller {
                 $notes = '';
             }
             
-            $treatment = $this->scientificNameLinks($description . $distribution . $notes);
+            $treatment = $this->scientificNameLinks($taxonID, $description . $distribution . $notes);
             
             return $treatment;
         }
     }
     
-    private function scientificNameLinks($text) {
+    private function scientificNameLinks($taxonID, $text) {
         $this->load->model('viewtaxonmodel','taxonmodel');
+        $genus = $this->taxonmodel->getGenus($taxonID);
         preg_match_all('/<span class="scientific_name">([^<]+)<\/span>/', $text, $matches);
         $matches = array_map('array_unique', $matches);
         foreach ($matches[0] as $index =>$value) {
             $sciName = $matches[1][$index];
-            $guid = $this->taxonmodel->getScientificNameLink($sciName);
-            if ($guid) {
-                $text = str_replace($value, '<a href="' . site_url() . 'flora/taxon/'. $guid . '">' . $value . '</a>', $text);
+            if (preg_match('/^[A-Z].+[A-Za-z]$/', $sciName)) {
+                if (preg_match('/^[A-Z]\. /', $sciName) && substr($sciName, 0, 1) === substr($genus, 0, 1)) {
+                    $sciName = preg_replace('/[A-Z]\./', $genus, $sciName);
+                }
+                $guid = $this->taxonmodel->getScientificNameLink($sciName);
+                if ($guid) {
+                    $text = str_replace($value, '<a href="' . site_url() . 'flora/taxon/'. $guid . '">' . $value . '</a>', $text);
+                }
             }
         }
         return $text;
@@ -972,9 +978,6 @@ class Flora extends CI_Controller {
             $this->data['park_name'] = $info['name'];
             $symbol = ($info['area'] < 0.03) ? 'point' : 'polygon';
             $this->data['park_map'] = $this->capad_park_map($parkno, $symbol);
-            //$this->data['checklist'] = $this->checklistmodel->getCheckListTaxa($parkno);
-            //$this->load->model('solrmodel');
-            //$this->data['solrresult'] = $this->solrmodel->solrChecklistSearch($this->data['checklist']);
         }
         
         $this->data['parks'] = $this->checklistmodel->getParks();
@@ -987,6 +990,53 @@ class Flora extends CI_Controller {
         $json = json_encode($data);
         header('Content-type: application/json');
         echo $json;
+    }
+    
+    public function downloadChecklist($park) {
+        $this->load->model('checklistmodel');
+        $data = $this->checklistmodel->getChecklist($park);
+        //print_r($data);
+        $csv = $this->arrayToCsv($data->taxa);
+        array_unshift($csv, '');
+        array_unshift($csv, 'Downloaded: ' . date('Y-m-d'));
+        array_unshift($csv, 'Source: ' . site_url() . 'flora/checklist/' . $park);
+        array_unshift($csv, 'Checklist for ' . $data->parkName . " ($park; $data->numFound taxa)");
+        
+        header('Content-type: text/csv');
+        header('Content-Disposition: attachment; filename="vicflora_checklist_' . $park . '_' . date('Ymd_Hi') . '.csv"');
+        echo implode("\r\n", $csv);
+    }
+    
+    private function arrayToCsv($data) {
+        $csv = array();
+        $csv[] = $this->arrayToCsvRow(array_keys((array) $data[0]), ',');
+        foreach ($data as $row) {
+            $csv[] = $this->arrayToCsvRow(array_values((array) $row), ',');
+        }
+        return $csv;
+    }
+    
+    private function arrayToCsvRow( array &$fields, $delimiter = ';', $enclosure = '"', $encloseAll = false, $nullToMysqlNull = false ) {
+        $delimiter_esc = preg_quote($delimiter, '/');
+        $enclosure_esc = preg_quote($enclosure, '/');
+
+        $output = array();
+        foreach ( $fields as $field ) {
+            if ($field === null && $nullToMysqlNull) {
+                $output[] = 'NULL';
+                continue;
+            }
+
+            // Enclose fields containing $delimiter, $enclosure or whitespace
+            if ( $encloseAll || preg_match( "/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field ) ) {
+                $output[] = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
+            }
+            else {
+                $output[] = $field;
+            }
+        }
+
+        return implode( $delimiter, $output );
     }
 }
 

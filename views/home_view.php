@@ -39,7 +39,7 @@
                     <?php foreach ($carousel as $index => $slide): ?>
                     <?php $caption = 'Illustration: ' . $slide->Creator . '. &copy;' . date('Y') . ' ' . $slide->RightsHolder . '. ' . $slide->License . '.'; ?>
                     <div class="item<?=(!$index) ? ' active' : ''; ?>">
-                        <img src="<?=$this->config->item('preview_baseurl')?><?=$slide->CumulusRecordID?>?b=600" alt="<?=$caption?>" />
+                        <img src="<?=$this->config->item('preview_baseurl')?>Library/<?=$slide->CumulusRecordID?>?b=600" alt="<?=$caption?>" />
                         <div class="carousel-caption"><?=$caption?></div>
                     </div>
                     <?php endforeach; ?>

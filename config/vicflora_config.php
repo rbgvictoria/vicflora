@@ -21,9 +21,9 @@ $config['solr_host'] = 'localhost';
 $config['solr_port'] = '65002';
 
 $cumulusBaseUrl = 'https://data.rbg.vic.gov.au/images/';
-$config['asset_baseurl'] = $cumulusBaseUrl . 'A/Library/';
-$config['preview_baseurl'] = $cumulusBaseUrl . 'P/Library/';
-$config['thumbnail_baseurl'] = $cumulusBaseUrl . 'T/Library/';
+$config['asset_baseurl'] = $cumulusBaseUrl . 'A/';
+$config['preview_baseurl'] = $cumulusBaseUrl . 'P/';
+$config['thumbnail_baseurl'] = $cumulusBaseUrl . 'T/';
 
 
 

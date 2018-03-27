@@ -267,24 +267,7 @@
 
                         <?php if ($key && $namedata['GUID'] !== 'd3590e10-e8ac-4848-9e33-9fbbaf171f7a'): ?>
                         <div>&nbsp;</div>
-                        <?php 
-                            $keyto = 'Key to the ';
-                            switch ($key['Rank']) {
-                                case 'genus':
-                                    $keyto .= 'genera';
-                                    break;
-
-                                case 'variety':
-                                    $keyto .= 'varieties';
-                                    break;
-
-                                default:
-                                    $keyto .= $key['Rank'];
-                                    break;
-                            }
-                            $keyto .= ' of <i>' . $key['Title'] . '</i>';
-                        ?>
-                        <div><?=anchor(site_url() . 'flora/key/' . $key['KeysID'], $keyto, array('class' => 'btn btn-primary colorbox_key'))?></div>
+                        <div><?=anchor(site_url() . 'flora/key/' . $key['KeysID'], $key['Title'], array('class' => 'btn btn-primary colorbox_key'))?></div>
                         <?php endif; ?>
                         </div>
                                 
@@ -320,7 +303,7 @@
                                     <div>
                                         <div class="image-box">
                                             <div class="content">
-                                                <img class="img-responsive" src="<?=$this->config->item('preview_baseurl')?><?=$heroImage->CumulusRecordID?>?b=<?=$size?>"
+                                                <img class="img-responsive" src="<?=$this->config->item('preview_baseurl')?><?= urlencode($heroImage->CumulusCatalogue)?>/<?=$heroImage->CumulusRecordID?>?b=<?=$size?>"
                                                      alt="Hero image" />
                                             </div>
                                         </div>
@@ -355,11 +338,11 @@
                         <div class="row thumbnail-row">
                         <?php foreach ($images as $image): ?>
                             <figure class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
-                                <a href="<?=$this->config->item('preview_baseurl')?><?=$image->id?>?b=<?=$image->b?>" 
+                                <a href="<?=$this->config->item('preview_baseurl')?><?= urlencode($image->catalog)?>/<?=$image->id?>?b=<?=$image->b?>" 
                                    class="thumbnail thumb" data-size="<?=$image->width?>x<?=$image->height?>" 
                                    data-alt="<?=$image->alt?>" data-caption="<?=$image->caption?>">
                                     <span>
-                                        <img alt="" src="<?=$this->config->item('thumbnail_baseurl')?><?=$image->id?>" />
+                                        <img alt="" src="<?=$this->config->item('thumbnail_baseurl')?><?= urlencode($image->catalog)?>/<?=$image->id?>" />
                                     </span>
                                 </a>
                             </figure>
@@ -383,14 +366,20 @@
                             </div>
                             <?php endforeach; ?>
                         </div>
+                        <div class="cl-separator-higher"><span class="glyphicon glyphicon-triangle-top"></span>Higher taxa</div>
                         <?php endif; ?>
                         
-                        <?php if ($classification && $subordinates): ?>
-            <div class="cl-separator-higher"><span class="glyphicon glyphicon-triangle-top"></span>Higher taxa</div>
-            <div class="cl-separator-subordinate"><span class="glyphicon glyphicon-triangle-bottom"></span>Subordinate taxa</div>
-                        <?php endif; ?>
+                        <div class="section currentname">
+                            <div class="currentname<?=($namedata['RankID']>=180) ? ' italic' : '';?>">
+                                <?php $author = ($namedata['Author']) ? ' <span class="author">' . $namedata['Author'] . '</span>' : ''; ?>
+                                <span class="taxon-rank"><?=$namedata['Rank']?></span><?=str_repeat('<span class="indent"></span>', $namedata['Depth']); ?>
+                                <?=anchor(site_url() . 'flora/taxon/' . $namedata['GUID'], '<span class="namebit ' . strtolower($namedata['Rank']) . '">' . 
+                                        $namedata['FullName'] . '</span>' . $author); ?>
+                            </div>
+                        </div>
             
                         <?php if ($subordinates): ?>
+                        <div class="cl-separator-subordinate"><span class="glyphicon glyphicon-triangle-bottom"></span>Subordinate taxa</div>
                         <div class="section subordinate-taxa">
                             <?php foreach ($subordinates as $child): ?>
                             <div class="currentname <?=($child['RankID']>=180) ? ' italic' : ''?>">

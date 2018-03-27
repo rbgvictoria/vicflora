@@ -5,13 +5,11 @@ require_once 'third_party/Encoding/Encoding.php';
 class RoboFlow {
     private $ci;
     private $db;
-    private $startTime;
     private $csvArray;
     
     public function __construct() {
         $this->ci =& get_instance();
         $this->db = $this->ci->load->database('default', TRUE);
-        $this->startTime = date('Y-m-d H:i:s');
     }
     
     public function update($file) {
@@ -37,26 +35,33 @@ class RoboFlow {
     }
     
     private function updateVicFloraImageMetadata() {
+        $handle = fopen('logs/image_upload_' . date('Ymd_Hi') . '.csv', 'w');
+        fputcsv($handle, array_keys((array) new ImageRecord()));
         foreach ($this->csvArray as $row) {
             $rec = $this->createImageRecord($row);
-            $flrec = $this->findRecord($row['CumulusRecordID']);
-            if ($flrec) {
-                $imageID = $flrec->ImageID;
-                $rec->TimestampCreated = $flrec->TimestampCreated;
-                $rec->TimestampModified = date('Y-m-d H:i:s');
-                $rec->GUID = $flrec->GUID;
-                $rec->Version = $flrec->Version + 1;
-                $this->updateImage($rec, $imageID);
-            }
-            else {
-                $rec->TimestampCreated = date('Y-m-d H:i:s');
-                $rec->TimestampModified = date('Y-m-d H:i:s');
-                $rec->GUID = UUID::v4();
-                $rec->Version = 1;
-                $this->insertImage($rec);
+            if ((!$rec->Latitude || ($rec->Latitude > -90 && $rec->Latitude < 90)) 
+                    && (!$rec->Longitude || ($rec->Longitude > -180 && $rec->Longitude < 180))) {
+                $flrec = $this->findRecord($row['CumulusCatalog'], $row['CumulusRecordID']);
+                if ($flrec) {
+                    $imageID = $flrec->ImageID;
+                    $rec->TimestampCreated = $flrec->TimestampCreated;
+                    $rec->TimestampModified = date('Y-m-d H:i:s');
+                    $rec->GUID = $flrec->GUID;
+                    $rec->Version = $flrec->Version + 1;
+                    $this->updateImage($rec, $imageID);
+                }
+                else {
+                    $rec->TimestampCreated = date('Y-m-d H:i:s');
+                    $rec->TimestampModified = date('Y-m-d H:i:s');
+                    $rec->GUID = UUID::v4();
+                    $rec->Version = 1;
+                    $this->insertImage($rec);
+                }
+                fputcsv($handle, array_values((array) $rec));
             }
         }
-        $this->deleteOldRecords();
+        fclose($handle);
+        //$this->deleteOldRecords();
     }
     
     private function createImageRecord($row) {
@@ -69,7 +74,12 @@ class RoboFlow {
         $rec->Modified = $row['dcterms:modified'];
         $rec->DCType = $row['dcterms:type'];
         $rec->Subtype = ($row['ac:subtype'] == 'Illustration') ? 'Illustration' : 'Photograph';
-        $rec->Caption = (substr($row['ac:caption'], -1) == '.') ? $row['ac:caption'] : $row['ac:caption'] . '.';
+        if ($row['ac:caption']) {
+            $rec->Caption = (substr($row['ac:caption'], -1) == '.') ? $row['ac:caption'] : $row['ac:caption'] . '.';
+        }
+        else {
+            $rec->Caption = null;
+        }
         $rec->SubjectCategory = $row['iptc:CVTerm'];
         $rec->SubjectPart = $row['ac:subjectPart'];
         $rec->SubjectOrientation = $row['ac:subjectOrientation'];
@@ -78,6 +88,9 @@ class RoboFlow {
         $rec->Creator = $row['dcterms:creator'];
         $rec->RightsHolder = $row['dcterms:rightsHolder'];
         $rec->License = $row['dcterms:license'];
+        if (in_array($rec->RightsHolder, array('Royal Botanic Gardens Victoria', 'Royal Botanic Gardens Board'))) {
+            $rec->License = 'CC BY-NC-SA 4.0';
+        }
         $rec->Rights = $row['dc:rights'];
         $rec->ScientificName = Encoding::toUTF8($row['dwc:scientificName']);
         $rec->CatalogNumber = $row['dwc:catalogNumber'];
@@ -87,11 +100,11 @@ class RoboFlow {
         $rec->CountryCode = $row['dwc:countryCode'];
         $rec->StateProvince = $row['dwc:stateProvince'];
         $rec->Locality = $row['dwc:locality'];
-        $rec->Latitude = $row['dwc:decimalLatitude'];
-        $rec->Longitude = $row['dwc:decimalLongitude'];
+        $rec->Latitude = (float) $row['dwc:decimalLatitude'];
+        $rec->Longitude = (float) $row['dwc:decimalLongitude'];
         $rec->PixelXDimension = $row['exif:PixelXDimension'];
         $rec->PixelYDimension = $row['exif:PixelYDimension'];
-        $rec->HeroImage = $row['HeroImage'];
+        $rec->HeroImage = ($row['HeroImage'] == 'true') ? true : false;
         $rec->Rating = $row['xmp:Rating'];
         $rec->ThumbnailUrlEnabled = (isset($row['ThumbnailUrlEnabled']) && strtolower($row['ThumbnailUrlEnabled'])=='true') ? TRUE : FALSE;
         $rec->PreviewUrlEnabled = (isset($row['PreviewUrlEnabled']) && strtolower($row['PreviewUrlEnabled'])=='true') ? TRUE : FALSE;
@@ -118,9 +131,10 @@ class RoboFlow {
         }
     }
     
-    private function findRecord($cumulusRecordID) {
+    private function findRecord($cumulusCatalog, $cumulusRecordID) {
         $this->db->select('ImageID, TimestampCreated, Version, GUID, Modified');
         $this->db->from('cumulus_image');
+        $this->db->where('CumulusCatalogue', $cumulusCatalog);
         $this->db->where('CumulusRecordID', $cumulusRecordID);
         $query = $this->db->get();
         if ($query->num_rows()) {
@@ -129,16 +143,20 @@ class RoboFlow {
     }
     
     private function updateImage($data, $imageID) {
-        $this->db->where('ImageID', $imageID);
-        $this->db->update('cumulus_image', $data);
+        try {
+            $this->db->where('ImageID', $imageID);
+            $this->db->update('cumulus_image', $data);
+        } catch (Exception $exc) {
+            echo $exc->getTraceAsString();
+        }
     }
     
     private function insertImage($data) {
         $this->db->insert('cumulus_image', $data);
     }
     
-    private function deleteOldRecords() {
-        $this->db->where('TimestampModified <', $this->startTime);
+    public function deleteOldRecords($startTime) {
+        $this->db->where('TimestampModified <', $startTime);
         $this->db->delete('cumulus_image');
     }
     
