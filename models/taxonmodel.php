@@ -416,7 +416,7 @@ class TaxonModel extends CI_Model {
     }
     
     public function getImage($guid) {
-        $this->db->select("i.CumulusCatalogue, i.CumulusRecordID, 
+        $this->db->select("lower(i.CumulusCatalogue) as CumulusCatalogue, i.CumulusRecordID, 
             i.PixelXDimension, i.PixelYDimension,
             n.FullName AS ScientificName, if(t.TaxonID!=st.TaxonID, sn.FullName, NULL) AS AsName, 
             i.Subtype, i.Caption, i.SubjectPart, i.Creator, i.RightsHolder, i.License, i.rights,
@@ -500,7 +500,7 @@ class TaxonModel extends CI_Model {
         elseif ($data->License == 'All rights reserved') {
             $license = 'all rights reserved';
         }
-        elseif ($data->SubjectCategory == 'Flora of the Otway Plain and Ranges plate') {
+        elseif ($data->SubjectCategory == 'Flora of the Otway Plain and Ranges Plate') {
             $license = 'not to be reproduced without prior permission from CSIRO Publishing.';
         }
         else {
@@ -513,6 +513,9 @@ class TaxonModel extends CI_Model {
         $caption .= (trim($data->Caption) && $scientificName) ? '. ' : '';
         $caption .= (trim($data->Caption)) ? trim($data->Caption) . ' ' : '';
         $caption .= '<br/>';
+        if ($data->Source) {
+            $caption .= '<b>Source:</b> ' . $data->Source . '<br/>';
+        }
         $caption .= ($data->Subtype === 'Illustration') ? 'Illustration: ' : 'Photo: ';
         $caption .= $data->Creator . ', &copy ' . date('Y') . ' ';
         if ($data->RightsHolder == 'Royal Botanic Gardens Victoria') {
@@ -531,7 +534,7 @@ class TaxonModel extends CI_Model {
     }
     
     public function getHeroImage($nodeNumber, $highestDescendantNodeNumber, $rankID) {
-        $this->db->select('i.GUID, i.CumulusCatalogue, i.CumulusRecordID, i.Subtype, i.PixelXDimension, i.PixelYDimension');
+        $this->db->select('i.GUID, lower(i.CumulusCatalogue) as CumulusCatalogue, i.CumulusRecordID, i.Subtype, i.PixelXDimension, i.PixelYDimension', false);
         $this->db->from('cumulus_image i');
         $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.TaxonID');
         $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');

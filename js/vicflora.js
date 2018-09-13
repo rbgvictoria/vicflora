@@ -6,8 +6,8 @@ if (uri[uri.length - 1].indexOf('?') > -1) {
 var query_string = location.href.substr(location.href.indexOf('?') + 1);
 var qstring;
 
-var thumbnailBaseUrl = 'https://data.rbg.vic.gov.au/images/T/library/';
-var previewBaseUrl = 'https://data.rbg.vic.gov.au/images/P/library/';
+var thumbnailBaseUrl = 'https://data.rbg.vic.gov.au/cip/preview/thumbnail/library/';
+var previewBaseUrl = 'https://data.rbg.vic.gov.au/cip/preview/image/library/';
 
 $(function() {
     if (query_string.indexOf('fq=end_or_higher_taxon%3Aend') !== -1) {
@@ -473,7 +473,6 @@ var getGlossaryDefinition = function(term, container) {
                 img += '<a href="' + previewBaseUrl + thumb.id + '?b=' 
                         + (thumb.width > thumb.height ? thumb.width : thumb.height) 
                         + '" data-size="' + thumb.width + 'x' + thumb.height + '" data-alt="' +  thumb.alt + '" data-caption="' + thumb.caption + '">';
-                //img += '<span><img src="' + thumbnailBaseUrl + thumb.id + '" onload="thumbnails()" /></span>';
                 img += '<i class="fa fa-picture-o fa-2x"></i>';
                 img += '</a>';
                 img += '</span>';
