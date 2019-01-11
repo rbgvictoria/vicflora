@@ -49,7 +49,7 @@ var keyBaseConfig = function() {
 
 
 var showKey = function(keyID) {
-    $('.keybase-link a').attr('href', 'http://keybase.rbg.vic.gov.au/keys/show/' + keyID);
+    $('.keybase-link a').attr('href', 'https://keybase.rbg.vic.gov.au/keys/show/' + keyID);
     var wsUrl = 'https://data.rbg.vic.gov.au/keybase-ws';
 
     $.fn.keybase({
@@ -75,7 +75,7 @@ var showKey = function(keyID) {
         if (keyID.indexOf('/') > -1) {
             keyID = keyID.substr(keyID.lastIndexOf('/') + 1);
         }
-        $('.keybase-link a').attr('href', 'http://keybase.rbg.vic.gov.au/keys/show/' + keyID);
+        $('.keybase-link a').attr('href', 'https://keybase.rbg.vic.gov.au/keys/show/' + keyID);
         $.fn.keybase({
             playerDiv: '#keybase-player',
             key: keyID,
@@ -173,8 +173,7 @@ var getBreadCrumb = function() {
     var crumbs = json.breadcrumbs;
     
     if (tscope.url) {
-        var url = fixUrl(tscope.url);
-        var li = $('<li/>').append('<a href="' + url + '">' + tscope.item_name + '</a>').appendTo($('ol.breadcrumb'));
+        var li = $('<li/>').append('<a href="' + tscope.url + '">' + tscope.item_name + '</a>').appendTo($('ol.breadcrumb'));
     }
     else {
         if (crumbs.length) {
@@ -182,10 +181,6 @@ var getBreadCrumb = function() {
             var li = $('<li/>').append('<a href="' + href + '">' + '<i class="fa fa-arrow-left"></i></a> ' + crumbs[crumbs.length-1].key_name).appendTo($('ol.breadcrumb'));
         }
     }
-};
-
-var fixUrl = function(url) {
-    return url.replace('http://data.rbg.vic.gov.au/vicflora', base_url);
 };
 
 var bracketedKey = function () {
