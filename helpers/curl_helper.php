@@ -16,7 +16,11 @@ if ( ! function_exists('doCurl')) {
         if ($proxy) {
             curl_setopt($ch, CURLOPT_PROXY, "http://10.15.14.4:8080"); 
             curl_setopt($ch, CURLOPT_PROXYPORT, 8080); 
+            curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
         }
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);
         $result = curl_exec($ch);
