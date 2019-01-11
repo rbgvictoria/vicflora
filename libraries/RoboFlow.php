@@ -106,8 +106,8 @@ class RoboFlow {
         $rec->PixelYDimension = $row['exif:PixelYDimension'];
         $rec->HeroImage = ($row['HeroImage'] == 'true') ? true : false;
         $rec->Rating = $row['xmp:Rating'];
-        $rec->ThumbnailUrlEnabled = (isset($row['ThumbnailUrlEnabled']) && strtolower($row['ThumbnailUrlEnabled'])=='true') ? TRUE : FALSE;
-        $rec->PreviewUrlEnabled = (isset($row['PreviewUrlEnabled']) && strtolower($row['PreviewUrlEnabled'])=='true') ? TRUE : FALSE;
+        $rec->ThumbnailUrlEnabled = true;
+        $rec->PreviewUrlEnabled = true;
         $rec->FileFormat = (isset($row['FileFormat'])) ? $row['FileFormat'] : NULL;
         $tax = $this->findTaxon(Encoding::toUTF8($row['dwc:scientificName']));
         if ($tax) {
