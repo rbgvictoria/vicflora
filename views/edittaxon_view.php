@@ -664,28 +664,6 @@
         </div>
     </div>
 
-    <?php if ($type == 'edit'): ?>
-    <!-- Remove from index -->    
-    <div class="edit-form-section clearfix">
-        <div class="col-md-12">
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-10">
-                    <div class="checkbox">
-                        <label>
-                        <?=form_checkbox(array(
-                            'name' => 'do_not_index',
-                            'id' => 'do_not_index',
-                            'value' => '1',
-                            'checked' => ($taxondata['DoNotIndex']) ? 'checked' : FALSE
-                        )); ?>Do not index
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
-    
     <!-- Submit -->
     <div class="edit-form-section clearfix">
         <div class="col-md-12 text-center">
