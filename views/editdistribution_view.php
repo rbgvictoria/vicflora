@@ -83,7 +83,8 @@
                                     'present' => 'present',
                                     'absent' => 'absent',
                                     'extinct' => 'extinct',
-                                    'doubtful' => 'doubtful'
+                                    'doubtful' => 'doubtful',
+                                    'excluded' => 'excluded'
                                 );
                             ?>
                             <table class="bioregions table table-bordered table-condensed">

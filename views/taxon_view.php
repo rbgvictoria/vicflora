@@ -338,7 +338,7 @@
                         <div class="row thumbnail-row">
                         <?php foreach ($images as $image): ?>
                             <figure class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
-                                <a href="<?=$this->config->item('preview_baseurl')?><?= urlencode($image->catalog)?>/<?=$image->id?>?b=<?=$image->b?>" 
+                                <a href="<?=$this->config->item('preview_baseurl')?><?= urlencode($image->catalog)?>/<?=$image->id?>?maxsize=<?=$image->maxsize?>" 
                                    class="thumbnail thumb" data-size="<?=$image->width?>x<?=$image->height?>" 
                                    data-alt="<?=$image->alt?>" data-caption="<?=$image->caption?>">
                                     <span>

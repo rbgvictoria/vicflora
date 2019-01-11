@@ -416,7 +416,7 @@ class TaxonModel extends CI_Model {
     }
     
     public function getImage($guid) {
-        $this->db->select("lower(i.CumulusCatalogue) as CumulusCatalogue, i.CumulusRecordID, 
+        $this->db->select("lower(replace(i.CumulusCatalogue, ' ', '-')) as CumulusCatalogue, i.CumulusRecordID, 
             i.PixelXDimension, i.PixelYDimension,
             n.FullName AS ScientificName, if(t.TaxonID!=st.TaxonID, sn.FullName, NULL) AS AsName, 
             i.Subtype, i.Caption, i.SubjectPart, i.Creator, i.RightsHolder, i.License, i.rights,
@@ -440,7 +440,7 @@ class TaxonModel extends CI_Model {
                 'caption' => $imgCaption->caption,
                 'width' => $imgSize->width,
                 'height' => $imgSize->height,
-                'b' => $imgSize->size
+                'maxsize' => ($row->Subtype === 'Illustration') ? $imgSize->size : 1024
             );
             return $image;
         }
@@ -534,7 +534,7 @@ class TaxonModel extends CI_Model {
     }
     
     public function getHeroImage($nodeNumber, $highestDescendantNodeNumber, $rankID) {
-        $this->db->select('i.GUID, lower(i.CumulusCatalogue) as CumulusCatalogue, i.CumulusRecordID, i.Subtype, i.PixelXDimension, i.PixelYDimension', false);
+        $this->db->select("i.GUID, lower(replace(i.CumulusCatalogue, ' ', '-')) as CumulusCatalogue, i.CumulusRecordID, i.Subtype, i.PixelXDimension, i.PixelYDimension", false);
         $this->db->from('cumulus_image i');
         $this->db->join('vicflora_taxon t', 'i.AcceptedID=t.TaxonID');
         $this->db->join('vicflora_taxontree tt', 't.TaxonID=tt.TaxonID');

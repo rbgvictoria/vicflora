@@ -208,23 +208,15 @@ class Flora extends CI_Controller {
             $vicDist = FALSE;
             if ($this->data['distribution']) {
                 $vicDist = $this->vicDistributionString($this->data['distribution']);
+                $this->data['profileMap'] = $this->profile_map($guid, $this->data['namedata']['RankID'], 'png');
             }
             if ($profile) {
                 $this->data['profileStr'] = $this->formatProfile($guid, $profile[0]['Profile'], $vicDist);
+                $this->data['svg_map'] = $this->map($guid, $this->data['namedata']['RankID']);
+                $this->data['bioregion_legend'] = $this->legendBioregion();
             }
             $this->data['stateDistribution'] = $this->mapmodel->getStateDistribution($guid, $rankID);
             $this->data['stateDistributionMap'] = $this->state_dist_map($guid, $rankID, 'png');
-            /*$this->data['boundingPolygonMap100'] = $this->bounding_polygon_map100($guid, $this->data['namedata']['RankID'], 'png');
-            $this->data['boundingPolygonMap99'] = $this->bounding_polygon_map99($guid, $this->data['namedata']['RankID'], 'png');
-            $this->data['boundingPolygonMap99C'] = $this->bounding_polygon_map99C($guid, $this->data['namedata']['RankID'], 'png');
-            $this->data['boundingPolygonMap80'] = $this->bounding_polygon_map80($guid, $this->data['namedata']['RankID'], 'png');*/
-            $this->data['profileMap'] = $this->profile_map($guid, $this->data['namedata']['RankID'], 'png');
-            $this->data['svg_map'] = $this->map($guid, $this->data['namedata']['RankID']);
-            //$this->data['imageMap'] = $this->imageMap(480);
-            //$this->data['ibra_map'] = $this->ibra_map($guid, $this->data['namedata']['RankID']);
-            $this->data['bioregion_legend'] = $this->legendBioregion();
-            //$this->data['vicgrid_map'] = $this->vicgrid_map($guid, $this->data['namedata']['RankID']);
-            //$this->data['maplink'] = $this->maplink($guid, $this->data['namedata']['RankID']);
         }
         else {
             if ($profile) {
@@ -507,7 +499,7 @@ class Flora extends CI_Controller {
             $query['format'] = 'image/svg';
         }
         $term = ($rankid == 220) ? 'species_id' : 'accepted_name_usage_id';
-        $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');taxon_id='$guid' AND occurrence_status NOT IN ('doubtful', 'absent');INCLUDE;FEAT_CODE IN ('mainland','island');$term='$guid' AND occurrence_status NOT IN ('doubtful', 'absent')");
+        $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');taxon_id='$guid' AND occurrence_status NOT IN ('doubtful', 'absent');INCLUDE;FEAT_CODE IN ('mainland','island');$term='$guid' AND occurrence_status NOT IN ('doubtful', 'absent', 'excluded')");
         
         $qstring = array();
         foreach ($query as $key => $value) {
@@ -538,7 +530,7 @@ class Flora extends CI_Controller {
         $query['srs'] = 'EPSG:4326';
         $query['format'] = 'image/svg';
         $term = ($rankid == 220) ? 'species_id' : 'accepted_name_usage_id';
-        $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');$term='$guid' AND establishment_means NOT IN ('cultivated') AND occurrence_status NOT IN ('doubtful','absent')");
+        $query['cql_filter'] = urlencode("FEAT_CODE IN ('mainland','island');$term='$guid' AND establishment_means NOT IN ('cultivated') AND occurrence_status NOT IN ('doubtful','absent', 'excluded')");
         
         $qstring = array();
         foreach ($query as $key => $value) {

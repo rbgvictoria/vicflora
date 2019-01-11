@@ -20,7 +20,6 @@ class Admin extends CI_Controller {
 
         if (!$this->input->is_cli_request()) {
             $this->load->library('session');
-            $this->output->enable_profiler(true);
         }
         $this->load->helper('url');
         $this->load->helper('form');
@@ -597,7 +596,7 @@ class Admin extends CI_Controller {
                     array(
                         'ProjectsID' => 10,
                         'ItemsID' => $this->keybasemodel->getKeyBaseItemsID($taxon['FullName']),
-                        'Url' => 'http://data.rbg.vic.gov.au/vicflora/flora/taxon/' . $taxon['GUID']
+                        'Url' => 'https://vicflora.rbg.vic.gov.au/flora/taxon/' . $taxon['GUID']
                     ),
                     $this->keybasemodel->getVicFloraData($taxon['GUID'])
                 );

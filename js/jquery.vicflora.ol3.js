@@ -196,6 +196,12 @@ var EditMap = function() {
                     }
                     html += '>doubtful</option>';
                     
+                    html += '<option value="excluded" ';
+                    if (occ === 'excluded') {
+                        html += 'selected';
+                    }
+                    html += '>excluded</option>';
+                    
                     html += '</select>';
                     html += '</td>';
                     
