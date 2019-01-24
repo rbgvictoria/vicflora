@@ -141,7 +141,7 @@ var EditMap = function() {
             var html;
             html = '<h3>Occurrence records</h3>';
             html += '<table class="occurrences-at-point table table-bordered table-condensed">';
-            html += '<tr><th>ALA record number</th><th>Catalogue number</th><th>Longitude</th><th>Latitude</th><th>Bioregion</th><th>Occurrence status</th><th>Establishment means</th></tr>';
+            html += '<tr><th>Catalogue number</th><th>Longitude</th><th>Latitude</th><th>Bioregion</th><th>Occurrence status</th><th>Establishment means</th></tr>';
             
             if (data.length > 0) {
                 $.each(data, function(index, item) {
@@ -150,13 +150,11 @@ var EditMap = function() {
                     var occ = item.occurrence_status !== null ? item.occurrence_status : '';
                     
                     html += '<tr>';
-                    if (!isNaN(item.catalogNumber)) {
-                        html += '<td><a href="http://biocache.ala.org.au/occurrence/' + item.uuid + '" target="_blank">' + item.uuid + '</a></td>';
+                    if (!isNaN(item.catalog_number)) {
                         html += '<td>VBA ' + item.catalog_number + '</td>';
                     }
                     else {
-                        html += '<td><a href="http://avh.ala.org.au/occurrence/' + item.uuid + '" target="_blank">' + item.uuid + '</a></td>';
-                        html += '<td>' + item.catalog_number + '</td>';
+                        html += '<td><a href="https://avh.ala.org.au/occurrences/search?q=' + encodeURIComponent('catalogue_number:"' + item.catalog_number + '"' ) + '#tab_recordsView" target="_blank">' + item.catalog_number + '</a></td>';
                     }
                     html += '<td>' + item.decimal_longitude + '</td>';
                     html += '<td>' + item.decimal_latitude + '</td>';
