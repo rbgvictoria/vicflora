@@ -133,7 +133,7 @@ class FloraModel extends CI_Model {
      * @return array
      */
     protected function getHigherClassification($nodenumber) {
-        $select = "SELECT lower(td.Name) AS Rank, n.Name
+        $select = "SELECT lower(td.Name) AS `Rank`, n.Name
             FROM vicflora_taxon t
             JOIN vicflora_taxontreedefitem td ON t.TaxonTreeDefItemID=td.TaxonTreeDefItemID
             JOIN vicflora_taxontree tt ON t.TaxonID=tt.TaxonID

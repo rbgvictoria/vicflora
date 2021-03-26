@@ -13,7 +13,7 @@ class EditTaxonModel extends TaxonModel {
             t.TaxonID,
             t.TaxonTreeDefItemID,
             t.RankID,
-            td.Name AS Rank,
+            td.Name AS `Rank`,
             t.ParentID,
             pt.GUID AS ParentGUID,
             pt.RankID AS ParentRankID,
@@ -825,6 +825,9 @@ class EditTaxonModel extends TaxonModel {
                     $query = $this->db->get();
                     $row = $query->row();
                     $refid = $row->ProtologueID;
+                    
+                    $this->db->where('NameID', $nameid);
+                    $this->db->delete('vicflora_apni');
 
                     $this->db->where('NameID', $nameid);
                     $this->db->delete('vicflora_name');

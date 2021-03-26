@@ -29,6 +29,16 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <?=form_label('Author role', 'ref_author_role', array('class' => 'col-sm-2 control-label')); ?>
+                    <div class="col-sm-10">
+                        <?=form_dropdown('ref_author_role', array(
+                            '' => '',
+                            'author' => 'Author',
+                            'editor' => 'Editor'
+                        ), $referenceData->AuthorRole); ?>
+                    </div>
+                </div>
+                <div class="form-group">
                     <?=form_label('Publication year', 'ref_publication_year', array('class' => 'col-sm-2 control-label')); ?>
                     <div class="col-sm-10">
                         <?=form_input(array(
@@ -169,9 +179,6 @@
                     </div>
                 </div>
                 <?php endif;?>
-                <div class="form-group text-right">
-                    <button name="save" value="save" type="submit" class="btn btn-default">Save</button>
-                </div>
                 <?php if ($inPublications):?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Includes</label>
@@ -190,6 +197,31 @@
                     </div>
                 </div>
                 <?php endif; ?>
+                <div class="form-group">
+                    <?=form_label('URL', 'ref_url', array('class' => 'col-sm-2 control-label')); ?>
+                    <div class="col-sm-10">
+                        <?=form_input(array(
+                            'name' => 'ref_url',
+                            'id' => 'ref_url',
+                            'class' => 'form-control input-sm',
+                            'value' => $referenceData->URL
+                        )); ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <?=form_label('Date accessed', 'ref_date_accessed', array('class' => 'col-sm-2 control-label')); ?>
+                    <div class="col-sm-10">
+                        <?=form_input(array(
+                            'name' => 'ref_date_accessed',
+                            'id' => 'ref_date_accessed',
+                            'class' => 'form-control input-sm',
+                            'value' => $referenceData->DateAccessed
+                        )); ?>
+                    </div>
+                </div>
+                <div class="form-group text-right">
+                    <button name="save" value="save" type="submit" class="btn btn-default">Save</button>
+                </div>
                 
             <?=form_close()?>
             <?php endif; ?>

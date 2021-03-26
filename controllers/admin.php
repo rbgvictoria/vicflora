@@ -94,7 +94,7 @@ class Admin extends CI_Controller {
                 $this->mapupdatemodel->updateTaxon($guid);
                 if ($update) {
                     $this->load->model('keybaseupdatemodel');
-                    $this->keybaseupdatemodel->updateProjectItem($guid);
+                    //$this->keybaseupdatemodel->updateProjectItem($guid);
                     $this->load->model('mapupdatemodel');
                     $this->mapupdatemodel->updateTaxon($guid);
                     if (count($update) == 1) {
@@ -143,10 +143,10 @@ class Admin extends CI_Controller {
         if ($this->input->post('submit')) {
             $newguid = $this->taxonmodel->updateTaxon($guid);
             if ($newguid) {
-                $this->load->model('keybaseupdatemodel');
-                $this->keybaseupdatemodel->updateProjectItem($newguid[0]);
+                //$this->load->model('keybaseupdatemodel');
+                //$this->keybaseupdatemodel->updateProjectItem($newguid[0]);
                 $this->load->model('mapupdatemodel');
-                $this->mapupdatemodel->updateTaxa($newguid[0]);
+                $this->mapupdatemodel->updateTaxon($newguid[0]);
                 $this->load->model('solrmodel');
                 $this->solrmodel->updateDocument($newguid[0]);
             }
@@ -161,9 +161,9 @@ class Admin extends CI_Controller {
     public function deletetaxon($guid=FALSE) {
         if (!$guid)
             redirect(base_url());
-        if (!isset($this->session->userdata['id']) || $this->session->userdata['id'] != 1 )
+        if (!$this->input->is_cli_request()) {
             redirect($_SERVER['HTTP_REFERER']);
-        
+        }
         $this->load->model('edittaxonmodel', 'taxonmodel');
         $this->taxonmodel->deleteTaxon($guid);
         
@@ -587,42 +587,21 @@ class Admin extends CI_Controller {
         $this->load->view('ala_matched_names_view', $this->data);
     }
     
-    public function keybase_update($update=FALSE) {
-        $this->load->model('keybasemodel');
-        $missing = $this->keybasemodel->getMissingTaxa();
-        if ($update) {
-            foreach ($missing as $taxon) {
-                $data = array_merge(
-                    array(
-                        'ProjectsID' => 10,
-                        'ItemsID' => $this->keybasemodel->getKeyBaseItemsID($taxon['FullName']),
-                        'Url' => 'https://vicflora.rbg.vic.gov.au/flora/taxon/' . $taxon['GUID']
-                    ),
-                    $this->keybasemodel->getVicFloraData($taxon['GUID'])
-                );
-                $this->keybasemodel->insertKeyBaseProjectItem($data);
-            }
-            $missing = $this->keybasemodel->getMissingTaxa();
-        }
-        $this->data['missing_taxa'] = $missing;
-        $this->data['not_in_keys'] = $this->keybasemodel->getNotKeyedOutItems();
-        if (!$this->input->is_cli_request()) {
-            $this->load->view('keybase_update_view', $this->data);
-        }
-    }
-    
     public function update_taxon_tree() {
         if (!$this->input->is_cli_request() ) {
             show_error('You don\'t have access to this page.', 403);
         }
+        echo "Update taxon tree started: " . date('Y-m-d H:i:s') . "\n";
         $this->load->library('VicFloraTaxonTree');
         $this->vicflorataxontree->updateTaxonTree();
+        echo "Update taxon tree completed: " . date('Y-m-d H:i:s') . "\n\n";
     }
     
     public function update_solr_index($id=false) {
         if (!$this->input->is_cli_request() ) {
             show_error('You don\'t have access to this page.', 403);
         }
+        echo "Update SOLR index started: " . date('Y-m-d H:i:s') . "\n";
         $this->load->model('solrmodel');
         if ($id) {
             $this->solrmodel->updateDocument($id);
@@ -631,12 +610,14 @@ class Admin extends CI_Controller {
             $this->solrmodel->updateAll();
         }
         $this->solr_unindex();
+        echo "Update SOLR index completed: " . date('Y-m-d H:i:s') . "\n\n";
     }
     
     public function update_cumulus_images($date=FALSE) {
         if (!$this->input->is_cli_request() ) {
             show_error('You don\'t have access to this page.', 403);
         }
+        echo "Update Cumulus images started: " . date('Y-m-d H:i:s') . "\n";
         $dir = getcwd() . '/roboflow';
         $library = array();
         $vcsb = array();
@@ -679,12 +660,14 @@ class Admin extends CI_Controller {
         $this->roboflow->update($dir . '/' . $vcsb[0]['filename']);
         
         $this->roboflow->deleteOldRecords($startTime);
+        echo "Update Cumulus images completed: " . date('Y-m-d H:i:s') . "\n\n";
     }
     
     public function update_maps($from=FALSE, $pageSize=1000, $start=0) {
         if (!$this->input->is_cli_request() ) {
             show_error('You don\'t have access to this page.', 403);
         }
+        echo "Update maps started: " . date('Y-m-d H:i:s') . "\n";
         set_time_limit(0);
         if (!$from) {
             $date = new DateTime();
@@ -696,30 +679,27 @@ class Admin extends CI_Controller {
         $startTime = date('Y-m-d H:i:s');
         $numLoaded = $this->vicfloramap->updateOccurrences($from, $pageSize, $start);
         $endTime = date('Y-m-d H:i:s');
+        echo "Update maps completed: " . date('Y-m-d H:i:s') . "\n\n";
     }
     
-    public function update_keybase($from=FALSE) {
+    public function update_keybase() {
         if (!$this->input->is_cli_request() ) {
             show_error('You don\'t have access to this page.', 403);
         }
-        if ($from) {
-            try {
-                $dt = new DateTime($from);
-                $from = date('Y-m-d H:i:s', $dt->getTimestamp());
-            } catch (Exception $exc) {
-                exit($exc->getTraceAsString());
-            }
-        }
+        echo "Update KeyBase started: " . date('Y-m-d H:i:s') . "\n";
         $this->load->model('keybaseupdatemodel');
-        $this->keybaseupdatemodel->updateKeyBaseProject($from);
+        $this->keybaseupdatemodel->updateKeyBaseProject();
+        echo "Update KeyBase completed: " . date('Y-m-d H:i:s') . "\n\n";
     }
     
     public function update_map_taxa($from=FALSE) {
         if ($from) {
             $from = $this->checkDate($from);
         }
+        echo "Update map taxa started: " . date('Y-m-d H:i:s') . "\n";
         $this->load->model('mapupdatemodel');
         $this->mapupdatemodel->updateTaxa($from);
+        echo "Update map taxa completed: " . date('Y-m-d H:i:s') . "\n\n";
     }
     
     public function refresh_outliers() {

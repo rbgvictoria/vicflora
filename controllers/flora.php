@@ -24,27 +24,6 @@ class Flora extends CI_Controller {
         $this->load->view('home_view', $this->data);
     }
     
-    public function about() {
-        $this->session->unset_userdata('last_search');
-        $this->load->model('staticpagesmodel');
-        $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent('about');
-        $this->load->view('staticview', $this->data);
-    }
-    
-    public function help() {
-        $this->session->unset_userdata('last_search');
-        $this->load->model('staticpagesmodel');
-        $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent('help');
-        $this->load->view('staticview', $this->data);
-    }
-    
-    public function acknowledgements() {
-        $this->session->unset_userdata('last_search');
-        $this->load->model('staticpagesmodel');
-        $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent('acknowledgements');
-        $this->load->view('staticview', $this->data);
-    }
-    
     public function search() {
         $this->load->model('solrmodel');
         $this->data['solrresult'] = $this->solrmodel->solrSearch();
@@ -157,6 +136,9 @@ class Flora extends CI_Controller {
         if (!$guid)
             redirect(base_url());
         
+        $this->data['js'][] = base_url() . autoVersion('js/vicflora-images.js');
+        $this->data['js'][] = base_url() . autoVersion('js/vicflora-specimen-images.js');
+        
         if (isset($_SERVER['HTTP_REFERER']) && preg_match('/\/search\??/', $_SERVER['HTTP_REFERER'])) {
             $this->session->unset_userdata('last_search');
             $this->session->set_userdata('last_search', $_SERVER['HTTP_REFERER']); 
@@ -170,6 +152,7 @@ class Flora extends CI_Controller {
         
         $this->data['images'] = array();
         $this->data['heroImage'] = FALSE;
+        $this->data['specimenImageCount'] = FALSE;
         if ($this->data['namedata']['TaxonomicStatus'] == 'accepted' &&
                 $rankID > 0) {
             $this->data['breadcrumbs'] = $this->taxonmodel->getClassificationBreadCrumbs($nodeNumber);
@@ -178,6 +161,8 @@ class Flora extends CI_Controller {
             if ($rankID >= 140) {
                 $this->data['images'] = $this->taxonmodel->getThumbnails($nodeNumber, $highestDescendantNodeNumber, $rankID);
                 $this->data['heroImage'] = $this->taxonmodel->getHeroImage($nodeNumber, $highestDescendantNodeNumber, $rankID);
+                $this->load->model('webservicemodel');
+                $this->data['specimenImageCount'] = $this->webservicemodel->getSpecimenImageCount($nodeNumber, $highestDescendantNodeNumber);
             }
         }
         
@@ -225,6 +210,11 @@ class Flora extends CI_Controller {
         }
         
         $this->load->view('taxon_view', $this->data);
+    }
+    
+    public function specimen_image_viewer($uuid)
+    {
+        $this->load->view('specimen_image_viewer_view', array('uuid' => $uuid));
     }
     
     private function formatProfile($taxonID, $profile, $vicDist=FALSE) {
@@ -827,24 +817,6 @@ class Flora extends CI_Controller {
         return $url . '?' . $qstring;
     }
     
-    public function bioregions() {
-        $this->load->model('staticpagesmodel');
-        $uri = substr($this->uri->uri_string(), strlen('flora/bioregions/'));
-        if ($uri) {
-            //$this->session->unset_userdata('last_search');
-            $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent('bioregions/' . $uri);
-            $this->load->view('staticview', $this->data);
-        }
-        else {
-            $this->data['map'] = $this->bioregion_map();
-            $this->load->model('mapmodel');
-            $this->data['bioregions'] = $this->mapmodel->getBioregions();
-            $this->data['legend'] = $this->legendBioregion('bioregion');
-            $this->data['staticcontent'] = $this->staticpagesmodel->getStaticContent('bioregions');
-            $this->load->view('bioregions_view', $this->data);
-        }
-    }
-    
     public function bioregion_map() {
         $url = $this->config->item('geoserver_url') . "/vicflora/wms";
         $query = array();
@@ -870,7 +842,6 @@ class Flora extends CI_Controller {
         //return $svg;
         return $url . '?' . $qstring;
     }
-        
 
     private function legendBioregion($fill=FALSE) {
         $geoserverurl = 'http://10.15.15.107:65002/geoserver';

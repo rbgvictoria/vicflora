@@ -366,6 +366,14 @@ class Ajax extends CI_Controller {
         $json = json_encode($records);
         echo $json;
     }
+    
+    public function specimen_image_thumbnails($taxonId)
+    {
+        $this->load->model('taxonmodel');
+        $data = $this->taxonmodel->getNode($taxonId);
+        print_r($data);
+    }
+
 
 }
 

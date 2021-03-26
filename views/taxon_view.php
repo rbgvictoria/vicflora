@@ -139,6 +139,9 @@
                         'CR' => 'critically endangered (CR)',
                         'EN' => 'endangered (EN)',
                         'VU' => 'vulnerable (VU)',
+                        '(CR)' => 'critically endangered (CR)',
+                        '(EN)' => 'endangered (EN)',
+                        '(VU)' => 'vulnerable (VU)'
                     );
 
                     $threatStatus = array();
@@ -191,6 +194,9 @@
                 <?php endif; ?>
                 <?php if ($images): ?>
                     <li role="presentation"><a href="#tab-images" aria-controls="images" role="tab" data-toggle="tab">Images</a></li>
+                <?php endif; ?>
+                <?php if ($specimenImageCount): ?>
+                    <li role="presentation"><a href="#tab-specimen-images" aria-controls="specimen-images" role="tab" data-toggle="tab">Specimen Images</a></li>
                 <?php endif; ?>
                 <?php if ($distribution): ?>
                     <li role="presentation"><a href="#tab-distribution" aria-controls="distribution" role="tab" data-toggle="tab">Distribution</a></li>
@@ -279,20 +285,20 @@
                                 $width = $heroImage->PixelXDimension;
                                 $height = $heroImage->PixelYDimension;
                                 if ($heroImage->Subtype == 'Illustration') {
-                                    $width = $width / 2;
-                                    $height = $height / 2;
+                                    $width = round($width / 2);
+                                    $height = round($height / 2);
                                 }    
 
                                 if ($width > $height) {
                                     if ($width > 512) {
-                                        $height = $height * (512 / $width);
+                                        $height = round($height * (512 / $width));
                                         $width = 512;
                                     }
                                     $size = $width;
                                 }
                                 else {
                                     if ($height > 512) {
-                                        $width = $width * (512 / $height);
+                                        $width = round($width * (512 / $height));
                                         $height = 512;
                                     }
                                     $size = $height;
@@ -303,7 +309,7 @@
                                     <div>
                                         <div class="image-box">
                                             <div class="content">
-                                                <img class="img-responsive" src="<?=$this->config->item('preview_baseurl')?><?= urlencode($heroImage->CumulusCatalogue)?>/<?=$heroImage->CumulusRecordID?>?b=<?=$size?>"
+                                                <img class="img-responsive" src="<?=$this->config->item('preview_baseurl')?><?= urlencode($heroImage->CumulusCatalogue)?>/<?=$heroImage->CumulusRecordID?>?maxsize=<?=$size?>"
                                                      alt="Hero image" />
                                             </div>
                                         </div>
@@ -349,6 +355,35 @@
                         <?php endforeach; ?>
                         </div>
                     </div>
+                    <?php endif; ?>
+
+                    <?php if ($specimenImageCount): ?>
+                    <div id="tab-specimen-images" role="tabpanel" class="tab-pane section images">
+                        <div class="row thumbnail-row"></div>
+                        <button id="showMoreImages" 
+                                type="button" 
+                                class="btn btn-primary" 
+                                data-taxon-id="<?=$namedata['GUID']?>" 
+                                data-limit="12" 
+                                data-offset="0">
+                            Show more images
+                        </button>
+                    </div>
+                        
+                        
+                    <div class="modal fade" id="specimenImageModal" tabindex="-1" role="dialog" aria-labelledby="specimenImageModal">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Specimen image</h4>
+                            </div>
+                          <div class="modal-body">
+                            <iframe src=""></iframe>
+                          </div>
+                        </div>
+                      </div>
+                    </div>                        
                     <?php endif; ?>
 
                     <?php if ($classification || $subordinates): ?>
@@ -448,7 +483,7 @@
                                     <figure class="distribution-map-frame">
                                         <div id="svg-avhdistribution"></div>
                                         <div class="legend">
-                                            <button class="btn btn-primary btn-sm"><i class="fa fa-bars fa-lg"></i></button>
+                                            <button class="btn btn-primary btn-sm"><span title="Legend"><i class="fa fa-bars fa-lg"></i></span></button>
                                             <img src="<?=base_url()?>images/vicflora-map-legend.png" alt="" />
                                             <i class="fa fa-remove"></i>
                                         </div>

@@ -28,11 +28,14 @@ class GlossaryModel extends CI_Model {
     
     public function getGlossaryImages($term) {
         $ret = array();
-        $this->db->select('i.GUID, i.CumulusRecordID, i.PixelXDimension, i.PixelYDimension, i.Caption,'
-                . 'i.Creator, i.RightsHolder, i.License');
+        $this->db->select('i.uid as GUID, i.cumulus_record_id as CumulusRecordID, '
+                . 'i.pixel_x_dimension as PixelXDimension, '
+                . 'i.pixel_y_dimension as PixelYDimension, '
+                . 'i.caption as Caption,'
+                . "i.creator as Creator, 'Royal Botanic Gardens Board' as RightsHolder, i.license AS License", false);
         $this->db->from('keybase_glossary.term t');
         $this->db->join('glossaryterm_image gi', 't.TermID=gi.TermID');
-        $this->db->join('cumulus_image i', 'gi.ImageID=i.ImageID');
+        $this->db->join('cumulus_images_cip i', 'gi.uid=i.uid');
         $this->db->where('t.GlossaryID', 4);
         $this->db->where('t.Name', $term);
         $query = $this->db->get();

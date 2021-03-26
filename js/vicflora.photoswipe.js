@@ -23,7 +23,7 @@ var swipe = function() {
     var $pswp = $('.pswp')[0];
     var image = [];
     
-    $('.thumbnail-row, .glossary-image-gallery').each( function() {
+    $('#tab-images .thumbnail-row, .glossary-image-gallery').each( function() {
         var $pic     = $(this);
         
         var getItems = function() {

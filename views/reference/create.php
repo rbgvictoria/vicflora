@@ -154,15 +154,37 @@
             <div class="text-right">
                 <?=anchor(site_url() . 'reference/create/', 'New reference', array('class' => 'btn btn-default btn-sm', 'target' => '_blank')); ?>
             </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label"></label>
-                    <div class="col-sm-10">
-                        <div id="reference-list" class="form-control-static"></div>
-                    </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-10">
+                    <div id="reference-list" class="form-control-static"></div>
                 </div>
-                <div class="text-right">
-                    <button name="save" value="save" type="submit" class="btn btn-default">Save</button>
+            </div>
+            <div class="form-group">
+                <?=form_label('URL', 'ref_url', array('class' => 'col-sm-2 control-label')); ?>
+                <div class="col-sm-10">
+                    <?=form_input(array(
+                        'name' => 'ref_url',
+                        'id' => 'ref_url',
+                        'class' => 'form-control input-sm',
+                        'value' => false
+                    )); ?>
                 </div>
+            </div>
+            <div class="form-group">
+                <?=form_label('Date accessed', 'ref_date_accessed', array('class' => 'col-sm-2 control-label')); ?>
+                <div class="col-sm-10">
+                    <?=form_input(array(
+                        'name' => 'ref_date_accessed',
+                        'id' => 'ref_date_accessed',
+                        'class' => 'form-control input-sm',
+                        'value' => false
+                    )); ?>
+                </div>
+            </div>
+            <div class="text-right">
+                <button name="save" value="save" type="submit" class="btn btn-default">Save</button>
+            </div>
                 
             <?=form_close()?>
 

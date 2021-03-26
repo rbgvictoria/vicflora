@@ -24,7 +24,8 @@ class ReferenceModel extends CI_Model {
                 );
             }
         }
-        return $this->db->last_query();
+        //return $this->db->last_query();
+        return $ret;
     }
     
     public function getReferenceData($id) {
@@ -46,9 +47,14 @@ class ReferenceModel extends CI_Model {
         $query = $this->db->get();
         if ($query->num_rows()) {
             $row = $query->row();
+            $label = $row->Author;
+            if ($row->AuthorRole == 'editor') {
+                $label .= ' (ed.) ';
+            }
+            $label .= ' (' . $row->PublicationYear . ')';
             return (object) array(
                 'value' => $row->ReferenceID,
-                'label' => $row->Author . ' (' . $row->PublicationYear . ')',
+                'label' => $label,
                 'description' => $this->compileDescription($row)
             );
         }
@@ -66,9 +72,14 @@ class ReferenceModel extends CI_Model {
             $ret = array();
             foreach ($query->result() as $row) {
                 $row->InPublicationID = NULL;
+                $label = $row->Author;
+                if ($row->AuthorRole == 'editor') {
+                    $label .= ' (ed.)';
+                }
+                $label .= ' (' . $row->PublicationYear . ')';
                 $ret[] = (object) array(
                     'value' => $row->ReferenceID,
-                    'label' => $row->Author . ' (' . $row->PublicationYear . ')',
+                    'label' => $label,
                     'description' => $this->compileDescription($row)
                 );
             }
@@ -200,15 +211,15 @@ class ReferenceModel extends CI_Model {
     }
     
     private function basicQuery() {
-        $this->db->select('r.ReferenceID, r.Version, r.Author, r.PublicationYear, 
+        $this->db->select('r.ReferenceID, r.Version, r.Author, r.AuthorRole, r.PublicationYear, 
             r.Title, r.JournalOrBook, r.Series, r.Edition, r.Volume, r.Part,
-            r.Page, r.Publisher, r.PlaceOfPublication, r.InPublicationID');
+            r.Page, r.Publisher, r.PlaceOfPublication, r.InPublicationID, r.URL, r.DateAccessed');
         $this->db->from('vicflora_reference r');
         $this->db->join('vicflora_reference ir', 'r.InPublicationID=ir.ReferenceID', 'left');
     }
     
     private function inPublicationSelect() {
-        $this->db->select('ir.Author as InAuthor, ir.PublicationYear AS InPublicationYear, 
+        $this->db->select('ir.Author as InAuthor, ir.AuthorRole as InAuthorRole, ir.PublicationYear AS InPublicationYear, 
             ir.Title AS InTitle, ir.JournalOrBook AS InJournalOrBook, ir.Series AS InSeries,
             ir.Edition AS InEdition, ir.Volume AS InVolume, ir.Part AS InPart,
             ir.Page AS InPage, ir.Publisher AS InPublisher, 
@@ -249,6 +260,13 @@ class ReferenceModel extends CI_Model {
             }
             $desc .= $this->compileInDescription($data);
         }
+        if ($data->URL) {
+            $desc .= '. ';
+            $desc .= "<a href=\"$data->URL\" target=\"_blank\">$data->URL</a>";
+            if ($data->DateAccessed) {
+                $desc .= " [Date accessed: " . date('j F Y', strtotime($data->DateAccessed)) . ']';
+            }
+        }
         $desc .= '.';
         return $desc;
     }
@@ -256,7 +274,11 @@ class ReferenceModel extends CI_Model {
     private function compileInDescription($data) {
         $desc = 'in: ';
         if ($data->InAuthor) {
-            $desc .= $data->InAuthor . ', ';
+            $desc .= $data->InAuthor;
+            if ($data->InAuthorRole == 'editor') {
+                $desc .= ' (ed.)';
+            }
+            $desc .= ', ';
         }
        $desc .= preg_replace('/~([^~]*)~/', '<i>$1</i>' , $data->InTitle) . ', ';
         if ($data->InPublisher || $data->InPlaceOfPublication) {

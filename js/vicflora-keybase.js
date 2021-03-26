@@ -56,7 +56,8 @@ var showKey = function(keyID) {
         baseUrl: wsUrl + "/ws/key_get",
         playerDiv: '#keybase-player',
         key: keyID,
-        title: false,
+        title: true,
+        keyTitle: keybaseTitleDisplay,
         reset: true,
         resizePlayerWindow: resizePlayerWindow,
         remainingItemsDisplay: remainingItemsDisplay,
@@ -190,7 +191,7 @@ var bracketedKey = function () {
 };
 
 var keybaseTitleDisplay = function(json) {
-    var title = json.key_name;
+    var title = json.key_title;
     $('.key-title').html(title);
 };
 

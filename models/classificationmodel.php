@@ -7,7 +7,7 @@ class ClassificationModel extends CI_Model {
     }
     
     public function getCurrentTaxon($guid) {
-        $this->db->select('t.GUID, td.Name AS Rank, n.FullName, IF(t.RankID>=140, n.Author, NULL) AS Author, tt.Depth, t.RankID', FALSE);
+        $this->db->select('t.GUID, td.Name AS `Rank`, n.FullName, IF(t.RankID>=140, n.Author, NULL) AS Author, tt.Depth, t.RankID', FALSE);
         $this->db->from('vicflora_taxon t');
         $this->db->join('vicflora_name n', 't.NameID=n.NameID');
         $this->db->join('vicflora_taxontreedefitem td', 't.TaxonTreeDefItemID=td.TaxonTreeDefitemID');
@@ -28,7 +28,7 @@ class ClassificationModel extends CI_Model {
         $query = $this->db->get();
         if ($query->num_rows()) {
             $row = $query->row();
-            $this->db->select('t.GUID, td.Name AS Rank, n.FullName, 
+            $this->db->select('t.GUID, td.Name AS `Rank`, n.FullName, 
                 IF(t.RankID>=140, n.Author, NULL) AS Author, tt.Depth, t.RankID', FALSE);
             $this->db->from('vicflora_taxon t');
             $this->db->join('vicflora_name n', 't.NameID=n.NameID');
@@ -49,7 +49,7 @@ class ClassificationModel extends CI_Model {
     }
     
     public function getChildren($guid) {
-        $this->db->select('t.GUID, td.Name AS Rank, n.FullName, IF(t.RankID>=140, n.Author, NULL) AS Author, tt.Depth, t.RankID',
+        $this->db->select('t.GUID, td.Name AS `Rank`, n.FullName, IF(t.RankID>=140, n.Author, NULL) AS Author, tt.Depth, t.RankID',
                 FALSE);
         $this->db->from('vicflora_taxon t');
         $this->db->join('vicflora_name n', 't.NameID=n.NameID');

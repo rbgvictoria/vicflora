@@ -41,6 +41,7 @@ class SolrModel extends CI_Model {
             'occurrence_status',
             'establishment_means',
             'threat_status',
+            'class',
             'subclass',
             'superorder',
             'order',
@@ -555,6 +556,10 @@ class SolrModel extends CI_Model {
             'itemlabels' => array('L' => 'Listed'),
         );
         
+        $this->facet_config['class'] = array(
+            'label' => 'Class',
+        );
+        
         $this->facet_config['subclass'] = array(
             'label' => 'Subclass',
         );
@@ -825,7 +830,7 @@ class SolrModel extends CI_Model {
     }
     
     private function higherClassification($nodenumber) {
-        $select = "SELECT lower(td.Name) AS Rank, n.Name
+        $select = "SELECT lower(td.Name) AS `Rank`, n.Name
             FROM vicflora_taxon t
             JOIN vicflora_taxontreedefitem td ON t.TaxonTreeDefItemID=td.TaxonTreeDefItemID
             JOIN vicflora_taxontree tt ON t.TaxonID=tt.TaxonID
@@ -1010,13 +1015,13 @@ class SolrModel extends CI_Model {
     
     private function media($id) {
         $ret = array();
-        $select = "SELECT t.taxonID, count(IF(i.Subtype='Illustration', 1, NULL)) AS numIllustrations,
-                  count(IF(i.Subtype='Photograph', 1, NULL)) AS numPhotographs
+        $select = "SELECT t.taxonID, count(IF(i.subtype='Illustration', 1, NULL)) AS numIllustrations,
+                  count(IF(i.subtype='Photograph', 1, NULL)) AS numPhotographs
                 FROM vicflora_taxon t
                 JOIN vicflora_name n ON t.NameID=n.NameID
                 LEFT JOIN vicflora_taxon ct ON t.TaxonID=ct.ParentID AND t.RankID=220
                 LEFT JOIN vicflora_name cn ON ct.NameID=cn.NameID
-                LEFT JOIN cumulus_image i ON coalesce(t.TaxonID, ct.TaxonID)=i.TaxonID AND PixelXDimension>0
+                LEFT JOIN cumulus_images_cip i ON coalesce(t.TaxonID, ct.TaxonID)=i.taxon_id AND pixel_x_dimension>0
                 WHERE t.GUID='$id' OR ct.GUID='$id'
                 GROUP BY t.TaxonID";
         $query = $this->db->query($select);

@@ -48,10 +48,10 @@
             $license = 'All rights reserved';
         }
         elseif ($image->SubjectCategory == 'Flora of the Otway Plain and Ranges plate') {
-            $license = 'not to be reproduced without prior permission from CSIRO Publishing.';
+            $license = 'Not to be reproduced without prior permission from CSIRO Publishing.';
         }
         else {
-            $license = anchor('https://creativecommons.org/licenses/by/4.0', 'CC BY 4.0');
+            $license = anchor('https://creativecommons.org/licenses/by-nc-sa/4.0', 'CC BY-NC-SA 4.0');
         }
         
         /*switch ($image->License) {

@@ -89,13 +89,13 @@
                     <li><a href="<?=site_url()?>flora/key/1903" class="colorbox_mainkey">Keys</a></li>
                     <li><a href="<?=site_url()?>flora/checklist">Checklists</a></li>
                     <li><a href="<?=site_url()?>flora/glossary">Glossary</a></li>
-                    <li><a href="<?=site_url()?>flora/bioregions">Bioregions & Vegetation</a></li>
+                    <li><a href="<?=site_url()?>static/bioregions">Bioregions & Vegetation</a></li>
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Help <span class="caret"></span></a>
                       <ul class="dropdown-menu" role="menu">
-                        <li><a href="<?=site_url()?>flora/help">Help</a></li>
-                        <li><a href="<?=site_url()?>flora/about">About</a></li>
-                        <li><a href="<?=site_url()?>flora/acknowledgements">Acknowledgements</a></li>
+                        <li><a href="<?=site_url()?>static/help">Help</a></li>
+                        <li><a href="<?=site_url()?>static/about">About</a></li>
+                        <li><a href="<?=site_url()?>static/acknowledgements">Acknowledgements</a></li>
                       </ul>
                     </li>
                   </ul>

@@ -42,9 +42,9 @@ class StaticPagesModel extends CI_Model {
     }
     
     public function getHomepageImages() {
-        $this->db->select('CumulusRecordID, Caption, Creator, RightsHolder, License');
-        $this->db->from('cumulus_image');
-        $this->db->where('SubjectCategory','Flora of Victoria Plate');
+        $this->db->select('cumulus_record_id as CumulusRecordID, Caption, Creator, copyright_owner as RightsHolder, License');
+        $this->db->from('cumulus_images_cip');
+        $this->db->where('subject_category','Flora of Victoria Plate');
         $this->db->order_by('RAND()');
         $this->db->limit(6);
         $query = $this->db->get();

@@ -6,8 +6,8 @@ if (uri[uri.length - 1].indexOf('?') > -1) {
 var query_string = location.href.substr(location.href.indexOf('?') + 1);
 var qstring;
 
-var thumbnailBaseUrl = 'https://data.rbg.vic.gov.au/cip/preview/thumbnail/library/';
-var previewBaseUrl = 'https://data.rbg.vic.gov.au/cip/preview/image/library/';
+var thumbnailBaseUrl = 'https://data.rbg.vic.gov.au/cip/preview/thumbnail/public/';
+var previewBaseUrl = 'https://data.rbg.vic.gov.au/cip/preview/image/public/';
 
 $(function() {
     if (query_string.indexOf('fq=end_or_higher_taxon%3Aend') !== -1) {
@@ -212,13 +212,6 @@ $(function() {
     if (uri.indexOf('glossary') > -1) {
         glossary();
     }
-    
-    /*
-     * Thumbnails
-     */
-    $('a[data-toggle=tab][aria-controls=images]').on('shown.bs.tab', function(e) {
-        thumbnails();
-    });
     
     /*
      * Hero image
@@ -810,30 +803,6 @@ function symbols() {
         });
     }
 }
-
-var thumbnails = function() {
-    var thumbnailWidth = $('.thumbnail').width();
-    $('.thumbnail').css('height', (thumbnailWidth + 10) + 'px');
-    $('.thumb span').width(thumbnailWidth);
-    $('.thumb span').height(thumbnailWidth);
-
-    $('.thumbnail img').each(function() {
-        var imgWidth = $(this).width();
-        var imgHeight = $(this).height();
-
-        if (imgWidth > thumbnailWidth || imgHeight > thumbnailWidth) {
-            if (imgWidth > imgHeight) {
-                var displayHeight = imgHeight * (thumbnailWidth / imgWidth);
-                var displayWidth = thumbnailWidth;
-            }
-            else {
-                var displayWidth = imgWidth * (thumbnailWidth / imgHeight);
-                var displayHeight = thumbnailWidth;
-            }
-            $(this).css({'width': displayWidth + 'px', 'height': displayHeight + 'px'});
-        }
-    });
-};
 
 /*
 (function( $ ) {

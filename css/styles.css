@@ -3206,7 +3206,7 @@ tbody.collapse.in {
   margin-left: 2px;
   vertical-align: middle;
   border-top: 4px dashed;
-  border-top: 4px solid \9;
+  border-top: 4px solid \9 ;
   border-right: 4px solid transparent;
   border-left: 4px solid transparent; }
 
@@ -3311,7 +3311,7 @@ tbody.collapse.in {
 .navbar-fixed-bottom .dropdown .caret {
   border-top: 0;
   border-bottom: 4px dashed;
-  border-bottom: 4px solid \9;
+  border-bottom: 4px solid \9 ;
   content: ""; }
 .dropup .dropdown-menu,
 .navbar-fixed-bottom .dropdown .dropdown-menu {
@@ -6849,7 +6849,7 @@ limitations under the License.
     padding-right: 2px; }
   .row.thumbnail-row .thumbnail {
     width: 100%;
-    height: 160px;
+    /*height: 160px;*/
     margin-left: 2px;
     margin-right: 2px;
     overflow: hidden;
@@ -7333,5 +7333,14 @@ limitations under the License.
 .keybase-bracketed-key .keybase-to-item {
   display: inline-block;
   float: right; }
+
+#specimenImageModal .modal-dialog {
+  width: 90%;
+  height: 90%; }
+#specimenImageModal .modal-content, #specimenImageModal .modal-body, #specimenImageModal iframe {
+  width: 100%;
+  height: 100%; }
+#specimenImageModal .modal-body {
+  height: 90%; }
 
 /*# sourceMappingURL=styles.css.map */
